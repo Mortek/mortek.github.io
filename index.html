@@ -35,7 +35,8 @@
     align-items: center;
     justify-content: center;
     padding: 60px 24px;
-    max-width: 600px;
+    max-width: 620px;
+    width: 100%;
     text-align: center;
   }
   .icon {
@@ -79,10 +80,12 @@
   .features {
     margin-top: 64px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     width: 100%;
-    max-width: 560px;
+  }
+  @media (max-width: 480px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
   }
   .feature {
     background: #1E1E22;
@@ -91,7 +94,7 @@
     border: 1px solid #2A2A30;
   }
   .feature .emoji { font-size: 1.8em; margin-bottom: 8px; }
-  .feature p { font-size: 0.85em; color: #888890; margin-top: 4px; }
+  .feature p { font-size: 0.82em; color: #888890; margin-top: 4px; line-height: 1.4; }
   .feature strong { color: #e0e0e0; font-size: 0.95em; }
   footer {
     width: 100%;
@@ -126,22 +129,32 @@
     <div class="feature">
       <div class="emoji">🖥️</div>
       <strong>18 Upgrades</strong>
-      <p>From GPU rigs to the Omniminer</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">🏆</div>
-      <strong>Leaderboards</strong>
-      <p>Compete via Google Play Games</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">💎</div>
-      <strong>Artifacts</strong>
-      <p>6 rarities with unique stat rolls</p>
+      <p>From GPU rigs to the Omniminer — mine even while you're away</p>
     </div>
     <div class="feature">
       <div class="emoji">🔁</div>
       <strong>Prestige & Ascend</strong>
-      <p>Reset for massive multipliers</p>
+      <p>Reset for massive multipliers and unlock meta-progression</p>
+    </div>
+    <div class="feature">
+      <div class="emoji">💎</div>
+      <strong>Artifacts</strong>
+      <p>Build your rig with 6 rarity artifact drops and unique stat rolls</p>
+    </div>
+    <div class="feature">
+      <div class="emoji">🏆</div>
+      <strong>Leaderboards</strong>
+      <p>Compete globally via Google Play Games Services</p>
+    </div>
+    <div class="feature">
+      <div class="emoji">🎯</div>
+      <strong>Daily Challenges</strong>
+      <p>3 daily + 3 weekly + 1 monthly challenge for bonus rewards</p>
+    </div>
+    <div class="feature">
+      <div class="emoji">🌍</div>
+      <strong>12 Languages</strong>
+      <p>EN · NL · ES · FR · DE · PT · JA · KO · ZH · RU · IT · TR</p>
     </div>
   </div>
 </main>
