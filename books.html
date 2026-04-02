@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Books — Mortek</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #141416;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a { color: inherit; text-decoration: none; }
+  header {
+    width: 100%;
+    padding: 20px 32px;
+    border-bottom: 1px solid #2A2A30;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  header .logo {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #F7931A;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  header nav a {
+    font-size: 0.9em;
+    color: #888890;
+    transition: color 0.15s;
+  }
+  header nav a:hover { color: #e0e0e0; }
+  header nav a.active { color: #F7931A; }
+  main {
+    flex: 1;
+    padding: 60px 24px;
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Author Bio */
+  .bio {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: #1E1E22;
+    border-radius: 16px;
+    border: 1px solid #2A2A30;
+    padding: 32px;
+    margin-bottom: 60px;
+  }
+  .bio img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #F7931A;
+    flex-shrink: 0;
+  }
+  .bio-text h2 {
+    font-size: 1.4em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .bio-text p {
+    font-size: 0.95em;
+    color: #888890;
+    line-height: 1.7;
+  }
+
+  /* Books Grid */
+  h1 {
+    font-size: 2em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  h1 span { color: #F7931A; }
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .book-card {
+    background: #1E1E22;
+    border-radius: 12px;
+    border: 1px solid #2A2A30;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .book-card:hover {
+    border-color: #F7931A;
+    transform: translateY(-4px);
+  }
+  .book-card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+  }
+  .book-card .info {
+    padding: 16px;
+  }
+  .book-card .info h3 {
+    font-size: 0.95em;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .book-card .info p {
+    font-size: 0.8em;
+    color: #888890;
+  }
+
+  @media (max-width: 700px) {
+    .books-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .bio { flex-direction: column; text-align: center; gap: 20px; }
+    header { flex-wrap: wrap; gap: 12px; }
+  }
+  @media (max-width: 400px) {
+    .books-grid { grid-template-columns: 1fr; }
+  }
+  footer {
+    width: 100%;
+    padding: 24px 32px;
+    border-top: 1px solid #2A2A30;
+    text-align: center;
+    font-size: 0.85em;
+    color: #888890;
+  }
+  footer a { color: #F7931A; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">Mortek</a>
+  <nav>
+    <a href="apps.html">Apps</a> &nbsp;&middot;&nbsp;
+    <a href="books.html" class="active">Books</a> &nbsp;&middot;&nbsp;
+    <a href="songs.html">Songs</a>
+  </nav>
+</header>
+
+<main>
+  <div class="bio">
+    <img src="books/profielfoto.jpeg" alt="Maurice Moret">
+    <div class="bio-text">
+      <h2>Maurice Moret</h2>
+      <p>Maurice Moret is a self-help author dedicated to helping people live with more clarity, intention, and freedom. His writing combines insights from psychology, neuroscience, and practical lived experience to create books that are grounded, honest, and immediately useful.</p>
+    </div>
+  </div>
+
+  <h1>My <span>Books</span></h1>
+
+  <div class="books-grid">
+    <div class="book-card">
+      <img src="books/book_covers/Stop_overthinking.jpg" alt="Stop Overthinking">
+      <div class="info">
+        <h3>Stop Overthinking</h3>
+      </div>
+    </div>
+    <div class="book-card">
+      <img src="books/book_covers/The_Stoic_Mind.jpg" alt="The Stoic Mind">
+      <div class="info">
+        <h3>The Stoic Mind</h3>
+      </div>
+    </div>
+    <div class="book-card">
+      <img src="books/book_covers/Dopamine_Detox.jpg" alt="Dopamine Detox">
+      <div class="info">
+        <h3>Dopamine Detox</h3>
+      </div>
+    </div>
+    <div class="book-card">
+      <img src="books/book_covers/The_Discipline_Blueprint.jpg" alt="The Discipline Blueprint">
+      <div class="info">
+        <h3>The Discipline Blueprint</h3>
+      </div>
+    </div>
+    <div class="book-card">
+      <img src="books/book_covers/Wealth_Without_Permission.jpg" alt="Wealth Without Permission">
+      <div class="info">
+        <h3>Wealth Without Permission</h3>
+      </div>
+    </div>
+    <div class="book-card">
+      <img src="books/book_covers/Read%20people%20like%20a%20book.jpg" alt="Read People Like a Book">
+      <div class="info">
+        <h3>Read People Like a Book</h3>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 Mortek &nbsp;&middot;&nbsp;
+  <a href="mailto:mauricemoret1991@gmail.com">Contact</a>
+</footer>
+
+</body>
+</html>

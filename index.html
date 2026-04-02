@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mortek — Crypto Mining Tycoon</title>
+<title>Mortek — Apps, Books & Music by Maurice Moret</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -13,15 +13,15 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
+  a { color: inherit; text-decoration: none; }
   header {
     width: 100%;
     padding: 20px 32px;
     border-bottom: 1px solid #2A2A30;
     text-align: center;
   }
-  header span {
+  header .logo {
     font-size: 1.1em;
     font-weight: 600;
     color: #F7931A;
@@ -33,69 +33,66 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 60px 24px;
-    max-width: 620px;
+    padding: 80px 24px 60px;
+    max-width: 900px;
     width: 100%;
-    text-align: center;
-  }
-  .icon {
-    width: 120px;
-    height: 120px;
-    background: #1E1E22;
-    border-radius: 28px;
-    border: 2px solid #F7931A;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 56px;
-    margin-bottom: 32px;
+    margin: 0 auto;
   }
   h1 {
-    font-size: 2em;
+    font-size: 2.4em;
     font-weight: 700;
     color: #fff;
     margin-bottom: 12px;
+    text-align: center;
   }
   h1 span { color: #F7931A; }
-  .tagline {
-    font-size: 1.05em;
+  .subtitle {
+    font-size: 1.1em;
     color: #888890;
-    margin-bottom: 40px;
+    margin-bottom: 60px;
+    text-align: center;
     line-height: 1.6;
   }
-  .btn {
-    display: inline-block;
-    background: #F7931A;
-    color: #141416;
-    font-weight: 700;
-    font-size: 1em;
-    padding: 14px 32px;
-    border-radius: 10px;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    transition: background 0.15s;
-  }
-  .btn:hover { background: #FFD700; }
-  .features {
-    margin-top: 64px;
+  .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 24px;
     width: 100%;
   }
-  @media (max-width: 480px) {
-    .features { grid-template-columns: repeat(2, 1fr); }
-  }
-  .feature {
+  .card {
     background: #1E1E22;
-    border-radius: 12px;
-    padding: 20px 16px;
+    border-radius: 16px;
     border: 1px solid #2A2A30;
+    padding: 40px 24px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  .feature .emoji { font-size: 1.8em; margin-bottom: 8px; }
-  .feature p { font-size: 0.82em; color: #888890; margin-top: 4px; line-height: 1.4; }
-  .feature strong { color: #e0e0e0; font-size: 0.95em; }
+  .card:hover {
+    border-color: #F7931A;
+    transform: translateY(-4px);
+  }
+  .card .icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 1.3em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 0.9em;
+    color: #888890;
+    line-height: 1.5;
+  }
+  @media (max-width: 640px) {
+    .cards { grid-template-columns: 1fr; gap: 16px; }
+    h1 { font-size: 1.8em; }
+    main { padding: 48px 20px 40px; }
+  }
   footer {
     width: 100%;
     padding: 24px 32px;
@@ -104,65 +101,41 @@
     font-size: 0.85em;
     color: #888890;
   }
-  footer a { color: #F7931A; text-decoration: none; }
+  footer a { color: #F7931A; }
   footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <header>
-  <span>Mortek</span>
+  <a href="/" class="logo">Mortek</a>
 </header>
 
 <main>
-  <div class="icon">⛏️</div>
-  <h1>Crypto Mining <span>Tycoon</span></h1>
-  <p class="tagline">
-    Tap to mine, buy upgrades, prestige for multipliers, and build the ultimate crypto empire.
-    An idle incremental game for Android.
-  </p>
-  <a class="btn" href="https://play.google.com/store/apps/details?id=com.mortek.cryptominingtycoon" target="_blank">
-    ▶ Download on Google Play
-  </a>
+  <h1>Welcome to <span>Mortek</span></h1>
+  <p class="subtitle">Apps, books, and music by Maurice Moret.</p>
 
-  <div class="features">
-    <div class="feature">
-      <div class="emoji">🖥️</div>
-      <strong>18 Upgrades</strong>
-      <p>From GPU rigs to the Omniminer — mine even while you're away</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">🔁</div>
-      <strong>Prestige & Ascend</strong>
-      <p>Reset for massive multipliers and unlock meta-progression</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">💎</div>
-      <strong>Artifacts</strong>
-      <p>Build your rig with 6 rarity artifact drops and unique stat rolls</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">🏆</div>
-      <strong>Leaderboards</strong>
-      <p>Compete globally via Google Play Games Services</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">🎯</div>
-      <strong>Daily Challenges</strong>
-      <p>3 daily + 3 weekly + 1 monthly challenge for bonus rewards</p>
-    </div>
-    <div class="feature">
-      <div class="emoji">🌍</div>
-      <strong>12 Languages</strong>
-      <p>EN · NL · ES · FR · DE · PT · JA · KO · ZH · RU · IT · TR</p>
-    </div>
+  <div class="cards">
+    <a href="apps.html" class="card">
+      <div class="icon">&#128241;</div>
+      <h2>Apps</h2>
+      <p>Mobile games and applications built for Android.</p>
+    </a>
+    <a href="books.html" class="card">
+      <div class="icon">&#128218;</div>
+      <h2>Books</h2>
+      <p>Self-help books on clarity, discipline, and personal growth.</p>
+    </a>
+    <a href="songs.html" class="card">
+      <div class="icon">&#127925;</div>
+      <h2>Songs</h2>
+      <p>Original music — coming soon.</p>
+    </a>
   </div>
 </main>
 
 <footer>
-  &copy; 2026 Mortek &nbsp;·&nbsp;
-  <a href="https://mortek.github.io/crypto-mining-tycoon/privacy_policy.html">Privacy Policy</a>
-  &nbsp;·&nbsp;
+  &copy; 2026 Mortek &nbsp;&middot;&nbsp;
   <a href="mailto:mauricemoret1991@gmail.com">Contact</a>
 </footer>
 
