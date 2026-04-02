@@ -19,7 +19,9 @@
     width: 100%;
     padding: 20px 32px;
     border-bottom: 1px solid #2A2A30;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 24px;
   }
   header .logo {
     font-size: 1.1em;
@@ -28,6 +30,13 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
+  header nav a {
+    font-size: 0.9em;
+    color: #888890;
+    transition: color 0.15s;
+  }
+  header nav a:hover { color: #e0e0e0; }
+  header nav a.active { color: #F7931A; }
   main {
     flex: 1;
     display: flex;
@@ -92,6 +101,7 @@
     .cards { grid-template-columns: 1fr; gap: 16px; }
     h1 { font-size: 1.8em; }
     main { padding: 48px 20px 40px; }
+    header { flex-wrap: wrap; gap: 12px; }
   }
   footer {
     width: 100%;
@@ -109,6 +119,11 @@
 
 <header>
   <a href="/" class="logo">Mortek</a>
+  <nav>
+    <a href="apps.html">Apps</a> &nbsp;&middot;&nbsp;
+    <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
+    <a href="songs.html">Songs</a>
+  </nav>
 </header>
 
 <main>
