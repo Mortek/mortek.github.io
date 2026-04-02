@@ -3,120 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Crypto Mining Tycoon — Tap to mine, buy upgrades, prestige for multipliers, and build the ultimate crypto empire. An idle incremental game for Android.">
+<meta property="og:title" content="Apps — Mortek">
+<meta property="og:description" content="Crypto Mining Tycoon — an idle incremental mining game for Android.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mortek.github.io/apps.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
 <title>Apps — Mortek</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #141416;
-    color: #e0e0e0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  a { color: inherit; text-decoration: none; }
-  header {
-    width: 100%;
-    padding: 20px 32px;
-    border-bottom: 1px solid #2A2A30;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-  header .logo {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #F7931A;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  header nav a {
-    font-size: 0.9em;
-    color: #888890;
-    transition: color 0.15s;
-  }
-  header nav a:hover { color: #e0e0e0; }
-  header nav a.active { color: #F7931A; }
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 60px 24px;
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    text-align: center;
-  }
-  .icon {
-    width: 120px;
-    height: 120px;
-    background: #1E1E22;
-    border-radius: 28px;
-    border: 2px solid #F7931A;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 56px;
-    margin-bottom: 32px;
-  }
-  h1 {
-    font-size: 2em;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
-  }
-  h1 span { color: #F7931A; }
-  .tagline {
-    font-size: 1.05em;
-    color: #888890;
-    margin-bottom: 40px;
-    line-height: 1.6;
-  }
-  .btn {
-    display: inline-block;
-    background: #F7931A;
-    color: #141416;
-    font-weight: 700;
-    font-size: 1em;
-    padding: 14px 32px;
-    border-radius: 10px;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    transition: background 0.15s;
-  }
-  .btn:hover { background: #FFD700; }
-  .features {
-    margin-top: 64px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    width: 100%;
-  }
-  .feature {
-    background: #1E1E22;
-    border-radius: 12px;
-    padding: 20px 16px;
-    border: 1px solid #2A2A30;
-  }
-  .feature .emoji { font-size: 1.8em; margin-bottom: 8px; }
-  .feature p { font-size: 0.82em; color: #888890; margin-top: 4px; line-height: 1.4; }
-  .feature strong { color: #e0e0e0; font-size: 0.95em; }
-  @media (max-width: 480px) {
-    .features { grid-template-columns: repeat(2, 1fr); }
-    header { flex-wrap: wrap; gap: 12px; }
-  }
-  footer {
-    width: 100%;
-    padding: 24px 32px;
-    border-top: 1px solid #2A2A30;
-    text-align: center;
-    font-size: 0.85em;
-    color: #888890;
-  }
-  footer a { color: #F7931A; }
-  footer a:hover { text-decoration: underline; }
-</style>
 </head>
 <body>
 
@@ -125,58 +19,59 @@
   <nav>
     <a href="apps.html" class="active">Apps</a> &nbsp;&middot;&nbsp;
     <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
-    <a href="songs.html">Songs</a>
+    <a href="songs.html">Songs</a> &nbsp;&middot;&nbsp;
+    <a href="about.html">About</a>
   </nav>
 </header>
 
-<main>
-  <div class="icon">&#9935;&#65039;</div>
+<main class="apps-main">
+  <div class="app-icon">&#9935;&#65039;</div>
   <h1>Crypto Mining <span>Tycoon</span></h1>
   <p class="tagline">
     Tap to mine, buy upgrades, prestige for multipliers, and build the ultimate crypto empire.
     An idle incremental game for Android.
   </p>
-  <a class="btn" href="https://play.google.com/store/apps/details?id=com.mortek.cryptominingtycoon" target="_blank">
-    &#9654; Download on Google Play
+  <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.mortek.cryptominingtycoon" target="_blank">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
   </a>
 
   <div class="features">
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#128421;&#65039;</div>
       <strong>20 Upgrades</strong>
       <p>From GPU rigs to the Omniminer — mine even while you're away</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#128257;</div>
       <strong>Prestige & Ascend</strong>
       <p>Reset for massive multipliers and unlock meta-progression</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#128142;</div>
       <strong>Artifacts</strong>
       <p>Build your rig with 6 rarity artifact drops and unique stat rolls</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#127942;</div>
       <strong>Leaderboards</strong>
       <p>Compete globally via Google Play Games Services</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#127919;</div>
       <strong>Daily Challenges</strong>
       <p>3 daily + 3 weekly + 1 monthly challenge for bonus rewards</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#127758;</div>
       <strong>12 Languages</strong>
       <p>EN &middot; NL &middot; ES &middot; FR &middot; DE &middot; PT &middot; JA &middot; KO &middot; ZH &middot; RU &middot; IT &middot; TR</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#127918;</div>
       <strong>Mini Games</strong>
       <p>Play fun mini games to earn bonus rewards and boost your mining</p>
     </div>
-    <div class="feature">
+    <div class="feature fade-in">
       <div class="emoji">&#127912;</div>
       <strong>50+ Skins</strong>
       <p>Customise the look of your game with over 50 unique skins</p>

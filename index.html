@@ -3,117 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mortek — Apps, books, and music by Maurice Moret. Explore mobile games, self-help books, and original music.">
+<meta property="og:title" content="Mortek — Maurice Moret">
+<meta property="og:description" content="Apps, books, and music by Maurice Moret.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mortek.github.io/">
+<meta property="og:image" content="https://mortek.github.io/books/profielfoto.jpeg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
 <title>Mortek — Apps, Books & Music by Maurice Moret</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #141416;
-    color: #e0e0e0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  a { color: inherit; text-decoration: none; }
-  header {
-    width: 100%;
-    padding: 20px 32px;
-    border-bottom: 1px solid #2A2A30;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-  header .logo {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #F7931A;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  header nav a {
-    font-size: 0.9em;
-    color: #888890;
-    transition: color 0.15s;
-  }
-  header nav a:hover { color: #e0e0e0; }
-  header nav a.active { color: #F7931A; }
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 80px 24px 60px;
-    max-width: 900px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  h1 {
-    font-size: 2.4em;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
-    text-align: center;
-  }
-  h1 span { color: #F7931A; }
-  .subtitle {
-    font-size: 1.1em;
-    color: #888890;
-    margin-bottom: 60px;
-    text-align: center;
-    line-height: 1.6;
-  }
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    width: 100%;
-  }
-  .card {
-    background: #1E1E22;
-    border-radius: 16px;
-    border: 1px solid #2A2A30;
-    padding: 40px 24px;
-    text-align: center;
-    transition: border-color 0.2s, transform 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .card:hover {
-    border-color: #F7931A;
-    transform: translateY(-4px);
-  }
-  .card .icon {
-    font-size: 3em;
-    margin-bottom: 20px;
-  }
-  .card h2 {
-    font-size: 1.3em;
-    color: #fff;
-    margin-bottom: 8px;
-  }
-  .card p {
-    font-size: 0.9em;
-    color: #888890;
-    line-height: 1.5;
-  }
-  @media (max-width: 640px) {
-    .cards { grid-template-columns: 1fr; gap: 16px; }
-    h1 { font-size: 1.8em; }
-    main { padding: 48px 20px 40px; }
-    header { flex-wrap: wrap; gap: 12px; }
-  }
-  footer {
-    width: 100%;
-    padding: 24px 32px;
-    border-top: 1px solid #2A2A30;
-    text-align: center;
-    font-size: 0.85em;
-    color: #888890;
-  }
-  footer a { color: #F7931A; }
-  footer a:hover { text-decoration: underline; }
-</style>
 </head>
 <body>
 
@@ -122,26 +20,27 @@
   <nav>
     <a href="apps.html">Apps</a> &nbsp;&middot;&nbsp;
     <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
-    <a href="songs.html">Songs</a>
+    <a href="songs.html">Songs</a> &nbsp;&middot;&nbsp;
+    <a href="about.html">About</a>
   </nav>
 </header>
 
-<main>
+<main class="home-main">
   <h1>Welcome to <span>Mortek</span></h1>
   <p class="subtitle">Apps, books, and music by Maurice Moret.</p>
 
   <div class="cards">
-    <a href="apps.html" class="card">
+    <a href="apps.html" class="card fade-in">
       <div class="icon">&#128241;</div>
       <h2>Apps</h2>
       <p>Mobile games and applications built for Android.</p>
     </a>
-    <a href="books.html" class="card">
+    <a href="books.html" class="card fade-in">
       <div class="icon">&#128218;</div>
       <h2>Books</h2>
       <p>Self-help books on clarity, discipline, and personal growth.</p>
     </a>
-    <a href="songs.html" class="card">
+    <a href="songs.html" class="card fade-in">
       <div class="icon">&#127925;</div>
       <h2>Songs</h2>
       <p>Original music — coming soon.</p>
