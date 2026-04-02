@@ -4,20 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="About Maurice Moret — App developer, self-help author, and musician. Creator of Mortek.">
+<meta name="theme-color" content="#141416">
 <meta property="og:title" content="About — Mortek">
 <meta property="og:description" content="About Maurice Moret — app developer, self-help author, and musician.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mortek.github.io/about.html">
 <meta property="og:image" content="https://mortek.github.io/books/profielfoto.jpeg">
+<link rel="canonical" href="https://mortek.github.io/about.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 <title>About — Mortek</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Maurice Moret",
+  "url": "https://mortek.github.io/about.html",
+  "image": "https://mortek.github.io/books/profielfoto.jpeg",
+  "jobTitle": "App Developer, Author, Musician",
+  "description": "Maurice Moret is a self-help author dedicated to helping people live with more clarity, intention, and freedom."
+}
+</script>
 </head>
 <body>
 
 <header>
-  <a href="/" class="logo">Mortek</a>
-  <nav>
+  <a href="/" class="logo" aria-label="Mortek home">Mortek</a>
+  <nav aria-label="Main navigation">
     <a href="apps.html">Apps</a> &nbsp;&middot;&nbsp;
     <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
     <a href="songs.html">Songs</a> &nbsp;&middot;&nbsp;
@@ -27,7 +42,7 @@
 
 <main class="about-main">
   <div class="about-hero fade-in">
-    <img src="books/profielfoto.jpeg" alt="Maurice Moret">
+    <img src="books/profielfoto.jpeg" alt="Maurice Moret" loading="lazy">
     <h1>Maurice <span>Moret</span></h1>
     <p class="role">App Developer &middot; Author &middot; Musician</p>
   </div>
@@ -38,16 +53,16 @@
   </p>
 
   <div class="about-links">
-    <a href="apps.html" class="about-link fade-in">
-      <div class="icon">&#128241;</div>
+    <a href="apps.html" class="about-link fade-in" aria-label="View apps">
+      <div class="icon" aria-hidden="true">&#128241;</div>
       <h3>Apps</h3>
     </a>
-    <a href="books.html" class="about-link fade-in">
-      <div class="icon">&#128218;</div>
+    <a href="books.html" class="about-link fade-in" aria-label="View books">
+      <div class="icon" aria-hidden="true">&#128218;</div>
       <h3>Books</h3>
     </a>
-    <a href="songs.html" class="about-link fade-in">
-      <div class="icon">&#127925;</div>
+    <a href="songs.html" class="about-link fade-in" aria-label="View songs">
+      <div class="icon" aria-hidden="true">&#127925;</div>
       <h3>Songs</h3>
     </a>
   </div>
