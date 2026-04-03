@@ -30,7 +30,7 @@ select:hover{border-color:#a07fff}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
 .sm-btn{background:#1e1e3a;border:1px solid #333;color:#999;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
 .sm-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
-.seek-row{display:flex;align-items:center;gap:10px;width:100%;max-width:640px;margin:10px 0 2px}
+.seek-row{display:flex;align-items:center;gap:10px;width:100%;max-width:960px;margin:10px 0 2px}
 .seek-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:#1e1e3a;border-radius:2px;outline:none;cursor:pointer}
 .seek-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#a07fff;cursor:pointer;box-shadow:0 0 6px rgba(160,127,255,0.4)}
 .seek-row input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
@@ -59,8 +59,6 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div id="appContent" class="hidden">
-<h1>MORTEK MUSIC — VISUALIZER</h1>
-
 <div class="panel">
   <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
   <input type="file" id="imgInput" accept="image/*">
@@ -136,7 +134,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.3.0</div>
+<div class="version">v1.3.1</div>
 
 <script>
 const C = document.getElementById('c');
