@@ -28,6 +28,9 @@ select:hover{border-color:#a07fff}
 #status{font-size:12px;color:#888;min-height:16px}
 .progress-bar{width:300px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
+.title-input{background:#1a1a30;border:1px solid #444;color:#fff;border-radius:6px;padding:7px 12px;font-size:13px;width:220px;text-align:center}
+.title-input:hover,.title-input:focus{border-color:#a07fff;outline:none}
+.title-input::placeholder{color:#666}
 </style>
 </head>
 <body>
@@ -38,6 +41,7 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
+  <input type="text" id="titleInput" class="title-input" placeholder="Song title...">
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
@@ -279,6 +283,20 @@ function drawFrame(data){
 
   manageParticles(energy);
 
+  // Title text above visualizer
+  const title=document.getElementById('titleInput').value.trim();
+  if(title){
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.font='bold 42px sans-serif';
+    ctx.fillStyle='#fff';
+    ctx.shadowColor='rgba(0,0,0,0.7)';
+    ctx.shadowBlur=12;
+    ctx.globalAlpha=0.95;
+    ctx.fillText(title,W/2,70);
+    ctx.restore();
+  }
+
   const vt=document.getElementById('vizType').value;
   if(vt==='circle') drawCircle(data,p,energy);
   else if(vt==='bars') drawBars(data,p);
@@ -336,6 +354,8 @@ document.getElementById('imgInput').onchange=e=>{
     imgLoaded=true;
     document.getElementById('imgLabel').textContent='✓ '+f.name;
     document.getElementById('imgLabel').classList.add('loaded');
+    const titleEl=document.getElementById('titleInput');
+    if(!titleEl.value.trim()) titleEl.value=f.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
     setStatus('Image loaded!');
     if(!animId) loop();
   };
