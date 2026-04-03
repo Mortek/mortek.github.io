@@ -115,7 +115,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.0.0</div>
+<div class="version">v1.0.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -354,7 +354,7 @@ function initAudio(buf){
 
 function playPreview(offset){
   if(!audioBuffer||!audioCtx) return;
-  if(source){try{source.stop();}catch(e){}}
+  if(source){source.onended=null;try{source.stop();}catch(e){}}
   offset=offset||0;
   playOffset=offset;
   playStartTime=audioCtx.currentTime;
