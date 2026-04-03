@@ -115,13 +115,13 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.0.2</div>
+<div class="version">v1.1.0</div>
 
 <script>
 const C = document.getElementById('c');
 const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
-let img = null, imgLoaded = false;
+let img = null, imgLoaded = false, imgName = '';
 let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
 const barMin = new Float32Array(100).fill(0.5);
@@ -382,6 +382,7 @@ document.getElementById('imgInput').onchange=e=>{
   img=new Image();
   img.onload=()=>{
     imgLoaded=true;
+    imgName=f.name.replace(/\.[^.]+$/,'');
     document.getElementById('imgLabel').textContent='✓ '+f.name;
     document.getElementById('imgLabel').classList.add('loaded');
     setStatus('Image loaded!');
@@ -433,7 +434,7 @@ document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
-  img=null;imgLoaded=false;window.audioBuffer=null;particles=[];
+  img=null;imgLoaded=false;imgName='';window.audioBuffer=null;particles=[];
   document.getElementById('imgLabel').textContent='+ Load Image';
   document.getElementById('imgLabel').classList.remove('loaded');
   document.getElementById('audioLabel').textContent='+ Load Audio';
@@ -589,7 +590,8 @@ document.getElementById('dlBtn').onclick=async function(){
     const webm=buildWebM(vOut,aOut,W,H,(dur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mortek-music-video.webm';a.click();
+    const dlName=(imgName||'mortek-music-video')+'.webm';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=dlName;a.click();
     URL.revokeObjectURL(a.href);
     setStatus('Done! Video saved.');
     // Restart preview
