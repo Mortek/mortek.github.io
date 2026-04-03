@@ -134,7 +134,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.3.1</div>
+<div class="version">v1.3.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -349,9 +349,11 @@ function loop(){
   drawFrame(data);
   // Update seek bar
   if(audioBuffer&&!seeking){
-    const cur=getCurrentTime(),total=audioBuffer.duration;
+    const total=audioBuffer.duration;
+    const cur=Math.min(getCurrentTime(),total);
     seekBar.value=Math.round(cur/total*1000);
     seekTime.textContent=fmtTime(cur)+' / '+fmtTime(total);
+    if(!playing&&cur>=total) seekBar.value=1000;
   }
 }
 
