@@ -112,7 +112,8 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="ctrl"><label>Overlay Darkness</label>
     <select id="overlay">
-      <option value="0.3" selected>Light</option>
+      <option value="0" selected>None</option>
+      <option value="0.3">Light</option>
       <option value="0.5">Medium</option>
       <option value="0.7">Dark</option>
     </select>
@@ -124,7 +125,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.7.0</div>
+<div class="version">v1.7.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -363,7 +364,7 @@ function drawFrame(data){
     ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
   }
 
-  ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);
+  if(ov>0){ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);}
 
   manageParticles(energy);
 
