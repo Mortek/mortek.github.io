@@ -449,15 +449,16 @@ document.getElementById('dlBtn').onclick=async function(){
   playing=false;
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,totalFrames=Math.ceil(dur*fps);
-    // Step 1: Pre-analyze audio offline using ScriptProcessorNode
+    const sr=48000,numSamples=Math.ceil(dur*sr);
+
+    // Step 1a: Pre-analyze audio offline (separate context for analysis)
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
-    const sr=48000;
-    const offCtx=new OfflineAudioContext(2,Math.ceil(dur*sr),sr);
-    const offAn=offCtx.createAnalyser();offAn.fftSize=512;
-    const offSrc=offCtx.createBufferSource();offSrc.buffer=buf;
-    offSrc.connect(offAn);
-    const proc=offCtx.createScriptProcessor(1024,2,2);
-    offAn.connect(proc);proc.connect(offCtx.destination);
+    const anCtx=new OfflineAudioContext(2,numSamples,sr);
+    const offAn=anCtx.createAnalyser();offAn.fftSize=512;
+    const anSrc=anCtx.createBufferSource();anSrc.buffer=buf;
+    anSrc.connect(offAn);
+    const proc=anCtx.createScriptProcessor(1024,2,2);
+    offAn.connect(proc);proc.connect(anCtx.destination);
     const frames=[];
     const samplesPerFrame=Math.round(sr/fps);
     let sampleCount=0,nextFrame=0;
@@ -470,9 +471,15 @@ document.getElementById('dlBtn').onclick=async function(){
         nextFrame+=samplesPerFrame;
       }
     };
-    offSrc.start(0);
-    const rendered=await offCtx.startRendering();
+    anSrc.start(0);
+    await anCtx.startRendering();
     while(frames.length<totalFrames)frames.push(new Uint8Array(offAn.frequencyBinCount));
+
+    // Step 1b: Clean audio render (separate context, no processor in path)
+    const audioCtx2=new OfflineAudioContext(2,numSamples,sr);
+    const audioSrc=audioCtx2.createBufferSource();audioSrc.buffer=buf;
+    audioSrc.connect(audioCtx2.destination);audioSrc.start(0);
+    const rendered=await audioCtx2.startRendering();
     pFill.style.width='10%';
 
     // Step 2: Encode video
@@ -490,23 +497,23 @@ document.getElementById('dlBtn').onclick=async function(){
     await vEnc.flush();vEnc.close();
     pFill.style.width='70%';
 
-    // Step 3: Encode audio
+    // Step 3: Encode audio from clean render
     setStatus('Encoding audio...');btn.textContent='Encoding audio...';
     let opusPriv=null;const aOut=[];
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
-    aEnc.configure({codec:'opus',sampleRate:48000,numberOfChannels:2,bitrate:128000});
+    aEnc.configure({codec:'opus',sampleRate:sr,numberOfChannels:2,bitrate:128000});
     const nCh=rendered.numberOfChannels,nF=rendered.length,ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
     for(let o=0;o<nF;o+=960){
       const n=Math.min(960,nF-o),d=new Float32Array(2*n);
       d.set(ch0.subarray(o,o+n),0);d.set(ch1.subarray(o,o+n),n);
-      const ad=new AudioData({format:'f32-planar',sampleRate:48000,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/48000*1000000),data:d.buffer});
+      const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
     await aEnc.flush();aEnc.close();
     pFill.style.width='85%';
 
     // Default OpusHead if encoder didn't provide one
-    if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,3840,true);dv.setUint32(12,48000,true);}
+    if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
     // Step 4: Mux & download
     setStatus('Building file...');btn.textContent='Building file...';
