@@ -9,39 +9,41 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0d0d18;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px}
-h1{font-size:17px;font-weight:600;color:#c4a0ff;letter-spacing:1px}
-canvas{border-radius:10px;max-width:100%;box-shadow:0 0 30px #0005}
-.panel{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
-.upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1e1e3a;border:1.5px dashed #555;color:#ccc;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .2s,background .2s}
-.upload-btn:hover{border-color:#a07fff;background:#2a2a4a}
+body{background:#0d0d18;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 20px;gap:0}
+h1{font-size:15px;font-weight:600;color:#c4a0ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+canvas{border-radius:12px;max-width:100%;box-shadow:0 4px 40px rgba(108,63,197,0.15)}
+.panel{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-bottom:20px}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1e1e3a;border:1.5px dashed #444;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
+.upload-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 .upload-btn.loaded{border-color:#5cb85c;border-style:solid;color:#7ddb7d}
 input[type=file]{display:none}
 .ctrl{display:flex;flex-direction:column;gap:3px;align-items:center}
-.ctrl label{font-size:11px;color:#888}
-select{background:#1a1a30;border:1px solid #444;color:#ddd;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer}
+.ctrl label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
+select{background:#1a1a30;border:1px solid #333;color:#ccc;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;transition:border-color .2s}
 select:hover{border-color:#a07fff}
-.ctrl-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:6px 10px;background:#111128;border-radius:10px;border:1px solid #2a2a44}
-.dl-btn{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:10px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:.5px;transition:opacity .2s}
-.dl-btn:hover{opacity:.85}
-.dl-btn:disabled{opacity:.4;cursor:not-allowed}
-#status{font-size:12px;color:#888;min-height:16px}
-.progress-bar{width:300px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none}
+.ctrl-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:8px 14px;background:#111128;border-radius:10px;border:1px solid #1e1e3a;margin-top:12px}
+.dl-btn{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:12px 36px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:.5px;transition:all .2s;margin-top:6px}
+.dl-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,63,197,0.3)}
+.dl-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+#status{font-size:11px;color:#666;min-height:16px;margin-top:10px}
+.progress-bar{width:300px;height:5px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none;margin-top:6px}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
-.sm-btn{background:#1e1e3a;border:1px solid #444;color:#ccc;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .2s,background .2s}
-.sm-btn:hover{border-color:#a07fff;background:#2a2a4a}
-.seek-row{display:flex;align-items:center;gap:10px;width:100%;max-width:640px}
-.seek-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:5px;background:#1e1e3a;border-radius:3px;outline:none;cursor:pointer}
-.seek-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#a07fff;cursor:pointer}
-.seek-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
-.seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:5px;border-radius:3px}
-.seek-time{font-size:11px;color:#888;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+.sm-btn{background:#1e1e3a;border:1px solid #333;color:#999;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
+.sm-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
+.seek-row{display:flex;align-items:center;gap:10px;width:100%;max-width:640px;margin:10px 0 2px}
+.seek-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:#1e1e3a;border-radius:2px;outline:none;cursor:pointer}
+.seek-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#a07fff;cursor:pointer;box-shadow:0 0 6px rgba(160,127,255,0.4)}
+.seek-row input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
+.seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:4px;border-radius:2px}
+.seek-time{font-size:11px;color:#666;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+.download-row{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px}
 .version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
-#loginOverlay{position:fixed;inset:0;background:#0d0d18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9999}
-#loginOverlay h2{font-size:18px;color:#c4a0ff;letter-spacing:1px;margin-bottom:8px}
-#loginOverlay input{background:#1a1a30;border:1px solid #444;color:#fff;border-radius:6px;padding:9px 14px;font-size:14px;width:220px;outline:none}
+#loginOverlay{position:fixed;inset:0;background:#0d0d18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9999}
+#loginOverlay h2{font-size:16px;color:#c4a0ff;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
+#loginOverlay input{background:#1a1a30;border:1px solid #333;color:#fff;border-radius:8px;padding:10px 16px;font-size:14px;width:240px;outline:none;transition:border-color .2s}
 #loginOverlay input:focus{border-color:#a07fff}
-#loginOverlay button{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:10px 32px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+#loginOverlay button{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:11px 36px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;width:240px}
+#loginOverlay button:hover{opacity:.85;transform:translateY(-1px)}
 #loginOverlay .login-err{font-size:12px;color:#ff4444;min-height:16px}
 #appContent.hidden{display:none}
 </style>
@@ -129,10 +131,12 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 
-<div id="status">Load an image and audio to begin</div>
-<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.2.1</div>
+<div class="download-row">
+  <div id="status">Load an image and audio to begin</div>
+  <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+  <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
+</div>
+<div class="version">v1.3.0</div>
 
 <script>
 const C = document.getElementById('c');
