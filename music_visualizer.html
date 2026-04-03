@@ -210,21 +210,23 @@ function drawCircle(data,p,energy){
   ctx.lineWidth=base*.8;
   ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
   ctx.restore();
-  // Full log-mapped spectrum with per-bar auto-gain for even movement
+  // Power-curve mapped spectrum with per-bar auto-gain for even movement
   const bars=200;
   const len=data.length;
-  const minBin=1, maxBin=len-1;
-  const logMin=Math.log(minBin), logMax=Math.log(maxBin);
+  const minBin=4, maxBin=len-1; // skip deepest bass bins
   for(let i=0;i<bars;i++){
-    const logBin=Math.exp(logMin+(logMax-logMin)*i/(bars-1));
-    const lo=Math.floor(logBin), hi=Math.min(lo+1,maxBin);
-    const frac=logBin-lo;
+    // Power-curve: spreads bass across fewer bars, more room for mid/high
+    const t=i/(bars-1);
+    const bin=minBin+(maxBin-minBin)*Math.pow(t,1.5);
+    const lo=Math.floor(bin), hi=Math.min(lo+1,maxBin);
+    const frac=bin-lo;
     const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
     // Auto-gain: track each bar's own min/max range
-    barMin[i]*=1.003; barMax[i]*=0.997; // slowly decay toward center
+    barMin[i]+=(raw-barMin[i])*0.02; // smooth tracking
+    barMax[i]+=(raw-barMax[i])*0.02;
     barMin[i]=Math.min(barMin[i],raw);
     barMax[i]=Math.max(barMax[i],raw);
-    const range=Math.max(barMax[i]-barMin[i],0.05);
+    const range=Math.max(barMax[i]-barMin[i],0.08);
     const v=Math.min((raw-barMin[i])/range,1);
     const a=(i/bars)*Math.PI*2-Math.PI/2;
     const r1=base, r2=base+v*H*.15+4;
