@@ -79,7 +79,8 @@ select:hover{border-color:#a07fff}
 <div class="ctrl-row">
   <div class="ctrl"><label>Particles</label>
     <select id="partStyle">
-      <option value="sparks" selected>Sparks</option>
+      <option value="sparksv2" selected>Sparks V2</option>
+      <option value="sparks">Sparks</option>
       <option value="stars">Stars</option>
       <option value="bubbles">Bubbles</option>
       <option value="snow">Snow</option>
@@ -125,7 +126,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.7.1</div>
+<div class="version">v1.7.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -248,6 +249,11 @@ function drawP(p, energy){
     ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.lineWidth=1.5;ctx.stroke();
   } else if(s==='sparks'){
     ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*6,p.y-p.vy*6);ctx.lineWidth=r*.6;ctx.stroke();
+  } else if(s==='sparksv2'){
+    ctx.shadowColor=p.color;ctx.shadowBlur=r*4;
+    ctx.lineWidth=r*.9;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*10,p.y-p.vy*10);ctx.stroke();
+    ctx.beginPath();ctx.arc(p.x,p.y,r*.7,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
   } else if(s==='snow'){
     // snowflake: 6 lines from center
     ctx.lineWidth=1;
