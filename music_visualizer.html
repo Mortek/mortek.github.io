@@ -79,14 +79,20 @@ select:hover{border-color:#a07fff}
 <div class="ctrl-row">
   <div class="ctrl"><label>Particles</label>
     <select id="partStyle">
+      <option value="sparks" selected>Sparks</option>
       <option value="stars">Stars</option>
       <option value="bubbles">Bubbles</option>
-      <option value="sparks">Sparks</option>
       <option value="snow">Snow</option>
       <option value="fireflies">Fireflies</option>
       <option value="matrix">Matrix Rain</option>
       <option value="confetti">Confetti</option>
       <option value="orbs">Orbs</option>
+      <option value="diamonds">Diamonds</option>
+      <option value="rings">Rings</option>
+      <option value="crosses">Crosses</option>
+      <option value="hearts">Hearts</option>
+      <option value="arrows">Arrows</option>
+      <option value="dots">Dots</option>
     </select>
   </div>
   <div class="ctrl"><label>Color Scheme</label>
@@ -102,17 +108,6 @@ select:hover{border-color:#a07fff}
       <option value="arctic">Arctic</option>
       <option value="sunset">Sunset</option>
       <option value="rainbow">Rainbow</option>
-      <option disabled>── Album Covers ──</option>
-      <option value="darkPhonk">Dark Phonk</option>
-      <option value="driftToSleep">Drift To Sleep</option>
-      <option value="fireplace">Fireplace</option>
-      <option value="forestWalk">Forest Walk</option>
-      <option value="lateNightStudy">Late Night Study</option>
-      <option value="lonelyRain">Lonely Rain</option>
-      <option value="morningCoffee">Morning Coffee</option>
-      <option value="oceanBreeze">Ocean Breeze</option>
-      <option value="rainyNight">Rainy Night</option>
-      <option value="tokyoDaydream">Tokyo Daydream</option>
     </select>
   </div>
   <div class="ctrl"><label>Overlay Darkness</label>
@@ -129,7 +124,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.6.0</div>
+<div class="version">v1.7.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -154,17 +149,7 @@ const palettes = {
   neon:   ['#00ff41','#39ff14','#00e676','#76ff03','#b9ff66'],
   arctic: ['#a0d8ef','#e0f7fa','#80deea','#b3e5fc','#81d4fa'],
   sunset: ['#ff7043','#ffa726','#ff5722','#ef5350','#ffca28'],
-  rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff'],
-  darkPhonk:['#9b30ff','#ff00bf','#6a0dad','#c77dff','#3c1361'],
-  driftToSleep:['#1b2a4a','#2c3e6b','#e8d5a3','#6b7fb5','#0f1b33'],
-  fireplace:['#e8920d','#d45a00','#3e2210','#fff1d0','#ff7a1a'],
-  forestWalk:['#1a5c2a','#4a7c3f','#6b8e4e','#a8c5a0','#2d5a27'],
-  lateNightStudy:['#3b2816','#d4a34a','#f5e6c8','#8b6914','#1a0f05'],
-  lonelyRain:['#3a5068','#2b3d52','#e07830','#5a7a96','#1e2d3d'],
-  morningCoffee:['#8b6331','#d4a04a','#f5e0b8','#c08a3e','#5c3d1a'],
-  oceanBreeze:['#f0966c','#e8b060','#f5c8a0','#d4845c','#f2a0a0'],
-  rainyNight:['#c49090','#d4a8a0','#8a7070','#e8c0b0','#5c4a4a'],
-  tokyoDaydream:['#ffb7c5','#70c0c8','#f09898','#c8a0d8','#ff8faa']
+  rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff']
 };
 
 function pal(){ return palettes[document.getElementById('colorScheme').value]||palettes.purple; }
@@ -277,6 +262,34 @@ function drawP(p, energy){
   } else if(s==='orbs'){
     ctx.globalAlpha=t*0.2;
     ctx.beginPath();ctx.arc(p.x,p.y,r*3,0,Math.PI*2);ctx.fill();
+  } else if(s==='diamonds'){
+    ctx.translate(p.x,p.y);ctx.rotate(Math.PI/4);
+    ctx.fillRect(-r*.5,-r*.5,r,r);
+  } else if(s==='rings'){
+    ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.arc(p.x,p.y,r*1.2,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(p.x,p.y,r*.5,0,Math.PI*2);ctx.stroke();
+  } else if(s==='crosses'){
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(p.x-r,p.y);ctx.lineTo(p.x+r,p.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(p.x,p.y-r);ctx.lineTo(p.x,p.y+r);ctx.stroke();
+  } else if(s==='hearts'){
+    const hr=r*.6;
+    ctx.beginPath();ctx.moveTo(p.x,p.y+hr);
+    ctx.bezierCurveTo(p.x-hr*2,p.y-hr,p.x,p.y-hr*2,p.x,p.y-hr*.5);
+    ctx.bezierCurveTo(p.x,p.y-hr*2,p.x+hr*2,p.y-hr,p.x,p.y+hr);
+    ctx.fill();
+  } else if(s==='arrows'){
+    ctx.lineWidth=1.5;
+    const ax=p.vx||0.3,ay=p.vy||0.3;
+    const len=Math.sqrt(ax*ax+ay*ay)||1;
+    const nx=ax/len,ny=ay/len;
+    ctx.beginPath();ctx.moveTo(p.x-nx*r*2,p.y-ny*r*2);ctx.lineTo(p.x+nx*r*2,p.y+ny*r*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(p.x+nx*r*2,p.y+ny*r*2);
+    ctx.lineTo(p.x+nx*r-ny*r,p.y+ny*r+nx*r);ctx.moveTo(p.x+nx*r*2,p.y+ny*r*2);
+    ctx.lineTo(p.x+nx*r+ny*r,p.y+ny*r-nx*r);ctx.stroke();
+  } else if(s==='dots'){
+    ctx.beginPath();ctx.arc(p.x,p.y,r*.5,0,Math.PI*2);ctx.fill();
   }
   ctx.restore();
 }
