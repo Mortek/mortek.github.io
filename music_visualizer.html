@@ -80,6 +80,7 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Particles</label>
     <select id="partStyle">
       <option value="sparks" selected>Sparks</option>
+      <option value="sparksint">Sparks Intensified</option>
       <option value="stars">Stars</option>
       <option value="bubbles">Bubbles</option>
       <option value="snow">Snow</option>
@@ -134,7 +135,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.7.4</div>
+<div class="version">v1.7.5</div>
 
 <script>
 const C = document.getElementById('c');
@@ -255,7 +256,7 @@ function drawP(p, energy){
     ctx.closePath();ctx.fill();
   } else if(s==='bubbles'){
     ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.lineWidth=1.5;ctx.stroke();
-  } else if(s==='sparks'){
+  } else if(s==='sparks'||s==='sparksint'){
     ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*6,p.y-p.vy*6);ctx.lineWidth=r*.6;ctx.stroke();
   } else if(s==='snow'){
     // snowflake: 6 lines from center
@@ -307,7 +308,9 @@ function drawP(p, energy){
 function updateP(p){p.age++;p.x+=p.vx;p.y+=p.vy;}
 
 function manageParticles(energy){
-  for(let i=0;i<2&&particles.length<100;i++) particles.push(mkParticle());
+  const ps=document.getElementById('partStyle').value;
+  const maxP=ps==='sparksint'?140:100, spawnR=ps==='sparksint'?3:2;
+  for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
   particles.forEach(p=>{updateP(p);drawP(p,energy);});
 }
