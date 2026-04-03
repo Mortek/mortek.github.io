@@ -30,6 +30,12 @@ select:hover{border-color:#a07fff}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
 .sm-btn{background:#1e1e3a;border:1px solid #444;color:#ccc;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .2s,background .2s}
 .sm-btn:hover{border-color:#a07fff;background:#2a2a4a}
+.seek-row{display:flex;align-items:center;gap:10px;width:100%;max-width:640px}
+.seek-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:5px;background:#1e1e3a;border-radius:3px;outline:none;cursor:pointer}
+.seek-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#a07fff;cursor:pointer}
+.seek-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
+.seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:5px;border-radius:3px}
+.seek-time{font-size:11px;color:#888;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -45,6 +51,11 @@ select:hover{border-color:#a07fff}
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
+
+<div class="seek-row">
+  <span class="seek-time" id="seekTime">0:00 / 0:00</span>
+  <input type="range" id="seekBar" min="0" max="1000" value="0">
+</div>
 
 <div class="ctrl-row">
   <div class="ctrl"><label>Visualizer</label>
@@ -109,6 +120,7 @@ const C = document.getElementById('c');
 const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false;
+let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
 const barMin = new Float32Array(100).fill(0.5);
 const barMax = new Float32Array(100).fill(0.5);
@@ -306,11 +318,20 @@ function drawFrame(data){
 }
 
 // ---- ANIMATION LOOP ----
+const seekBar=document.getElementById('seekBar');
+const seekTime=document.getElementById('seekTime');
+let seeking=false;
 function loop(){
   animId=requestAnimationFrame(loop);
   const data=new Uint8Array(analyser?analyser.frequencyBinCount:256);
   if(analyser&&playing) analyser.getByteFrequencyData(data);
   drawFrame(data);
+  // Update seek bar
+  if(audioBuffer&&!seeking){
+    const cur=getCurrentTime(),total=audioBuffer.duration;
+    seekBar.value=Math.round(cur/total*1000);
+    seekTime.textContent=fmtTime(cur)+' / '+fmtTime(total);
+  }
 }
 
 // ---- AUDIO SETUP ----
@@ -329,15 +350,28 @@ function initAudio(buf){
   playPreview();
 }
 
-function playPreview(){
+function playPreview(offset){
   if(!audioBuffer||!audioCtx) return;
   if(source){try{source.stop();}catch(e){}}
+  offset=offset||0;
+  playOffset=offset;
+  playStartTime=audioCtx.currentTime;
   source=audioCtx.createBufferSource();
   source.buffer=audioBuffer;
   source.connect(analyser);
-  source.start(0);
+  source.start(0,offset);
   playing=true;
   source.onended=()=>{playing=false;};
+}
+
+function getCurrentTime(){
+  if(!audioCtx||!playing) return playOffset;
+  return playOffset+(audioCtx.currentTime-playStartTime);
+}
+
+function fmtTime(s){
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
 }
 
 // ---- FILE INPUTS ----
@@ -374,11 +408,24 @@ document.getElementById('audioInput').onchange=e=>{
   reader.readAsArrayBuffer(f);
 };
 
+// ---- SEEK BAR ----
+seekBar.addEventListener('input',()=>{seeking=true;});
+seekBar.addEventListener('change',()=>{
+  seeking=false;
+  if(!audioBuffer||!audioCtx)return;
+  const t=seekBar.value/1000*audioBuffer.duration;
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  document.getElementById('pauseBtn').textContent='Pause';
+  playPreview(t);
+});
+
 // ---- PAUSE / CLEAR ----
 document.getElementById('pauseBtn').onclick=function(){
   if(!audioCtx||!source)return;
-  if(audioCtx.state==='running'){audioCtx.suspend();this.textContent='Resume';}
-  else{audioCtx.resume();this.textContent='Pause';}
+  if(audioCtx.state==='running'){
+    playOffset=getCurrentTime();
+    audioCtx.suspend();this.textContent='Resume';
+  } else{audioCtx.resume();playStartTime=audioCtx.currentTime;this.textContent='Pause';}
 };
 document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
@@ -393,6 +440,7 @@ document.getElementById('clearBtn').onclick=function(){
   document.getElementById('audioInput').value='';
   document.getElementById('dlBtn').disabled=true;
   document.getElementById('pauseBtn').textContent='Pause';
+  seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
   setStatus('Load an image and audio to begin');
 };
 
