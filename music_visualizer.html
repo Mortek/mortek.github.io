@@ -64,6 +64,8 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
+  <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
+  <input type="file" id="logoInput" accept="image/*">
   <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
@@ -135,13 +137,14 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.7.7</div>
+<div class="version">v1.7.8</div>
 
 <script>
 const C = document.getElementById('c');
 const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false, imgName = '';
+let logo = null, logoLoaded = false;
 let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
 const barMin = new Float32Array(100).fill(0.5);
@@ -318,13 +321,24 @@ function manageParticles(energy){
 // ---- VISUALIZERS ----
 function drawCircle(data,p,energy){
   const cx=W/2,cy=H/2,base=140+energy*30;
-  // inner glow ring
-  ctx.save();
-  ctx.globalAlpha=0.15+energy*.3;
-  ctx.strokeStyle=p[0];
-  ctx.lineWidth=base*.8;
-  ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
-  ctx.restore();
+  // inner circle: logo or glow ring
+  if(logoLoaded&&logo){
+    ctx.save();
+    ctx.beginPath();ctx.arc(cx,cy,base*.9,0,Math.PI*2);ctx.clip();
+    const lSize=base*1.8;
+    const lRatio=logo.naturalWidth/logo.naturalHeight;
+    let lw,lh;
+    if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
+    ctx.drawImage(logo,cx-lw/2,cy-lh/2,lw,lh);
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.globalAlpha=0.15+energy*.3;
+    ctx.strokeStyle=p[0];
+    ctx.lineWidth=base*.8;
+    ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
   // Power-curve mapped half-spectrum, mirrored for full 360°
   const halfBars=100;
   const len=data.length;
@@ -468,6 +482,19 @@ document.getElementById('imgInput').onchange=e=>{
   img.src=URL.createObjectURL(f);
 };
 
+document.getElementById('logoInput').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  logo=new Image();
+  logo.onload=()=>{
+    logoLoaded=true;
+    document.getElementById('logoLabel').textContent='✓ '+f.name;
+    document.getElementById('logoLabel').classList.add('loaded');
+    setStatus('Logo loaded!');
+  };
+  logo.onerror=()=>setStatus('Error loading logo');
+  logo.src=URL.createObjectURL(f);
+};
+
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
@@ -515,7 +542,7 @@ document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
-  img=null;imgLoaded=false;imgName='';window.audioBuffer=null;particles=[];
+  img=null;imgLoaded=false;imgName='';logo=null;logoLoaded=false;window.audioBuffer=null;particles=[];
   delete palettes.imageColors;
   const sel=document.getElementById('colorScheme');
   const oldOpt=sel.querySelector('option[value="imageColors"]');if(oldOpt)oldOpt.remove();
@@ -527,6 +554,9 @@ document.getElementById('clearBtn').onclick=function(){
   document.getElementById('audioLabel').classList.remove('loaded');
   document.getElementById('imgInput').value='';
   document.getElementById('audioInput').value='';
+  document.getElementById('logoInput').value='';
+  document.getElementById('logoLabel').textContent='+ Load Logo';
+  document.getElementById('logoLabel').classList.remove('loaded');
   document.getElementById('dlBtn').disabled=true;
   document.getElementById('pauseBtn').textContent='Pause';
   document.getElementById('muteBtn').textContent='Mute';
