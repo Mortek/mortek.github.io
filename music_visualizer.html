@@ -115,7 +115,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.1.0</div>
+<div class="version">v1.1.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -591,8 +591,9 @@ document.getElementById('dlBtn').onclick=async function(){
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
     const dlName=(imgName||'mortek-music-video')+'.webm';
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=dlName;a.click();
-    URL.revokeObjectURL(a.href);
+    const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
     setStatus('Done! Video saved.');
     // Restart preview
     initAudio(buf);
