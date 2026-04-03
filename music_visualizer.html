@@ -28,6 +28,8 @@ select:hover{border-color:#a07fff}
 #status{font-size:12px;color:#888;min-height:16px}
 .progress-bar{width:300px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
+.sm-btn{background:#1e1e3a;border:1px solid #444;color:#ccc;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .2s,background .2s}
+.sm-btn:hover{border-color:#a07fff;background:#2a2a4a}
 </style>
 </head>
 <body>
@@ -38,6 +40,8 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
+  <button class="sm-btn" id="pauseBtn">Pause</button>
+  <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
@@ -234,28 +238,19 @@ function drawCircle(data,p,energy){
   ctx.lineWidth=base*.8;
   ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
   ctx.restore();
-  // Build half-spectrum with log mapping so all frequencies are visible
-  const halfBars=100;
+  // Full log-mapped spectrum around the circle for even reactivity
+  const bars=200;
   const len=data.length;
-  const minBin=2; // skip sub-bass rumble
-  const maxBin=len-1;
+  const minBin=1, maxBin=len-1;
   const logMin=Math.log(minBin), logMax=Math.log(maxBin);
-  const half=[];
-  for(let i=0;i<halfBars;i++){
-    const logBin=Math.exp(logMin+(logMax-logMin)*i/(halfBars-1));
+  for(let i=0;i<bars;i++){
+    const logBin=Math.exp(logMin+(logMax-logMin)*i/(bars-1));
     const lo=Math.floor(logBin), hi=Math.min(lo+1,maxBin);
     const frac=logBin-lo;
     const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
-    // Soft compression to tame bass peaks
-    half.push(Math.pow(raw,0.7));
-  }
-  // Mirror: right half = reversed left half for symmetric circle
-  const vals=[...half,...half.slice().reverse()];
-  const bars=vals.length;
-  for(let i=0;i<bars;i++){
-    const v=vals[i];
+    const v=Math.pow(raw,0.5);
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*.22+4;
+    const r1=base, r2=base+v*H*.3+4;
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
@@ -323,12 +318,6 @@ function drawFrame(data){
   else if(vt==='mirrorBars') drawMirrorBars(data,p);
   else drawWave(data,p);
 
-  // Branding bar
-  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,H-66,W,66);
-  ctx.font='bold 28px sans-serif';ctx.fillStyle='#fff';
-  ctx.fillText('Mortek Music',22,H-33);
-  ctx.font='13px sans-serif';ctx.fillStyle=p[0];
-  ctx.fillText('youtube.com/@MortekMusic',22,H-10);
 }
 
 // ---- ANIMATION LOOP ----
@@ -398,6 +387,28 @@ document.getElementById('audioInput').onchange=e=>{
     }, ()=>setStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
+};
+
+// ---- PAUSE / CLEAR ----
+document.getElementById('pauseBtn').onclick=function(){
+  if(!audioCtx||!source)return;
+  if(audioCtx.state==='running'){audioCtx.suspend();this.textContent='Resume';}
+  else{audioCtx.resume();this.textContent='Pause';}
+};
+document.getElementById('clearBtn').onclick=function(){
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
+  if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
+  img=null;imgLoaded=false;window.audioBuffer=null;particles=[];
+  document.getElementById('imgLabel').textContent='+ Load Image';
+  document.getElementById('imgLabel').classList.remove('loaded');
+  document.getElementById('audioLabel').textContent='+ Load Audio';
+  document.getElementById('audioLabel').classList.remove('loaded');
+  document.getElementById('imgInput').value='';
+  document.getElementById('audioInput').value='';
+  document.getElementById('dlBtn').disabled=true;
+  document.getElementById('pauseBtn').textContent='Pause';
+  setStatus('Load an image and audio to begin');
 };
 
 // ---- EBML/WebM helpers ----
