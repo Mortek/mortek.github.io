@@ -28,9 +28,6 @@ select:hover{border-color:#a07fff}
 #status{font-size:12px;color:#888;min-height:16px}
 .progress-bar{width:300px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none}
 .progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
-.title-input{background:#1a1a30;border:1px solid #444;color:#fff;border-radius:6px;padding:7px 12px;font-size:13px;width:220px;text-align:center}
-.title-input:hover,.title-input:focus{border-color:#a07fff;outline:none}
-.title-input::placeholder{color:#666}
 </style>
 </head>
 <body>
@@ -41,7 +38,6 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
-  <input type="text" id="titleInput" class="title-input" placeholder="Song title...">
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
@@ -78,6 +74,17 @@ select:hover{border-color:#a07fff}
       <option value="arctic">Arctic</option>
       <option value="sunset">Sunset</option>
       <option value="rainbow">Rainbow</option>
+      <option disabled>── Album Covers ──</option>
+      <option value="darkPhonk">Dark Phonk</option>
+      <option value="driftToSleep">Drift To Sleep</option>
+      <option value="fireplace">Fireplace</option>
+      <option value="forestWalk">Forest Walk</option>
+      <option value="lateNightStudy">Late Night Study</option>
+      <option value="lonelyRain">Lonely Rain</option>
+      <option value="morningCoffee">Morning Coffee</option>
+      <option value="oceanBreeze">Ocean Breeze</option>
+      <option value="rainyNight">Rainy Night</option>
+      <option value="tokyoDaydream">Tokyo Daydream</option>
     </select>
   </div>
   <div class="ctrl"><label>Overlay Darkness</label>
@@ -111,7 +118,17 @@ const palettes = {
   neon:   ['#00ff41','#39ff14','#00e676','#76ff03','#b9ff66'],
   arctic: ['#a0d8ef','#e0f7fa','#80deea','#b3e5fc','#81d4fa'],
   sunset: ['#ff7043','#ffa726','#ff5722','#ef5350','#ffca28'],
-  rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff']
+  rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff'],
+  darkPhonk:['#9b30ff','#ff00bf','#6a0dad','#c77dff','#3c1361'],
+  driftToSleep:['#1b2a4a','#2c3e6b','#e8d5a3','#6b7fb5','#0f1b33'],
+  fireplace:['#e8920d','#d45a00','#3e2210','#fff1d0','#ff7a1a'],
+  forestWalk:['#1a5c2a','#4a7c3f','#6b8e4e','#a8c5a0','#2d5a27'],
+  lateNightStudy:['#3b2816','#d4a34a','#f5e6c8','#8b6914','#1a0f05'],
+  lonelyRain:['#3a5068','#2b3d52','#e07830','#5a7a96','#1e2d3d'],
+  morningCoffee:['#8b6331','#d4a04a','#f5e0b8','#c08a3e','#5c3d1a'],
+  oceanBreeze:['#f0966c','#e8b060','#f5c8a0','#d4845c','#f2a0a0'],
+  rainyNight:['#c49090','#d4a8a0','#8a7070','#e8c0b0','#5c4a4a'],
+  tokyoDaydream:['#ffb7c5','#70c0c8','#f09898','#c8a0d8','#ff8faa']
 };
 
 function pal(){ return palettes[document.getElementById('colorScheme').value]; }
@@ -217,9 +234,26 @@ function drawCircle(data,p,energy){
   ctx.lineWidth=base*.8;
   ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
   ctx.restore();
-  const bars=200;
+  // Build half-spectrum with log mapping so all frequencies are visible
+  const halfBars=100;
+  const len=data.length;
+  const minBin=2; // skip sub-bass rumble
+  const maxBin=len-1;
+  const logMin=Math.log(minBin), logMax=Math.log(maxBin);
+  const half=[];
+  for(let i=0;i<halfBars;i++){
+    const logBin=Math.exp(logMin+(logMax-logMin)*i/(halfBars-1));
+    const lo=Math.floor(logBin), hi=Math.min(lo+1,maxBin);
+    const frac=logBin-lo;
+    const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
+    // Soft compression to tame bass peaks
+    half.push(Math.pow(raw,0.7));
+  }
+  // Mirror: right half = reversed left half for symmetric circle
+  const vals=[...half,...half.slice().reverse()];
+  const bars=vals.length;
   for(let i=0;i<bars;i++){
-    const v=data[Math.floor(i*data.length/bars)]/255;
+    const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
     const r1=base, r2=base+v*H*.22+4;
     ctx.beginPath();
@@ -283,20 +317,6 @@ function drawFrame(data){
 
   manageParticles(energy);
 
-  // Title text above visualizer
-  const title=document.getElementById('titleInput').value.trim();
-  if(title){
-    ctx.save();
-    ctx.textAlign='center';
-    ctx.font='bold 42px sans-serif';
-    ctx.fillStyle='#fff';
-    ctx.shadowColor='rgba(0,0,0,0.7)';
-    ctx.shadowBlur=12;
-    ctx.globalAlpha=0.95;
-    ctx.fillText(title,W/2,70);
-    ctx.restore();
-  }
-
   const vt=document.getElementById('vizType').value;
   if(vt==='circle') drawCircle(data,p,energy);
   else if(vt==='bars') drawBars(data,p);
@@ -354,8 +374,6 @@ document.getElementById('imgInput').onchange=e=>{
     imgLoaded=true;
     document.getElementById('imgLabel').textContent='✓ '+f.name;
     document.getElementById('imgLabel').classList.add('loaded');
-    const titleEl=document.getElementById('titleInput');
-    if(!titleEl.value.trim()) titleEl.value=f.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
     setStatus('Image loaded!');
     if(!animId) loop();
   };
@@ -382,68 +400,120 @@ document.getElementById('audioInput').onchange=e=>{
   reader.readAsArrayBuffer(f);
 };
 
-// ---- DOWNLOAD VIDEO ----
-document.getElementById('dlBtn').onclick=async function(){
-  if(!window.audioBuffer) return;
-  const btn=this;
-  btn.disabled=true; btn.textContent='Preparing...';
-  setStatus('Recording video — please wait...');
-  document.getElementById('progressBar').style.display='block';
+// ---- EBML/WebM helpers ----
+function u8(...a){return new Uint8Array(a)}
+function cat(...arrs){const t=arrs.reduce((s,a)=>s+a.length,0);const r=new Uint8Array(t);let o=0;for(const a of arrs){r.set(a,o);o+=a.length;}return r;}
+function vint(v){if(v<=0x7E)return u8(0x80|v);if(v<=0x3FFE)return u8(0x40|(v>>8),v&0xFF);if(v<=0x1FFFFE)return u8(0x20|(v>>16),(v>>8)&0xFF,v&0xFF);return u8(0x10|(v>>>24)&0xFF,(v>>16)&0xFF,(v>>8)&0xFF,v&0xFF);}
+function eid(id){if(id<=0xFF)return u8(id);if(id<=0xFFFF)return u8(id>>8,id&0xFF);if(id<=0xFFFFFF)return u8(id>>16,(id>>8)&0xFF,id&0xFF);return u8((id>>24)&0xFF,(id>>16)&0xFF,(id>>8)&0xFF,id&0xFF);}
+function el(id,d){return cat(eid(id),vint(d.length),d);}
+function elU(id,v,w){if(!w){w=1;let t=v;while(t>=256){w++;t=Math.floor(t/256);}}const d=new Uint8Array(w);let t=v;for(let i=w-1;i>=0;i--){d[i]=t&0xFF;t=Math.floor(t/256);}return el(id,d);}
+function elF(id,v){const b=new ArrayBuffer(8);new DataView(b).setFloat64(0,v);return el(id,new Uint8Array(b));}
+function elS(id,s){return el(id,new TextEncoder().encode(s));}
 
+function buildWebM(vChunks,aChunks,w,h,durMs,opusPriv){
+  const header=el(0x1A45DFA3,cat(elU(0x4286,1),elU(0x42F7,1),elU(0x42F2,4),elU(0x42F3,8),elS(0x4282,'webm'),elU(0x4287,4),elU(0x4285,2)));
+  const info=el(0x1549A966,cat(elU(0x2AD7B1,1000000),elS(0x4D80,'Mortek'),elS(0x5741,'Mortek'),elF(0x4489,durMs)));
+  const vTrack=el(0xAE,cat(elU(0xD7,1),elU(0x73C5,1,4),elU(0x9C,0),elU(0x83,1),elS(0x86,'V_VP8'),el(0xE0,cat(elU(0xB0,w,2),elU(0xBA,h,2)))));
+  const aTrack=el(0xAE,cat(elU(0xD7,2),elU(0x73C5,2,4),elU(0x9C,0),elU(0x83,2),elS(0x86,'A_OPUS'),elU(0x56AA,6500000,4),elU(0x56BB,80000000,4),el(0x63A2,opusPriv),el(0xE1,cat(elF(0xB5,48000),elU(0x9F,2)))));
+  const tracks=el(0x1654AE6B,cat(vTrack,aTrack));
+  // Build clusters (1s each)
+  const all=[];
+  for(const c of vChunks)all.push({trk:1,t:c.ts/1000,d:c.data,kf:c.kf});
+  for(const c of aChunks)all.push({trk:2,t:c.ts/1000,d:c.data,kf:true});
+  all.sort((a,b)=>a.t-b.t);
+  const clusters=[];let cStart=0,cBlocks=[];
+  for(const b of all){
+    if(b.t>=cStart+1000&&cBlocks.length){clusters.push(mkCluster(cStart,cBlocks));cStart=Math.floor(b.t/1000)*1000;cBlocks=[];}
+    cBlocks.push(b);
+  }
+  if(cBlocks.length)clusters.push(mkCluster(cStart,cBlocks));
+  const segData=cat(info,tracks,...clusters);
+  return cat(header,eid(0x18538067),u8(0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF),segData);
+}
+function mkCluster(tc,blocks){
+  const parts=blocks.map(b=>{
+    const rel=Math.round(b.t-tc);
+    const trkV=b.trk===1?u8(0x81):u8(0x82);
+    const tB=u8((rel>>8)&0xFF,rel&0xFF);
+    const fl=b.kf?u8(0x80):u8(0x00);
+    return el(0xA3,cat(trkV,tB,fl,b.d));
+  });
+  return el(0x1F43B675,cat(elU(0xE7,Math.round(tc)),...parts));
+}
+
+// ---- DOWNLOAD VIDEO (fast offline encode) ----
+document.getElementById('dlBtn').onclick=async function(){
+  if(!window.audioBuffer)return;
+  if(typeof VideoEncoder==='undefined'){setStatus('Fast encoding requires Chrome or Edge.');return;}
+  const btn=this;
+  btn.disabled=true;
+  const pBar=document.getElementById('progressBar'),pFill=document.getElementById('progressFill');
+  pBar.style.display='block';pFill.style.width='0%';
   if(source){try{source.stop();}catch(e){}}
   playing=false;
+  try{
+    const buf=window.audioBuffer,fps=30,dur=buf.duration,totalFrames=Math.ceil(dur*fps);
+    // Step 1: Pre-analyze audio offline
+    setStatus('Analyzing audio...');btn.textContent='Analyzing...';
+    const offCtx=new OfflineAudioContext(2,Math.ceil(dur*48000),48000);
+    const offAn=offCtx.createAnalyser();offAn.fftSize=512;
+    const offSrc=offCtx.createBufferSource();offSrc.buffer=buf;
+    offSrc.connect(offAn);offAn.connect(offCtx.destination);
+    const frames=[new Uint8Array(offAn.frequencyBinCount)];
+    for(let i=1;i<totalFrames;i++){
+      const t=i/fps;
+      offCtx.suspend(t).then(()=>{const d=new Uint8Array(offAn.frequencyBinCount);offAn.getByteFrequencyData(d);frames.push(d);offCtx.resume();});
+    }
+    offSrc.start(0);
+    const rendered=await offCtx.startRendering();
+    while(frames.length<totalFrames)frames.push(new Uint8Array(offAn.frequencyBinCount));
+    pFill.style.width='10%';
 
-  await new Promise(r=>setTimeout(r,200));
+    // Step 2: Encode video
+    setStatus('Encoding video...');
+    const vOut=[];
+    const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
+    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
+    for(let i=0;i<totalFrames;i++){
+      drawFrame(frames[i]);
+      const vf=new VideoFrame(C,{timestamp:Math.round(i*1000000/fps)});
+      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
+      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      if(i%30===0){pFill.style.width=(10+i/totalFrames*55)+'%';btn.textContent='Encoding video... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));}
+    }
+    await vEnc.flush();vEnc.close();
+    pFill.style.width='70%';
 
-  if(audioCtx) audioCtx.close();
-  audioCtx=new AudioContext();
-  analyser=audioCtx.createAnalyser();
-  analyser.fftSize=512;
-  gainNode=audioCtx.createGain();
-  analyser.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+    // Step 3: Encode audio
+    setStatus('Encoding audio...');btn.textContent='Encoding audio...';
+    let opusPriv=null;const aOut=[];
+    const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
+    aEnc.configure({codec:'opus',sampleRate:48000,numberOfChannels:2,bitrate:128000});
+    const nCh=rendered.numberOfChannels,nF=rendered.length,ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
+    for(let o=0;o<nF;o+=960){
+      const n=Math.min(960,nF-o),d=new Float32Array(2*n);
+      d.set(ch0.subarray(o,o+n),0);d.set(ch1.subarray(o,o+n),n);
+      const ad=new AudioData({format:'f32-planar',sampleRate:48000,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/48000*1000000),data:d.buffer});
+      aEnc.encode(ad);ad.close();
+    }
+    await aEnc.flush();aEnc.close();
+    pFill.style.width='85%';
 
-  const src=audioCtx.createBufferSource();
-  src.buffer=window.audioBuffer;
-  src.connect(analyser);
-  const dest=audioCtx.createMediaStreamDestination();
-  gainNode.connect(dest);
+    // Default OpusHead if encoder didn't provide one
+    if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,3840,true);dv.setUint32(12,48000,true);}
 
-  const videoStream=C.captureStream(30);
-  const combined=new MediaStream([...videoStream.getTracks(),...dest.stream.getTracks()]);
-  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')?'video/webm;codecs=vp9,opus':'video/webm';
-  const mr=new MediaRecorder(combined,{mimeType:mime,videoBitsPerSecond:8000000});
-  const chunks=[];
-  mr.ondataavailable=e=>chunks.push(e.data);
-  mr.onstop=()=>{
-    const blob=new Blob(chunks,{type:'video/webm'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='mortek-music-video.webm';
-    a.click();
-    btn.disabled=false; btn.textContent='Download Video';
-    document.getElementById('progressBar').style.display='none';
-    setStatus('Done! File saved. Convert to MP4 free at cloudconvert.com if needed.');
-    playing=false;
-  };
-
-  const dur=window.audioBuffer.duration;
-  const start=Date.now();
-  const prog=setInterval(()=>{
-    const pct=Math.min(100,((Date.now()-start)/1000/dur)*100);
-    document.getElementById('progressFill').style.width=pct+'%';
-    btn.textContent=`Recording... ${Math.round(pct)}%`;
-  },500);
-
-  mr.start();
-  src.start(0);
-  playing=true;
-  source=src;
-  src.onended=()=>{
-    clearInterval(prog);
-    mr.stop();
-    playing=false;
-  };
+    // Step 4: Mux & download
+    setStatus('Building file...');btn.textContent='Building file...';
+    const webm=buildWebM(vOut,aOut,W,H,dur*1000,opusPriv);
+    pFill.style.width='100%';
+    const blob=new Blob([webm],{type:'video/webm'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mortek-music-video.webm';a.click();
+    URL.revokeObjectURL(a.href);
+    setStatus('Done! Video saved.');
+    // Restart preview
+    initAudio(buf);
+  }catch(err){setStatus('Error: '+err.message);console.error(err);}
+  finally{btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
