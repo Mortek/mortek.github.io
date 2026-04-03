@@ -448,7 +448,8 @@ document.getElementById('dlBtn').onclick=async function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   try{
-    const buf=window.audioBuffer,fps=30,dur=buf.duration,totalFrames=Math.ceil(dur*fps);
+    const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
+    const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
     // Step 1a: Pre-analyze audio offline (separate context for analysis)
@@ -482,13 +483,24 @@ document.getElementById('dlBtn').onclick=async function(){
     const rendered=await audioCtx2.startRendering();
     pFill.style.width='10%';
 
-    // Step 2: Encode video
+    // Step 2: Encode video (music frames + fade-out)
     setStatus('Encoding video...');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
+    const lastFrame=frames[frames.length-1]||new Uint8Array(256);
+    const fadeFrames=fadeOut*fps;
     for(let i=0;i<totalFrames;i++){
-      drawFrame(frames[i]);
+      let frameData;
+      if(i<totalMusic){
+        frameData=frames[i]||new Uint8Array(256);
+      } else {
+        // Fade out: lerp last frame data toward zero
+        const t=1-(i-totalMusic)/fadeFrames;
+        frameData=new Uint8Array(lastFrame.length);
+        for(let j=0;j<lastFrame.length;j++) frameData[j]=Math.round(lastFrame[j]*t*t);
+      }
+      drawFrame(frameData);
       const vf=new VideoFrame(C,{timestamp:Math.round(i*1000000/fps)});
       vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
       if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
@@ -503,9 +515,16 @@ document.getElementById('dlBtn').onclick=async function(){
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
     aEnc.configure({codec:'opus',sampleRate:sr,numberOfChannels:2,bitrate:128000});
     const nCh=rendered.numberOfChannels,nF=rendered.length,ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
-    for(let o=0;o<nF;o+=960){
-      const n=Math.min(960,nF-o),d=new Float32Array(2*n);
-      d.set(ch0.subarray(o,o+n),0);d.set(ch1.subarray(o,o+n),n);
+    const totalAudioSamples=nF+fadeOut*sr;
+    for(let o=0;o<totalAudioSamples;o+=960){
+      const n=Math.min(960,totalAudioSamples-o),d=new Float32Array(2*n);
+      if(o<nF){
+        const end=Math.min(o+n,nF),count=end-o;
+        d.set(ch0.subarray(o,end),0);d.set(ch1.subarray(o,end),n);
+        // Zero-fill remainder if chunk straddles the boundary
+        // (already zero from Float32Array init)
+      }
+      // Samples beyond nF are silence (already zero)
       const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
@@ -517,7 +536,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 4: Mux & download
     setStatus('Building file...');btn.textContent='Building file...';
-    const webm=buildWebM(vOut,aOut,W,H,dur*1000,opusPriv);
+    const webm=buildWebM(vOut,aOut,W,H,(dur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mortek-music-video.webm';a.click();
