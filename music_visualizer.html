@@ -135,7 +135,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.4.0</div>
+<div class="version">v1.5.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -172,8 +172,68 @@ const palettes = {
   tokyoDaydream:['#ffb7c5','#70c0c8','#f09898','#c8a0d8','#ff8faa']
 };
 
-function pal(){ return palettes[document.getElementById('colorScheme').value]; }
+function pal(){ return palettes[document.getElementById('colorScheme').value]||palettes.purple; }
 function randCol(){ const p=pal(); return p[Math.floor(Math.random()*p.length)]; }
+
+// ---- EXTRACT COLORS FROM IMAGE ----
+function extractColors(image,count){
+  const sz=64;
+  const tc=document.createElement('canvas');tc.width=sz;tc.height=sz;
+  const tx=tc.getContext('2d');
+  tx.drawImage(image,0,0,sz,sz);
+  const d=tx.getImageData(0,0,sz,sz).data;
+  // Collect pixels, skip very dark and very bright
+  const pixels=[];
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const lum=r*0.299+g*0.587+b*0.114;
+    if(lum>30&&lum<235) pixels.push([r,g,b]);
+  }
+  if(pixels.length<10) return null;
+  // Simple k-means clustering
+  let centers=[];
+  for(let i=0;i<count;i++) centers.push(pixels[Math.floor(Math.random()*pixels.length)].slice());
+  for(let iter=0;iter<20;iter++){
+    const clusters=Array.from({length:count},()=>[]);
+    for(const p of pixels){
+      let best=0,bestD=Infinity;
+      for(let c=0;c<count;c++){
+        const dr=p[0]-centers[c][0],dg=p[1]-centers[c][1],db=p[2]-centers[c][2];
+        const dist=dr*dr+dg*dg+db*db;
+        if(dist<bestD){bestD=dist;best=c;}
+      }
+      clusters[best].push(p);
+    }
+    for(let c=0;c<count;c++){
+      if(!clusters[c].length) continue;
+      centers[c]=[0,1,2].map(ch=>Math.round(clusters[c].reduce((s,p)=>s+p[ch],0)/clusters[c].length));
+    }
+  }
+  // Sort by saturation (most colorful first)
+  centers.sort((a,b)=>{
+    const satA=Math.max(...a)-Math.min(...a),satB=Math.max(...b)-Math.min(...b);
+    return satB-satA;
+  });
+  return centers.map(c=>'#'+c.map(v=>v.toString(16).padStart(2,'0')).join(''));
+}
+
+function applyImageColors(image){
+  const colors=extractColors(image,5);
+  if(!colors) return;
+  palettes.imageColors=colors;
+  const sel=document.getElementById('colorScheme');
+  // Remove old image colors option if exists
+  const old=sel.querySelector('option[value="imageColors"]');
+  if(old) old.remove();
+  const oldSep=sel.querySelector('.img-color-sep');
+  if(oldSep) oldSep.remove();
+  // Add at top
+  const sep=document.createElement('option');sep.disabled=true;sep.textContent='── Uploaded Image ──';sep.className='img-color-sep';
+  const opt=document.createElement('option');opt.value='imageColors';opt.textContent='Image Colors';
+  sel.insertBefore(opt,sel.firstChild);
+  sel.insertBefore(sep,sel.firstChild);
+  sel.value='imageColors';
+}
 
 // ---- PARTICLES ----
 // All particles use the same stars-style drift & lifecycle, just different shapes
@@ -407,7 +467,8 @@ document.getElementById('imgInput').onchange=e=>{
     imgName=f.name.replace(/\.[^.]+$/,'');
     document.getElementById('imgLabel').textContent='✓ '+f.name;
     document.getElementById('imgLabel').classList.add('loaded');
-    setStatus('Image loaded!');
+    applyImageColors(img);
+    setStatus('Image loaded — colors extracted!');
     if(!animId) loop();
   };
   img.onerror=()=>setStatus('Error loading image');
@@ -462,6 +523,11 @@ document.getElementById('clearBtn').onclick=function(){
   playing=false;
   if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
   img=null;imgLoaded=false;imgName='';window.audioBuffer=null;particles=[];
+  delete palettes.imageColors;
+  const sel=document.getElementById('colorScheme');
+  const oldOpt=sel.querySelector('option[value="imageColors"]');if(oldOpt)oldOpt.remove();
+  const oldSep=sel.querySelector('.img-color-sep');if(oldSep)oldSep.remove();
+  sel.value='purple';
   document.getElementById('imgLabel').textContent='+ Load Image';
   document.getElementById('imgLabel').classList.remove('loaded');
   document.getElementById('audioLabel').textContent='+ Load Audio';
