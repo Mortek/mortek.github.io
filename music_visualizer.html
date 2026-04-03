@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mortek Music Visualizer — Create music videos with custom visuals, particles, and color schemes.">
+<meta name="theme-color" content="#0d0d18">
+<title>Music Visualizer — Mortek</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d18;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;gap:14px}
+h1{font-size:17px;font-weight:600;color:#c4a0ff;letter-spacing:1px}
+canvas{border-radius:10px;max-width:100%;box-shadow:0 0 30px #0005}
+.panel{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1e1e3a;border:1.5px dashed #555;color:#ccc;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .2s,background .2s}
+.upload-btn:hover{border-color:#a07fff;background:#2a2a4a}
+.upload-btn.loaded{border-color:#5cb85c;border-style:solid;color:#7ddb7d}
+input[type=file]{display:none}
+.ctrl{display:flex;flex-direction:column;gap:3px;align-items:center}
+.ctrl label{font-size:11px;color:#888}
+select{background:#1a1a30;border:1px solid #444;color:#ddd;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer}
+select:hover{border-color:#a07fff}
+.ctrl-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:6px 10px;background:#111128;border-radius:10px;border:1px solid #2a2a44}
+.dl-btn{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:10px 28px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:.5px;transition:opacity .2s}
+.dl-btn:hover{opacity:.85}
+.dl-btn:disabled{opacity:.4;cursor:not-allowed}
+#status{font-size:12px;color:#888;min-height:16px}
+.progress-bar{width:300px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;display:none}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6c3fc5,#4a90d9);width:0%;transition:width .3s}
+</style>
+</head>
+<body>
+<h1>MORTEK MUSIC — VISUALIZER</h1>
+
+<div class="panel">
+  <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
+  <input type="file" id="imgInput" accept="image/*">
+  <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
+  <input type="file" id="audioInput" accept="audio/*">
+</div>
+
+<canvas id="c" width="1280" height="720"></canvas>
+
+<div class="ctrl-row">
+  <div class="ctrl"><label>Visualizer</label>
+    <select id="vizType">
+      <option value="circle" selected>Circle Spectrum</option>
+      <option value="bars">Spectrum Bars</option>
+      <option value="wave">Waveform</option>
+      <option value="mirrorBars">Mirror Bars</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Particles</label>
+    <select id="partStyle">
+      <option value="stars">Stars</option>
+      <option value="bubbles">Bubbles</option>
+      <option value="sparks">Sparks</option>
+      <option value="snow">Snow</option>
+      <option value="fireflies">Fireflies</option>
+      <option value="matrix">Matrix Rain</option>
+      <option value="confetti">Confetti</option>
+      <option value="orbs">Orbs</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Color Scheme</label>
+    <select id="colorScheme">
+      <option value="purple">Purple / Blue</option>
+      <option value="fire">Fire</option>
+      <option value="teal">Teal / Cyan</option>
+      <option value="gold">Gold</option>
+      <option value="pink">Pink / Magenta</option>
+      <option value="neon">Neon Green</option>
+      <option value="arctic">Arctic</option>
+      <option value="sunset">Sunset</option>
+      <option value="rainbow">Rainbow</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Overlay Darkness</label>
+    <select id="overlay">
+      <option value="0.3">Light</option>
+      <option value="0.5" selected>Medium</option>
+      <option value="0.7">Dark</option>
+    </select>
+  </div>
+</div>
+
+<div id="status">Load an image and audio to begin</div>
+<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+<button class="dl-btn" id="dlBtn" disabled>Download Video</button>
+
+<script>
+const C = document.getElementById('c');
+const ctx = C.getContext('2d');
+const W = C.width, H = C.height;
+let img = null, imgLoaded = false;
+let audioCtx, analyser, audioBuffer, gainNode, source;
+let playing = false, animId;
+let particles = [];
+
+const palettes = {
+  purple: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'],
+  fire:   ['#ff6b00','#ff3d00','#ffcc00','#ff9100','#ff4500'],
+  teal:   ['#00e5ff','#00bcd4','#26c6da','#4dd0e1','#00acc1'],
+  gold:   ['#ffd700','#ffb300','#ff8f00','#ffe082','#ffc107'],
+  pink:   ['#ff4da6','#e91e8c','#ff80d5','#f50057','#ff69b4'],
+  neon:   ['#00ff41','#39ff14','#00e676','#76ff03','#b9ff66'],
+  arctic: ['#a0d8ef','#e0f7fa','#80deea','#b3e5fc','#81d4fa'],
+  sunset: ['#ff7043','#ffa726','#ff5722','#ef5350','#ffca28'],
+  rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff']
+};
+
+function pal(){ return palettes[document.getElementById('colorScheme').value]; }
+function randCol(){ const p=pal(); return p[Math.floor(Math.random()*p.length)]; }
+
+// ---- PARTICLES ----
+const matChars = '01アイウエオカキクケコ';
+function mkParticle(){
+  const s = document.getElementById('partStyle').value;
+  const base = {x:Math.random()*W, y:Math.random()*H, age:0, life:150+Math.random()*200, color:randCol(), style:s};
+  if(s==='matrix') return {...base, x:Math.floor(Math.random()*(W/16))*16, y:-20, vy:2+Math.random()*4, char:matChars[Math.floor(Math.random()*matChars.length)], life:H/3};
+  if(s==='snow') return {...base, vy:0.5+Math.random()*1.5, vx:(Math.random()-.5)*.4, r:1.5+Math.random()*3, y:-10};
+  if(s==='confetti') return {...base, vx:(Math.random()-.5)*2, vy:0.8+Math.random()*2, r:3+Math.random()*5, rot:Math.random()*360, rspd:(Math.random()-.5)*5};
+  if(s==='fireflies') return {...base, vx:(Math.random()-.5)*.8, vy:(Math.random()-.5)*.8, r:2+Math.random()*3, pulse:Math.random()*Math.PI*2};
+  if(s==='orbs') return {...base, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, r:8+Math.random()*20, alpha:0.08+Math.random()*.15};
+  if(s==='bubbles') return {...base, vy:-0.5-Math.random(), vx:(Math.random()-.5)*.4, r:3+Math.random()*10, y:H+10};
+  if(s==='sparks') return {...base, vx:(Math.random()-.5)*4, vy:-2-Math.random()*4, grav:0.1, r:1.5+Math.random()*2};
+  // stars default
+  return {...base, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5, r:1+Math.random()*3};
+}
+
+function drawP(p, energy){
+  const t = 1 - p.age/p.life;
+  ctx.save();
+  ctx.globalAlpha = t * (p.alpha||0.8);
+  ctx.fillStyle = p.color;
+  ctx.strokeStyle = p.color;
+  const boost = 1 + energy*2.5;
+
+  if(p.style==='matrix'){
+    ctx.globalAlpha = t;
+    ctx.fillStyle = p.color;
+    ctx.font = '14px monospace';
+    ctx.fillText(p.char, p.x, p.y);
+  } else if(p.style==='snow'){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  } else if(p.style==='confetti'){
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);
+  } else if(p.style==='fireflies'){
+    const pulse = Math.sin(p.pulse+p.age*.08)*.5+.5;
+    ctx.globalAlpha = pulse * t * .9;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r*(1+pulse*.5)*boost,0,Math.PI*2);
+    ctx.fill();
+  } else if(p.style==='orbs'){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r*(1+energy),0,Math.PI*2);
+    ctx.fill();
+  } else if(p.style==='bubbles'){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r*boost,0,Math.PI*2);
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+  } else if(p.style==='sparks'){
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+    ctx.lineTo(p.x-p.vx*4,p.y-p.vy*4);
+    ctx.lineWidth=p.r*boost;
+    ctx.stroke();
+  } else {
+    // stars
+    ctx.beginPath();
+    for(let i=0;i<5;i++){
+      const a=(i*72-90)*Math.PI/180, b=(i*72-54)*Math.PI/180;
+      const r=p.r*boost, ri=r*.4;
+      i===0?ctx.moveTo(p.x+r*Math.cos(a),p.y+r*Math.sin(a)):ctx.lineTo(p.x+r*Math.cos(a),p.y+r*Math.sin(a));
+      ctx.lineTo(p.x+ri*Math.cos(b),p.y+ri*Math.sin(b));
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function updateP(p){
+  p.age++;
+  if(p.style==='snow'||p.style==='bubbles'){p.x+=p.vx;p.y+=p.vy;}
+  else if(p.style==='matrix'){p.y+=p.vy;}
+  else if(p.style==='confetti'){p.x+=p.vx;p.y+=p.vy;p.rot+=p.rspd;p.vy+=0.05;}
+  else if(p.style==='sparks'){p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav||0;}
+  else {p.x+=p.vx;p.y+=p.vy;}
+}
+
+function manageParticles(energy){
+  const s=document.getElementById('partStyle').value;
+  const target=s==='matrix'?60:s==='orbs'?25:100;
+  const spawn=s==='sparks'?Math.floor(energy*6):s==='fireflies'?1:2;
+  for(let i=0;i<spawn&&particles.length<target;i++) particles.push(mkParticle());
+  particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
+  particles.forEach(p=>{updateP(p);drawP(p,energy);});
+}
+
+// ---- VISUALIZERS ----
+function drawCircle(data,p,energy){
+  const cx=W/2,cy=H/2,base=140+energy*30;
+  // inner glow ring
+  ctx.save();
+  ctx.globalAlpha=0.15+energy*.3;
+  ctx.strokeStyle=p[0];
+  ctx.lineWidth=base*.8;
+  ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+  const bars=200;
+  for(let i=0;i<bars;i++){
+    const v=data[Math.floor(i*data.length/bars)]/255;
+    const a=(i/bars)*Math.PI*2-Math.PI/2;
+    const r1=base, r2=base+v*H*.22+4;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
+    ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
+    ctx.strokeStyle=p[i%p.length];
+    ctx.lineWidth=2.5;
+    ctx.globalAlpha=0.7+v*.3;
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+}
+function drawBars(data,p){
+  const n=80,bw=W/n*.75;
+  for(let i=0;i<n;i++){
+    const v=data[i]/255, bh=v*H*.5;
+    const x=i*(W/n)+(W/n-bw)/2;
+    ctx.fillStyle=p[i%p.length];
+    ctx.globalAlpha=0.85;
+    ctx.beginPath();ctx.roundRect(x,H*.75-bh,bw,bh,3);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+function drawMirrorBars(data,p){
+  const n=80,bw=W/n*.7;
+  for(let i=0;i<n;i++){
+    const v=data[i]/255, bh=v*H*.35;
+    const x=i*(W/n)+(W/n-bw)/2;
+    ctx.fillStyle=p[i%p.length];
+    ctx.globalAlpha=0.8;
+    ctx.beginPath();ctx.roundRect(x,H/2-bh,bw,bh,2);ctx.fill();
+    ctx.beginPath();ctx.roundRect(x,H/2,bw,bh,2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+function drawWave(data,p){
+  ctx.beginPath();ctx.strokeStyle=p[0];ctx.lineWidth=3;ctx.globalAlpha=.9;
+  for(let i=0;i<data.length;i++){
+    const x=i/data.length*W, v=(data[i]/128-1)*H*.28;
+    i===0?ctx.moveTo(x,H/2+v):ctx.lineTo(x,H/2+v);
+  }
+  ctx.stroke();ctx.globalAlpha=1;
+}
+
+// ---- MAIN DRAW ----
+function drawFrame(data){
+  const p=pal();
+  const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
+  const ov=parseFloat(document.getElementById('overlay').value);
+
+  ctx.clearRect(0,0,W,H);
+  if(imgLoaded && img){
+    const sc=Math.max(W/img.naturalWidth, H/img.naturalHeight);
+    const dw=img.naturalWidth*sc, dh=img.naturalHeight*sc;
+    ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+  } else {
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+  }
+
+  ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);
+
+  manageParticles(energy);
+
+  const vt=document.getElementById('vizType').value;
+  if(vt==='circle') drawCircle(data,p,energy);
+  else if(vt==='bars') drawBars(data,p);
+  else if(vt==='mirrorBars') drawMirrorBars(data,p);
+  else drawWave(data,p);
+
+  // Branding bar
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(0,H-66,W,66);
+  ctx.font='bold 28px sans-serif';ctx.fillStyle='#fff';
+  ctx.fillText('Mortek Music',22,H-33);
+  ctx.font='13px sans-serif';ctx.fillStyle=p[0];
+  ctx.fillText('youtube.com/@MortekMusic',22,H-10);
+}
+
+// ---- ANIMATION LOOP ----
+function loop(){
+  animId=requestAnimationFrame(loop);
+  const data=new Uint8Array(analyser?analyser.frequencyBinCount:256);
+  if(analyser&&playing) analyser.getByteFrequencyData(data);
+  drawFrame(data);
+}
+
+// ---- AUDIO SETUP ----
+function initAudio(buf){
+  if(audioCtx) audioCtx.close();
+  audioCtx=new AudioContext();
+  audioBuffer=buf;
+  analyser=audioCtx.createAnalyser();
+  analyser.fftSize=512;
+  gainNode=audioCtx.createGain();
+  analyser.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  particles=[];
+  if(animId) cancelAnimationFrame(animId);
+  loop();
+  playPreview();
+}
+
+function playPreview(){
+  if(!audioBuffer||!audioCtx) return;
+  if(source){try{source.stop();}catch(e){}}
+  source=audioCtx.createBufferSource();
+  source.buffer=audioBuffer;
+  source.connect(analyser);
+  source.start(0);
+  playing=true;
+  source.onended=()=>{playing=false;};
+}
+
+// ---- FILE INPUTS ----
+document.getElementById('imgInput').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  img=new Image();
+  img.onload=()=>{
+    imgLoaded=true;
+    document.getElementById('imgLabel').textContent='✓ '+f.name;
+    document.getElementById('imgLabel').classList.add('loaded');
+    setStatus('Image loaded!');
+    if(!animId) loop();
+  };
+  img.onerror=()=>setStatus('Error loading image');
+  img.src=URL.createObjectURL(f);
+};
+
+document.getElementById('audioInput').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  setStatus('Loading audio...');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const tmp=new AudioContext();
+    tmp.decodeAudioData(ev.target.result.slice(0), buf=>{
+      tmp.close();
+      window.audioBuffer=buf;
+      document.getElementById('audioLabel').textContent='✓ '+f.name;
+      document.getElementById('audioLabel').classList.add('loaded');
+      document.getElementById('dlBtn').disabled=false;
+      setStatus('Audio loaded! Previewing — configure your look, then download.');
+      initAudio(buf);
+    }, ()=>setStatus('Error decoding audio'));
+  };
+  reader.readAsArrayBuffer(f);
+};
+
+// ---- DOWNLOAD VIDEO ----
+document.getElementById('dlBtn').onclick=async function(){
+  if(!window.audioBuffer) return;
+  const btn=this;
+  btn.disabled=true; btn.textContent='Preparing...';
+  setStatus('Recording video — please wait...');
+  document.getElementById('progressBar').style.display='block';
+
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
+
+  await new Promise(r=>setTimeout(r,200));
+
+  if(audioCtx) audioCtx.close();
+  audioCtx=new AudioContext();
+  analyser=audioCtx.createAnalyser();
+  analyser.fftSize=512;
+  gainNode=audioCtx.createGain();
+  analyser.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  const src=audioCtx.createBufferSource();
+  src.buffer=window.audioBuffer;
+  src.connect(analyser);
+  const dest=audioCtx.createMediaStreamDestination();
+  gainNode.connect(dest);
+
+  const videoStream=C.captureStream(30);
+  const combined=new MediaStream([...videoStream.getTracks(),...dest.stream.getTracks()]);
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')?'video/webm;codecs=vp9,opus':'video/webm';
+  const mr=new MediaRecorder(combined,{mimeType:mime,videoBitsPerSecond:8000000});
+  const chunks=[];
+  mr.ondataavailable=e=>chunks.push(e.data);
+  mr.onstop=()=>{
+    const blob=new Blob(chunks,{type:'video/webm'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='mortek-music-video.webm';
+    a.click();
+    btn.disabled=false; btn.textContent='Download Video';
+    document.getElementById('progressBar').style.display='none';
+    setStatus('Done! File saved. Convert to MP4 free at cloudconvert.com if needed.');
+    playing=false;
+  };
+
+  const dur=window.audioBuffer.duration;
+  const start=Date.now();
+  const prog=setInterval(()=>{
+    const pct=Math.min(100,((Date.now()-start)/1000/dur)*100);
+    document.getElementById('progressFill').style.width=pct+'%';
+    btn.textContent=`Recording... ${Math.round(pct)}%`;
+  },500);
+
+  mr.start();
+  src.start(0);
+  playing=true;
+  source=src;
+  src.onended=()=>{
+    clearInterval(prog);
+    mr.stop();
+    playing=false;
+  };
+};
+
+function setStatus(t){document.getElementById('status').textContent=t;}
+loop();
+</script>
+</body>
+</html>
