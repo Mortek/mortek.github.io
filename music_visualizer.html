@@ -449,17 +449,27 @@ document.getElementById('dlBtn').onclick=async function(){
   playing=false;
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,totalFrames=Math.ceil(dur*fps);
-    // Step 1: Pre-analyze audio offline
+    // Step 1: Pre-analyze audio offline using ScriptProcessorNode
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
-    const offCtx=new OfflineAudioContext(2,Math.ceil(dur*48000),48000);
+    const sr=48000;
+    const offCtx=new OfflineAudioContext(2,Math.ceil(dur*sr),sr);
     const offAn=offCtx.createAnalyser();offAn.fftSize=512;
     const offSrc=offCtx.createBufferSource();offSrc.buffer=buf;
-    offSrc.connect(offAn);offAn.connect(offCtx.destination);
-    const frames=[new Uint8Array(offAn.frequencyBinCount)];
-    for(let i=1;i<totalFrames;i++){
-      const t=i/fps;
-      offCtx.suspend(t).then(()=>{const d=new Uint8Array(offAn.frequencyBinCount);offAn.getByteFrequencyData(d);frames.push(d);offCtx.resume();});
-    }
+    offSrc.connect(offAn);
+    const proc=offCtx.createScriptProcessor(1024,2,2);
+    offAn.connect(proc);proc.connect(offCtx.destination);
+    const frames=[];
+    const samplesPerFrame=Math.round(sr/fps);
+    let sampleCount=0,nextFrame=0;
+    proc.onaudioprocess=()=>{
+      sampleCount+=1024;
+      while(sampleCount>=nextFrame&&frames.length<totalFrames){
+        const d=new Uint8Array(offAn.frequencyBinCount);
+        offAn.getByteFrequencyData(d);
+        frames.push(d);
+        nextFrame+=samplesPerFrame;
+      }
+    };
     offSrc.start(0);
     const rendered=await offCtx.startRendering();
     while(frames.length<totalFrames)frames.push(new Uint8Array(offAn.frequencyBinCount));
