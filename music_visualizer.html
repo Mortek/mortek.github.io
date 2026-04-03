@@ -36,6 +36,9 @@ select:hover{border-color:#a07fff}
 .seek-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
 .seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:5px;border-radius:3px}
 .seek-time{font-size:11px;color:#888;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+.title-input{background:#1a1a30;border:1px solid #444;color:#fff;border-radius:6px;padding:7px 12px;font-size:13px;width:200px}
+.title-input:hover,.title-input:focus{border-color:#a07fff;outline:none}
+.title-input::placeholder{color:#666}
 .version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
 </style>
 </head>
@@ -47,6 +50,7 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
+  <input type="text" id="videoTitle" class="title-input" placeholder="Video title...">
   <button class="sm-btn" id="pauseBtn">Pause</button>
   <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
@@ -115,7 +119,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.0.2</div>
+<div class="version">v1.1.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -440,6 +444,7 @@ document.getElementById('clearBtn').onclick=function(){
   document.getElementById('audioLabel').classList.remove('loaded');
   document.getElementById('imgInput').value='';
   document.getElementById('audioInput').value='';
+  document.getElementById('videoTitle').value='';
   document.getElementById('dlBtn').disabled=true;
   document.getElementById('pauseBtn').textContent='Pause';
   seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
@@ -589,7 +594,8 @@ document.getElementById('dlBtn').onclick=async function(){
     const webm=buildWebM(vOut,aOut,W,H,(dur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mortek-music-video.webm';a.click();
+    const vidTitle=document.getElementById('videoTitle').value.trim()||'mortek-music-video';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=vidTitle+'.webm';a.click();
     URL.revokeObjectURL(a.href);
     setStatus('Done! Video saved.');
     // Restart preview
