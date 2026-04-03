@@ -36,6 +36,7 @@ select:hover{border-color:#a07fff}
 .seek-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
 .seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:5px;border-radius:3px}
 .seek-time{font-size:11px;color:#888;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+.version{position:fixed;bottom:8px;right:12px;font-size:10px;color:#333;pointer-events:none}
 </style>
 </head>
 <body>
@@ -114,6 +115,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
+<div class="version">v1.0.0</div>
 
 <script>
 const C = document.getElementById('c');
