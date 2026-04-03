@@ -43,7 +43,7 @@ select:hover{border-color:#a07fff}
 #loginOverlay input:focus{border-color:#a07fff}
 #loginOverlay button{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:10px 32px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
 #loginOverlay .login-err{font-size:12px;color:#ff4444;min-height:16px}
-#appContent{display:none}
+#appContent.hidden{display:none}
 </style>
 </head>
 <body>
@@ -56,7 +56,7 @@ select:hover{border-color:#a07fff}
   <div class="login-err" id="loginErr"></div>
 </div>
 
-<div id="appContent">
+<div id="appContent" class="hidden">
 <h1>MORTEK MUSIC — VISUALIZER</h1>
 
 <div class="panel">
@@ -132,7 +132,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.2.0</div>
+<div class="version">v1.2.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -633,13 +633,13 @@ async function doLogin(){
   const h=await sha1(u+':'+p);
   if(h!==H_VALID){document.getElementById('loginErr').textContent='Wrong username or password';return;}
   document.getElementById('loginOverlay').style.display='none';
-  document.getElementById('appContent').style.display='';
+  document.getElementById('appContent').classList.remove('hidden');
   sessionStorage.setItem('mv_auth','1');
 }
 // Check if already authenticated this session
 if(sessionStorage.getItem('mv_auth')==='1'){
   document.getElementById('loginOverlay').style.display='none';
-  document.getElementById('appContent').style.display='';
+  document.getElementById('appContent').classList.remove('hidden');
 }
 document.getElementById('loginBtn').onclick=doLogin;
 document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
