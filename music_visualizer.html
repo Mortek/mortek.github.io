@@ -109,6 +109,9 @@ const C = document.getElementById('c');
 const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false;
+// Per-bar auto-gain tracking for even circle spectrum movement
+const barMin = new Float32Array(200).fill(0.5);
+const barMax = new Float32Array(200).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
@@ -207,22 +210,22 @@ function drawCircle(data,p,energy){
   ctx.lineWidth=base*.8;
   ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
   ctx.restore();
-  // Full log-mapped spectrum around the circle for even reactivity
+  // Full log-mapped spectrum with per-bar auto-gain for even movement
   const bars=200;
   const len=data.length;
   const minBin=1, maxBin=len-1;
   const logMin=Math.log(minBin), logMax=Math.log(maxBin);
-  // Pre-compute all values and find max to normalize
-  const raw_vals=[];
   for(let i=0;i<bars;i++){
     const logBin=Math.exp(logMin+(logMax-logMin)*i/(bars-1));
     const lo=Math.floor(logBin), hi=Math.min(lo+1,maxBin);
     const frac=logBin-lo;
-    raw_vals.push((data[lo]*(1-frac)+data[hi]*frac)/255);
-  }
-  const peak=Math.max(...raw_vals,0.01);
-  for(let i=0;i<bars;i++){
-    const v=Math.pow(raw_vals[i]/peak,0.6)*peak;
+    const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
+    // Auto-gain: track each bar's own min/max range
+    barMin[i]*=1.003; barMax[i]*=0.997; // slowly decay toward center
+    barMin[i]=Math.min(barMin[i],raw);
+    barMax[i]=Math.max(barMax[i],raw);
+    const range=Math.max(barMax[i]-barMin[i],0.05);
+    const v=Math.min((raw-barMin[i])/range,1);
     const a=(i/bars)*Math.PI*2-Math.PI/2;
     const r1=base, r2=base+v*H*.15+4;
     ctx.beginPath();
