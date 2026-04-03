@@ -110,8 +110,8 @@ const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false;
 // Per-bar auto-gain tracking for even circle spectrum movement
-const barMin = new Float32Array(200).fill(0.5);
-const barMax = new Float32Array(200).fill(0.5);
+const barMin = new Float32Array(100).fill(0.5);
+const barMax = new Float32Array(100).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
@@ -210,26 +210,32 @@ function drawCircle(data,p,energy){
   ctx.lineWidth=base*.8;
   ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
   ctx.restore();
-  // Power-curve mapped spectrum with per-bar auto-gain for even movement
-  const bars=200;
+  // Power-curve mapped half-spectrum, mirrored for full 360°
+  const halfBars=100;
   const len=data.length;
-  const minBin=4, maxBin=len-1; // skip deepest bass bins
-  for(let i=0;i<bars;i++){
-    // Power-curve: spreads bass across fewer bars, more room for mid/high
-    const t=i/(bars-1);
+  const minBin=4, maxBin=Math.floor(len*0.7); // skip silent high bins
+  const half=[];
+  for(let i=0;i<halfBars;i++){
+    const t=i/(halfBars-1);
     const bin=minBin+(maxBin-minBin)*Math.pow(t,1.5);
     const lo=Math.floor(bin), hi=Math.min(lo+1,maxBin);
     const frac=bin-lo;
     const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
     // Auto-gain: track each bar's own min/max range
-    barMin[i]+=(raw-barMin[i])*0.02; // smooth tracking
-    barMax[i]+=(raw-barMax[i])*0.02;
+    barMin[i]+=(raw-barMin[i])*0.01;
+    barMax[i]+=(raw-barMax[i])*0.01;
     barMin[i]=Math.min(barMin[i],raw);
     barMax[i]=Math.max(barMax[i],raw);
-    const range=Math.max(barMax[i]-barMin[i],0.08);
-    const v=Math.min((raw-barMin[i])/range,1);
+    const range=Math.max(barMax[i]-barMin[i],0.1);
+    half.push(Math.min((raw-barMin[i])/range,1));
+  }
+  // Mirror for full circle
+  const vals=[...half,...half.slice().reverse()];
+  const bars=vals.length;
+  for(let i=0;i<bars;i++){
+    const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*.15+4;
+    const r1=base, r2=base+v*H*.1+4;
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
