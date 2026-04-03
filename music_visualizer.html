@@ -93,8 +93,8 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="ctrl"><label>Overlay Darkness</label>
     <select id="overlay">
-      <option value="0.3">Light</option>
-      <option value="0.5" selected>Medium</option>
+      <option value="0.3" selected>Light</option>
+      <option value="0.5">Medium</option>
       <option value="0.7">Dark</option>
     </select>
   </div>
@@ -139,91 +139,60 @@ function pal(){ return palettes[document.getElementById('colorScheme').value]; }
 function randCol(){ const p=pal(); return p[Math.floor(Math.random()*p.length)]; }
 
 // ---- PARTICLES ----
+// All particles use the same stars-style drift & lifecycle, just different shapes
 const matChars = '01アイウエオカキクケコ';
 function mkParticle(){
   const s = document.getElementById('partStyle').value;
-  const base = {x:Math.random()*W, y:Math.random()*H, age:0, life:150+Math.random()*200, color:randCol(), style:s};
-  if(s==='matrix') return {...base, x:Math.floor(Math.random()*(W/16))*16, y:-20, vy:2+Math.random()*4, char:matChars[Math.floor(Math.random()*matChars.length)], life:H/3};
-  if(s==='snow') return {...base, vy:0.5+Math.random()*1.5, vx:(Math.random()-.5)*.4, r:1.5+Math.random()*3, y:-10};
-  if(s==='confetti') return {...base, vx:(Math.random()-.5)*2, vy:0.8+Math.random()*2, r:3+Math.random()*5, rot:Math.random()*360, rspd:(Math.random()-.5)*5};
-  if(s==='fireflies') return {...base, vx:(Math.random()-.5)*.8, vy:(Math.random()-.5)*.8, r:2+Math.random()*3, pulse:Math.random()*Math.PI*2};
-  if(s==='orbs') return {...base, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, r:8+Math.random()*20, alpha:0.08+Math.random()*.15};
-  if(s==='bubbles') return {...base, vy:-0.5-Math.random(), vx:(Math.random()-.5)*.4, r:3+Math.random()*10, y:H+10};
-  if(s==='sparks') return {...base, vx:(Math.random()-.5)*4, vy:-2-Math.random()*4, grav:0.1, r:1.5+Math.random()*2};
-  // stars default
-  return {...base, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5, r:1+Math.random()*3};
+  return {x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+    age:0, life:150+Math.random()*200, color:randCol(), style:s, r:1+Math.random()*3,
+    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
 }
 
 function drawP(p, energy){
   const t = 1 - p.age/p.life;
+  const boost = 1 + energy*2.5;
+  const r = p.r*boost;
   ctx.save();
-  ctx.globalAlpha = t * (p.alpha||0.8);
+  ctx.globalAlpha = t * 0.8;
   ctx.fillStyle = p.color;
   ctx.strokeStyle = p.color;
-  const boost = 1 + energy*2.5;
+  const s = p.style;
 
-  if(p.style==='matrix'){
-    ctx.globalAlpha = t;
-    ctx.fillStyle = p.color;
-    ctx.font = '14px monospace';
-    ctx.fillText(p.char, p.x, p.y);
-  } else if(p.style==='snow'){
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-  } else if(p.style==='confetti'){
-    ctx.translate(p.x,p.y);
-    ctx.rotate(p.rot*Math.PI/180);
-    ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);
-  } else if(p.style==='fireflies'){
-    const pulse = Math.sin(p.pulse+p.age*.08)*.5+.5;
-    ctx.globalAlpha = pulse * t * .9;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r*(1+pulse*.5)*boost,0,Math.PI*2);
-    ctx.fill();
-  } else if(p.style==='orbs'){
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r*(1+energy),0,Math.PI*2);
-    ctx.fill();
-  } else if(p.style==='bubbles'){
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r*boost,0,Math.PI*2);
-    ctx.lineWidth=1.5;
-    ctx.stroke();
-  } else if(p.style==='sparks'){
-    ctx.beginPath();
-    ctx.moveTo(p.x,p.y);
-    ctx.lineTo(p.x-p.vx*4,p.y-p.vy*4);
-    ctx.lineWidth=p.r*boost;
-    ctx.stroke();
-  } else {
-    // stars
+  if(s==='stars'){
     ctx.beginPath();
     for(let i=0;i<5;i++){
       const a=(i*72-90)*Math.PI/180, b=(i*72-54)*Math.PI/180;
-      const r=p.r*boost, ri=r*.4;
       i===0?ctx.moveTo(p.x+r*Math.cos(a),p.y+r*Math.sin(a)):ctx.lineTo(p.x+r*Math.cos(a),p.y+r*Math.sin(a));
-      ctx.lineTo(p.x+ri*Math.cos(b),p.y+ri*Math.sin(b));
+      ctx.lineTo(p.x+r*.4*Math.cos(b),p.y+r*.4*Math.sin(b));
     }
-    ctx.closePath(); ctx.fill();
+    ctx.closePath();ctx.fill();
+  } else if(s==='bubbles'){
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.lineWidth=1.5;ctx.stroke();
+  } else if(s==='sparks'){
+    ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*6,p.y-p.vy*6);ctx.lineWidth=r*.6;ctx.stroke();
+  } else if(s==='snow'){
+    // snowflake: 6 lines from center
+    ctx.lineWidth=1;
+    for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+Math.cos(a)*r*1.5,p.y+Math.sin(a)*r*1.5);ctx.stroke();}
+  } else if(s==='fireflies'){
+    ctx.globalAlpha=t*0.9*(Math.sin(p.age*.1)*.3+.7);
+    ctx.beginPath();ctx.arc(p.x,p.y,r*.8,0,Math.PI*2);ctx.fill();
+  } else if(s==='matrix'){
+    ctx.font=(10+r*2)+'px monospace';ctx.fillText(p.char,p.x,p.y);
+  } else if(s==='confetti'){
+    ctx.translate(p.x,p.y);ctx.rotate((p.rot+p.age*2)*Math.PI/180);
+    ctx.fillRect(-r*.6,-r*.25,r*1.2,r*.5);
+  } else if(s==='orbs'){
+    ctx.globalAlpha=t*0.2;
+    ctx.beginPath();ctx.arc(p.x,p.y,r*3,0,Math.PI*2);ctx.fill();
   }
   ctx.restore();
 }
 
-function updateP(p){
-  p.age++;
-  if(p.style==='snow'||p.style==='bubbles'){p.x+=p.vx;p.y+=p.vy;}
-  else if(p.style==='matrix'){p.y+=p.vy;}
-  else if(p.style==='confetti'){p.x+=p.vx;p.y+=p.vy;p.rot+=p.rspd;p.vy+=0.05;}
-  else if(p.style==='sparks'){p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav||0;}
-  else {p.x+=p.vx;p.y+=p.vy;}
-}
+function updateP(p){p.age++;p.x+=p.vx;p.y+=p.vy;}
 
 function manageParticles(energy){
-  const s=document.getElementById('partStyle').value;
-  const target=s==='matrix'?60:s==='orbs'?25:100;
-  const spawn=s==='sparks'?Math.floor(energy*6):s==='fireflies'?1:2;
-  for(let i=0;i<spawn&&particles.length<target;i++) particles.push(mkParticle());
+  for(let i=0;i<2&&particles.length<100;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
   particles.forEach(p=>{updateP(p);drawP(p,energy);});
 }
@@ -243,14 +212,19 @@ function drawCircle(data,p,energy){
   const len=data.length;
   const minBin=1, maxBin=len-1;
   const logMin=Math.log(minBin), logMax=Math.log(maxBin);
+  // Pre-compute all values and find max to normalize
+  const raw_vals=[];
   for(let i=0;i<bars;i++){
     const logBin=Math.exp(logMin+(logMax-logMin)*i/(bars-1));
     const lo=Math.floor(logBin), hi=Math.min(lo+1,maxBin);
     const frac=logBin-lo;
-    const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
-    const v=Math.pow(raw,0.5);
+    raw_vals.push((data[lo]*(1-frac)+data[hi]*frac)/255);
+  }
+  const peak=Math.max(...raw_vals,0.01);
+  for(let i=0;i<bars;i++){
+    const v=Math.pow(raw_vals[i]/peak,0.6)*peak;
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*.3+4;
+    const r1=base, r2=base+v*H*.15+4;
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
