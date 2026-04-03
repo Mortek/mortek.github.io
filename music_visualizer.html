@@ -64,27 +64,19 @@ select:hover{border-color:#a07fff}
   <input type="file" id="imgInput" accept="image/*">
   <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
   <input type="file" id="audioInput" accept="audio/*">
-  <button class="sm-btn" id="pauseBtn">Pause</button>
-  <button class="sm-btn" id="muteBtn">Mute</button>
   <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
 
 <div class="seek-row">
+  <button class="sm-btn" id="pauseBtn">Pause</button>
+  <button class="sm-btn" id="muteBtn">Mute</button>
   <span class="seek-time" id="seekTime">0:00 / 0:00</span>
   <input type="range" id="seekBar" min="0" max="1000" value="0">
 </div>
 
 <div class="ctrl-row">
-  <div class="ctrl"><label>Visualizer</label>
-    <select id="vizType">
-      <option value="circle" selected>Circle Spectrum</option>
-      <option value="bars">Spectrum Bars</option>
-      <option value="wave">Waveform</option>
-      <option value="mirrorBars">Mirror Bars</option>
-    </select>
-  </div>
   <div class="ctrl"><label>Particles</label>
     <select id="partStyle">
       <option value="stars">Stars</option>
@@ -99,6 +91,8 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="ctrl"><label>Color Scheme</label>
     <select id="colorScheme">
+      <option value="imageColors" selected>Image Colors</option>
+      <option disabled>──────────</option>
       <option value="purple">Purple / Blue</option>
       <option value="fire">Fire</option>
       <option value="teal">Teal / Cyan</option>
@@ -135,7 +129,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.5.0</div>
+<div class="version">v1.6.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -151,6 +145,7 @@ let playing = false, animId;
 let particles = [];
 
 const palettes = {
+  imageColors: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'], // default until image loaded
   purple: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'],
   fire:   ['#ff6b00','#ff3d00','#ffcc00','#ff9100','#ff4500'],
   teal:   ['#00e5ff','#00bcd4','#26c6da','#4dd0e1','#00acc1'],
@@ -340,38 +335,6 @@ function drawCircle(data,p,energy){
   }
   ctx.globalAlpha=1;
 }
-function drawBars(data,p){
-  const n=80,bw=W/n*.75;
-  for(let i=0;i<n;i++){
-    const v=data[i]/255, bh=v*H*.5;
-    const x=i*(W/n)+(W/n-bw)/2;
-    ctx.fillStyle=p[i%p.length];
-    ctx.globalAlpha=0.85;
-    ctx.beginPath();ctx.roundRect(x,H*.75-bh,bw,bh,3);ctx.fill();
-  }
-  ctx.globalAlpha=1;
-}
-function drawMirrorBars(data,p){
-  const n=80,bw=W/n*.7;
-  for(let i=0;i<n;i++){
-    const v=data[i]/255, bh=v*H*.35;
-    const x=i*(W/n)+(W/n-bw)/2;
-    ctx.fillStyle=p[i%p.length];
-    ctx.globalAlpha=0.8;
-    ctx.beginPath();ctx.roundRect(x,H/2-bh,bw,bh,2);ctx.fill();
-    ctx.beginPath();ctx.roundRect(x,H/2,bw,bh,2);ctx.fill();
-  }
-  ctx.globalAlpha=1;
-}
-function drawWave(data,p){
-  ctx.beginPath();ctx.strokeStyle=p[0];ctx.lineWidth=3;ctx.globalAlpha=.9;
-  for(let i=0;i<data.length;i++){
-    const x=i/data.length*W, v=(data[i]/128-1)*H*.28;
-    i===0?ctx.moveTo(x,H/2+v):ctx.lineTo(x,H/2+v);
-  }
-  ctx.stroke();ctx.globalAlpha=1;
-}
-
 // ---- MAIN DRAW ----
 function drawFrame(data){
   const p=pal();
@@ -391,11 +354,7 @@ function drawFrame(data){
 
   manageParticles(energy);
 
-  const vt=document.getElementById('vizType').value;
-  if(vt==='circle') drawCircle(data,p,energy);
-  else if(vt==='bars') drawBars(data,p);
-  else if(vt==='mirrorBars') drawMirrorBars(data,p);
-  else drawWave(data,p);
+  drawCircle(data,p,energy);
 
 }
 
