@@ -37,9 +37,26 @@ select:hover{border-color:#a07fff}
 .seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:5px;border-radius:3px}
 .seek-time{font-size:11px;color:#888;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
 .version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
+#loginOverlay{position:fixed;inset:0;background:#0d0d18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9999}
+#loginOverlay h2{font-size:18px;color:#c4a0ff;letter-spacing:1px;margin-bottom:8px}
+#loginOverlay input{background:#1a1a30;border:1px solid #444;color:#fff;border-radius:6px;padding:9px 14px;font-size:14px;width:220px;outline:none}
+#loginOverlay input:focus{border-color:#a07fff}
+#loginOverlay button{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:10px 32px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+#loginOverlay .login-err{font-size:12px;color:#ff4444;min-height:16px}
+#appContent{display:none}
 </style>
 </head>
 <body>
+
+<div id="loginOverlay">
+  <h2>MORTEK MUSIC — VISUALIZER</h2>
+  <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn">Login</button>
+  <div class="login-err" id="loginErr"></div>
+</div>
+
+<div id="appContent">
 <h1>MORTEK MUSIC — VISUALIZER</h1>
 
 <div class="panel">
@@ -115,7 +132,7 @@ select:hover{border-color:#a07fff}
 <div id="status">Load an image and audio to begin</div>
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
-<div class="version">v1.1.1</div>
+<div class="version">v1.2.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -603,6 +620,30 @@ document.getElementById('dlBtn').onclick=async function(){
 
 function setStatus(t){document.getElementById('status').textContent=t;}
 loop();
+</script>
+</div>
+
+<script>
+// Login gate
+const H_VALID='cd8c10325c09bbd38f2c66321f2ba7bd29844cc6';
+function sha1(s){return crypto.subtle.digest('SHA-1',new TextEncoder().encode(s)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}
+async function doLogin(){
+  const u=document.getElementById('loginUser').value;
+  const p=document.getElementById('loginPass').value;
+  const h=await sha1(u+':'+p);
+  if(h!==H_VALID){document.getElementById('loginErr').textContent='Wrong username or password';return;}
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('appContent').style.display='';
+  sessionStorage.setItem('mv_auth','1');
+}
+// Check if already authenticated this session
+if(sessionStorage.getItem('mv_auth')==='1'){
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('appContent').style.display='';
+}
+document.getElementById('loginBtn').onclick=doLogin;
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+document.getElementById('loginUser').onkeydown=e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();};
 </script>
 </body>
 </html>
