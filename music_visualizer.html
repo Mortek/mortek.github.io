@@ -22,14 +22,15 @@ canvas{display:block;border-radius:12px;max-width:100%;height:auto;box-shadow:0 
 .clear-x:hover{opacity:1}
 .upload-wrap.has-file .clear-x{display:inline-flex}
 .cat-label{width:100%;text-align:center;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1.5px;padding:2px 0 0}
-.icon-btn{background:#1e1e3a;border:1px solid #333;color:#999;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:16px;line-height:1;transition:all .2s}
+.icon-btn{background:#1e1e3a;border:1px solid #333;color:#999;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:16px;display:inline-flex;align-items:center;justify-content:center;transition:all .2s}
 .icon-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 input[type=file]{display:none}
 .ctrl{display:flex;flex-direction:column;gap:3px;align-items:center}
 .ctrl label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
 select{background:#1a1a30;border:1px solid #333;color:#ccc;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;transition:border-color .2s}
 select:hover{border-color:#a07fff}
-.ctrl-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;padding:8px 14px;background:#111128;border-radius:10px;border:1px solid #1e1e3a;margin-top:12px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:960px;margin-top:12px}
+.ctrl-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:8px 10px;background:#111128;border-radius:10px;border:1px solid #1e1e3a}
 .dl-btn{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:12px 36px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:.5px;transition:all .2s;margin-top:6px}
 .dl-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,63,197,0.3)}
 .dl-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
@@ -75,9 +76,11 @@ select:hover{border-color:#a07fff}
       <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
     </span>
     <button class="sm-btn" id="clearBtn">Clear All</button>
+    <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
   </div>
 </div>
 
+<div class="settings-grid">
 <div class="ctrl-row">
   <div class="cat-label">Particles</div>
   <div class="ctrl"><label>Shape</label>
@@ -247,7 +250,6 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Logo Color <span id="logoTintVal">40%</span></label>
     <input type="range" id="logoTint" min="0" max="100" value="40" style="width:90px">
   </div>
-  <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
 </div>
 <div class="ctrl-row">
   <div class="cat-label">Background FX</div>
@@ -291,6 +293,7 @@ select:hover{border-color:#a07fff}
     <input type="range" id="hueSat" min="0" max="100" value="100" style="width:90px">
   </div>
 </div>
+</div>
 
 <canvas id="c" width="1280" height="720"></canvas>
 
@@ -306,7 +309,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.3.0</div>
+<div class="version">v2.3.1</div>
 
 <script>
 const C = document.getElementById('c');
