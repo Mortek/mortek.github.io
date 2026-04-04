@@ -66,6 +66,7 @@ select:hover{border-color:#a07fff}
   <input type="file" id="audioInput" accept="audio/*">
   <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
   <input type="file" id="logoInput" accept="image/*">
+  <span style="display:inline-block;width:20px"></span>
   <button class="sm-btn" id="clearImgBtn">Clear Image</button>
   <button class="sm-btn" id="clearAudioBtn">Clear Audio</button>
   <button class="sm-btn" id="clearBtn">Clear All</button>
@@ -232,8 +233,8 @@ select:hover{border-color:#a07fff}
       <option value="220">Very Large</option>
     </select>
   </div>
-  <div class="ctrl"><label>Logo Color <span id="logoTintVal">50%</span></label>
-    <input type="range" id="logoTint" min="0" max="100" value="50" style="width:90px">
+  <div class="ctrl"><label>Logo Color <span id="logoTintVal">40%</span></label>
+    <input type="range" id="logoTint" min="0" max="100" value="40" style="width:90px">
   </div>
   <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
 </div>
@@ -243,7 +244,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.4</div>
+<div class="version">v1.9.5</div>
 
 <script>
 const C = document.getElementById('c');
@@ -518,7 +519,7 @@ function drawCircle(data,p,energy){
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
     ctx.beginPath();ctx.arc(cx,cy,base*.9,0,Math.PI*2);ctx.clip();
-    const lSize=base*1.8;
+    const lSize=baseR*1.8;
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
     if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
