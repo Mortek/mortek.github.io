@@ -137,7 +137,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.8.1</div>
+<div class="version">v1.8.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -145,6 +145,7 @@ const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false, imgName = '';
 let logo = null, logoLoaded = false;
+let logoMaskSrc = null; // pre-processed: bright parts as white with luminosity-alpha
 const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
@@ -229,6 +230,25 @@ function applyImageColors(image){
   sel.insertBefore(opt,sel.firstChild);
   sel.insertBefore(sep,sel.firstChild);
   sel.value='imageColors';
+}
+
+// ---- LOGO MASK: extract bright parts as luminosity-alpha silhouette ----
+function processLogoMask(){
+  const tc=document.createElement('canvas');
+  tc.width=logo.naturalWidth; tc.height=logo.naturalHeight;
+  const tx=tc.getContext('2d');
+  tx.drawImage(logo,0,0);
+  const id=tx.getImageData(0,0,tc.width,tc.height), d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const lum=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;
+    const a=d[i+3]/255;
+    // Dark pixels become transparent, bright pixels become opaque white
+    const t=lum<30?0:Math.pow((lum-30)/225,1.2);
+    d[i]=d[i+1]=d[i+2]=255;
+    d[i+3]=Math.round(a*t*255);
+  }
+  tx.putImageData(id,0,0);
+  logoMaskSrc=tc;
 }
 
 // ---- PARTICLES ----
@@ -348,17 +368,17 @@ function manageParticles(energy,data){
 function drawCircle(data,p,energy){
   const cx=W/2,cy=H/2,base=140+energy*30;
   // inner circle: logo or glow ring
-  if(logoLoaded&&logo){
+  if(logoLoaded&&logoMaskSrc){
     ctx.save();
     ctx.beginPath();ctx.arc(cx,cy,base*.9,0,Math.PI*2);ctx.clip();
     const lSize=base*1.8;
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
     if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
-    // Recolor logo silhouette to palette primary color
+    // Tint luminosity mask to palette primary color
     const lc=logoCanvas, lx=lc.getContext('2d');
     lc.width=Math.ceil(lw); lc.height=Math.ceil(lh);
-    lx.drawImage(logo,0,0,lc.width,lc.height);
+    lx.drawImage(logoMaskSrc,0,0,lc.width,lc.height);
     lx.globalCompositeOperation='source-in';
     lx.fillStyle=p[0];
     lx.fillRect(0,0,lc.width,lc.height);
@@ -528,6 +548,7 @@ document.getElementById('logoInput').onchange=e=>{
   logo=new Image();
   logo.onload=()=>{
     logoLoaded=true;
+    processLogoMask();
     document.getElementById('logoLabel').textContent='✓ '+f.name;
     document.getElementById('logoLabel').classList.add('loaded');
     setStatus('Logo loaded!');
@@ -583,7 +604,7 @@ document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
-  img=null;imgLoaded=false;imgName='';logo=null;logoLoaded=false;window.audioBuffer=null;particles=[];
+  img=null;imgLoaded=false;imgName='';logo=null;logoLoaded=false;logoMaskSrc=null;window.audioBuffer=null;particles=[];
   delete palettes.imageColors;
   const sel=document.getElementById('colorScheme');
   const oldOpt=sel.querySelector('option[value="imageColors"]');if(oldOpt)oldOpt.remove();
