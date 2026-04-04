@@ -244,7 +244,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.5</div>
+<div class="version">v1.9.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -514,7 +514,7 @@ function manageParticles(energy,data){
 // ---- VISUALIZERS ----
 function drawCircle(data,p,energy){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
-  const cx=W/2,cy=H/2,base=baseR+energy*30;
+  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6;
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
