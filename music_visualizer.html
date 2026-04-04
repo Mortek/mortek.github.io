@@ -49,11 +49,14 @@ select:hover{border-color:#a07fff}
 .version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
 .donate-btn{position:fixed;top:12px;right:16px;background:linear-gradient(135deg,#0070ba,#003087);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s;z-index:100;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .donate-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,112,186,0.3)}
+.donate-btn .tooltip{position:absolute;top:calc(100% + 10px);right:0;background:#1e1e3a;color:#aaa;font-size:11px;font-weight:400;padding:10px 14px;border-radius:8px;width:240px;line-height:1.5;letter-spacing:0;opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:0 4px 16px rgba(0,0,0,0.4);border:1px solid #2a2a4a}
+.donate-btn:hover .tooltip{opacity:1}
+.btn-group{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
 </style>
 </head>
 <body>
 
-<a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">&#9829; Donate</a>
+<a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">&#9829; Donate<span class="tooltip">This tool is free and ad-free. If you enjoy it, a small donation helps me keep building and improving it. Completely optional — no pressure!</span></a>
 
 <div id="appContent">
 
@@ -75,8 +78,10 @@ select:hover{border-color:#a07fff}
       <input type="file" id="logoInput" accept="image/*">
       <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
     </span>
-    <button class="sm-btn" id="clearBtn">Clear All</button>
-    <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
+    <div class="btn-group">
+      <button class="sm-btn" id="clearBtn">Clear All</button>
+      <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
+    </div>
   </div>
 </div>
 
@@ -309,7 +314,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.3.2</div>
+<div class="version">v2.3.3</div>
 
 <script>
 const C = document.getElementById('c');
