@@ -303,6 +303,9 @@ select:hover{border-color:#a07fff}
       <option value="5">Very Fast</option>
     </select>
   </div>
+  <div class="ctrl"><label>Hue Intensity <span id="hueSatVal">50%</span></label>
+    <input type="range" id="hueSat" min="0" max="100" value="50" style="width:90px">
+  </div>
 </div>
 
 <div class="download-row">
@@ -310,7 +313,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.1.1</div>
+<div class="version">v2.1.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -336,7 +339,7 @@ let frameCount = 0;
 
 // ---- PREFERENCES (session cookie) ----
 const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','bassZoom','brightPulse','vigPulse','hueShift'];
-const prefRangeIds=['logoTint'];
+const prefRangeIds=['logoTint','hueSat'];
 function savePrefs(){
   const prefs={};
   prefIds.forEach(id=>{prefs[id]=document.getElementById(id).value;});
@@ -362,6 +365,9 @@ loadPrefs();
 const logoTintEl=document.getElementById('logoTint'),logoTintVal=document.getElementById('logoTintVal');
 logoTintVal.textContent=logoTintEl.value+'%';
 logoTintEl.oninput=function(){logoTintVal.textContent=this.value+'%';};
+const hueSatEl=document.getElementById('hueSat'),hueSatVal=document.getElementById('hueSatVal');
+hueSatVal.textContent=hueSatEl.value+'%';
+hueSatEl.oninput=function(){hueSatVal.textContent=this.value+'%';};
 document.getElementById('savePrefBtn').onclick=function(){
   savePrefs();
   this.textContent='Saved!';
@@ -702,7 +708,10 @@ function drawFrame(data){
       ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
     }
     // Hue shift via filter
-    if(hueStr>0) ctx.filter='hue-rotate('+bgHue+'deg)';
+    if(hueStr>0){
+      const hueSat=parseInt(document.getElementById('hueSat').value)/100;
+      ctx.filter='hue-rotate('+bgHue+'deg) saturate('+hueSat+')';
+    }
     const sc=Math.max(W/img.naturalWidth, H/img.naturalHeight);
     const dw=img.naturalWidth*sc, dh=img.naturalHeight*sc;
     ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
