@@ -279,8 +279,8 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Brightness Pulse</label>
     <select id="brightPulse">
       <option value="0">Off</option>
-      <option value="0.06">Subtle</option>
-      <option value="0.12" selected>Medium</option>
+      <option value="0.06" selected>Subtle</option>
+      <option value="0.12">Medium</option>
       <option value="0.25">Strong</option>
       <option value="0.4">Extreme</option>
     </select>
@@ -297,8 +297,8 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Hue Shift</label>
     <select id="hueShift">
       <option value="0">Off</option>
-      <option value="0.3">Slow</option>
-      <option value="0.8" selected>Medium</option>
+      <option value="0.3" selected>Slow</option>
+      <option value="0.8">Medium</option>
       <option value="2">Fast</option>
       <option value="5">Very Fast</option>
     </select>
@@ -310,7 +310,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.1.0</div>
+<div class="version">v2.1.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -674,18 +674,19 @@ function drawFrame(data){
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
 
-  // Bass onset for background FX
+  // Bass onset detection for background FX (reuse prevBass from particles)
   const bassFX=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+  const bassOnset=Math.max(bassFX-prevBass,0);
   const zoomStr=parseFloat(document.getElementById('bassZoom').value);
   const brightStr=parseFloat(document.getElementById('brightPulse').value);
   const vigStr=parseFloat(document.getElementById('vigPulse').value);
   const hueStr=parseFloat(document.getElementById('hueShift').value);
 
-  // Trigger on energy spikes
-  if(energy>0.15){
-    bgZoom=Math.max(bgZoom,bassFX*zoomStr);
-    bgBright=Math.max(bgBright,bassFX*brightStr);
-    bgVig=Math.max(bgVig,bassFX*vigStr);
+  // Only trigger on actual bass onset
+  if(bassOnset>0.05){
+    bgZoom=Math.max(bgZoom,bassOnset*zoomStr*8);
+    bgBright=Math.max(bgBright,bassOnset*brightStr*4);
+    bgVig=Math.max(bgVig,bassOnset*vigStr*4);
   }
   // Ease back
   bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
