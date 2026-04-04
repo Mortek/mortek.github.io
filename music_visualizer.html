@@ -16,6 +16,13 @@ canvas{display:block;border-radius:12px;max-width:100%;height:auto;box-shadow:0 
 .upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1e1e3a;border:1.5px dashed #444;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
 .upload-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 .upload-btn.loaded{border-color:#5cb85c;border-style:solid;color:#7ddb7d}
+.upload-wrap{display:inline-flex;align-items:center;gap:0}
+.clear-x{display:none;background:none;border:none;color:#ff5555;font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;opacity:0.6;transition:opacity .2s}
+.clear-x:hover{opacity:1}
+.upload-wrap.has-file .clear-x{display:inline-flex}
+.cat-label{width:100%;text-align:center;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1.5px;padding:2px 0 0}
+.icon-btn{background:#1e1e3a;border:1px solid #333;color:#999;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:16px;line-height:1;transition:all .2s}
+.icon-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 input[type=file]{display:none}
 .ctrl{display:flex;flex-direction:column;gap:3px;align-items:center}
 .ctrl label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
@@ -60,29 +67,36 @@ select:hover{border-color:#a07fff}
 
 <div id="appContent" class="hidden">
 <div class="panel">
-  <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
-  <input type="file" id="imgInput" accept="image/*">
-  <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
-  <input type="file" id="audioInput" accept="audio/*">
-  <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
-  <input type="file" id="logoInput" accept="image/*">
-  <span style="display:inline-block;width:20px"></span>
-  <button class="sm-btn" id="clearImgBtn">Clear Image</button>
-  <button class="sm-btn" id="clearAudioBtn">Clear Audio</button>
+  <span class="upload-wrap" id="imgWrap">
+    <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
+    <input type="file" id="imgInput" accept="image/*">
+    <button class="clear-x" id="clearImgBtn" title="Clear image">&times;</button>
+  </span>
+  <span class="upload-wrap" id="audioWrap">
+    <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
+    <input type="file" id="audioInput" accept="audio/*">
+    <button class="clear-x" id="clearAudioBtn" title="Clear audio">&times;</button>
+  </span>
+  <span class="upload-wrap" id="logoWrap">
+    <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
+    <input type="file" id="logoInput" accept="image/*">
+    <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
+  </span>
   <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
 
 <div class="seek-row">
-  <button class="sm-btn" id="pauseBtn">Pause</button>
-  <button class="sm-btn" id="muteBtn">Mute</button>
+  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
+  <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
   <span class="seek-time" id="seekTime">0:00 / 0:00</span>
   <input type="range" id="seekBar" min="0" max="1000" value="0">
 </div>
 
 <div class="ctrl-row">
-  <div class="ctrl"><label>Particles</label>
+  <div class="cat-label">Particles</div>
+  <div class="ctrl"><label>Shape</label>
     <select id="partStyle">
       <option value="sparks">Sparks</option>
       <option value="sparksint" selected>Sparks Intensified</option>
@@ -101,7 +115,7 @@ select:hover{border-color:#a07fff}
       <option value="dots">Dots</option>
     </select>
   </div>
-  <div class="ctrl"><label>Part. Intensity</label>
+  <div class="ctrl"><label>Intensity</label>
     <select id="partIntensity">
       <option value="0.5">Low</option>
       <option value="1">Normal</option>
@@ -109,7 +123,7 @@ select:hover{border-color:#a07fff}
       <option value="3.5">Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label>Part. Amount</label>
+  <div class="ctrl"><label>Amount</label>
     <select id="partAmount">
       <option value="50">Few (50)</option>
       <option value="100">Normal (100)</option>
@@ -117,7 +131,7 @@ select:hover{border-color:#a07fff}
       <option value="350" selected>Lots (350)</option>
     </select>
   </div>
-  <div class="ctrl"><label>Part. Speed</label>
+  <div class="ctrl"><label>Speed</label>
     <select id="partSpeed">
       <option value="0.15">Slow</option>
       <option value="0.5" selected>Normal</option>
@@ -125,7 +139,7 @@ select:hover{border-color:#a07fff}
       <option value="2">Very Fast</option>
     </select>
   </div>
-  <div class="ctrl"><label>Part. Size</label>
+  <div class="ctrl"><label>Size</label>
     <select id="partSize">
       <option value="0.5">Tiny</option>
       <option value="1" selected>Normal</option>
@@ -133,7 +147,7 @@ select:hover{border-color:#a07fff}
       <option value="3.5">Huge</option>
     </select>
   </div>
-  <div class="ctrl"><label>Part. Lifetime</label>
+  <div class="ctrl"><label>Lifetime</label>
     <select id="partLife">
       <option value="0.4">Short</option>
       <option value="1">Normal</option>
@@ -150,6 +164,70 @@ select:hover{border-color:#a07fff}
       <option value="120" selected>Extreme</option>
     </select>
   </div>
+</div>
+<div class="ctrl-row">
+  <div class="cat-label">Spectrum Bars</div>
+  <div class="ctrl"><label>Intensity</label>
+    <select id="barIntensity">
+      <option value="0.4">Low</option>
+      <option value="1">Normal</option>
+      <option value="2" selected>High</option>
+      <option value="3.5">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Threshold</label>
+    <select id="barThreshold">
+      <option value="0">None</option>
+      <option value="0.08" selected>Low</option>
+      <option value="0.2">Medium</option>
+      <option value="0.4">High</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Count</label>
+    <select id="barCount">
+      <option value="50">50</option>
+      <option value="100" selected>100</option>
+      <option value="150">150</option>
+      <option value="200">200</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Width</label>
+    <select id="barWidth">
+      <option value="1">Thin</option>
+      <option value="2.5" selected>Normal</option>
+      <option value="4">Thick</option>
+      <option value="6">Very Thick</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Length</label>
+    <select id="barLength">
+      <option value="0.04">Tiny</option>
+      <option value="0.07" selected>Short</option>
+      <option value="0.1">Normal</option>
+      <option value="0.15">Long</option>
+      <option value="0.22">Very Long</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Smoothing</label>
+    <select id="barSmoothing">
+      <option value="0.05">Snappy</option>
+      <option value="0.01">Normal</option>
+      <option value="0.003">Smooth</option>
+      <option value="0.001" selected>Very Smooth</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Inner Radius</label>
+    <select id="innerRadius">
+      <option value="80">Tiny</option>
+      <option value="110" selected>Small</option>
+      <option value="140">Normal</option>
+      <option value="180">Large</option>
+      <option value="220">Very Large</option>
+    </select>
+  </div>
+</div>
+<div class="ctrl-row">
+  <div class="cat-label">Visual</div>
   <div class="ctrl"><label>Color Scheme</label>
     <select id="colorScheme">
       <option value="imageColors" selected>Image Colors</option>
@@ -182,66 +260,6 @@ select:hover{border-color:#a07fff}
       <option value="0.9" selected>Very Dark</option>
     </select>
   </div>
-</div>
-<div class="ctrl-row">
-  <div class="ctrl"><label>Bar Intensity</label>
-    <select id="barIntensity">
-      <option value="0.4">Low</option>
-      <option value="1">Normal</option>
-      <option value="2" selected>High</option>
-      <option value="3.5">Extreme</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bar Threshold</label>
-    <select id="barThreshold">
-      <option value="0">None</option>
-      <option value="0.08" selected>Low</option>
-      <option value="0.2">Medium</option>
-      <option value="0.4">High</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bar Count</label>
-    <select id="barCount">
-      <option value="50">50</option>
-      <option value="100" selected>100</option>
-      <option value="150">150</option>
-      <option value="200">200</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bar Width</label>
-    <select id="barWidth">
-      <option value="1">Thin</option>
-      <option value="2.5" selected>Normal</option>
-      <option value="4">Thick</option>
-      <option value="6">Very Thick</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bar Smoothing</label>
-    <select id="barSmoothing">
-      <option value="0.05">Snappy</option>
-      <option value="0.01">Normal</option>
-      <option value="0.003">Smooth</option>
-      <option value="0.001" selected>Very Smooth</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Inner Radius</label>
-    <select id="innerRadius">
-      <option value="80">Tiny</option>
-      <option value="110" selected>Small</option>
-      <option value="140">Normal</option>
-      <option value="180">Large</option>
-      <option value="220">Very Large</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bar Length</label>
-    <select id="barLength">
-      <option value="0.04">Tiny</option>
-      <option value="0.07" selected>Short</option>
-      <option value="0.1">Normal</option>
-      <option value="0.15">Long</option>
-      <option value="0.22">Very Long</option>
-    </select>
-  </div>
   <div class="ctrl"><label>Logo Color <span id="logoTintVal">40%</span></label>
     <input type="range" id="logoTint" min="0" max="100" value="40" style="width:90px">
   </div>
@@ -253,7 +271,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.8</div>
+<div class="version">v2.0.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -704,6 +722,7 @@ document.getElementById('imgInput').onchange=e=>{
     imgName=f.name.replace(/\.[^.]+$/,'');
     document.getElementById('imgLabel').textContent='✓ '+f.name;
     document.getElementById('imgLabel').classList.add('loaded');
+    document.getElementById('imgWrap').classList.add('has-file');
     applyImageColors(img);
     setStatus('Image loaded — colors extracted!');
     if(!animId) loop();
@@ -719,6 +738,7 @@ function loadLogoFromSrc(src,name){
     processLogoMask();
     document.getElementById('logoLabel').textContent='✓ '+(name||'Logo');
     document.getElementById('logoLabel').classList.add('loaded');
+    document.getElementById('logoWrap').classList.add('has-file');
     setStatus('Logo loaded!');
   };
   logo.onerror=()=>setStatus('Error loading logo');
@@ -751,6 +771,7 @@ document.getElementById('audioInput').onchange=e=>{
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
+      document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
       initAudio(buf);
@@ -773,15 +794,15 @@ seekBar.addEventListener('change',()=>{
 // ---- MUTE / PAUSE / CLEAR ----
 document.getElementById('muteBtn').onclick=function(){
   if(!gainNode)return;
-  if(gainNode.gain.value>0){gainNode.gain.value=0;this.textContent='Unmute';}
-  else{gainNode.gain.value=1;this.textContent='Mute';}
+  if(gainNode.gain.value>0){gainNode.gain.value=0;this.innerHTML='&#128263;';this.title='Unmute';}
+  else{gainNode.gain.value=1;this.innerHTML='&#128264;';this.title='Mute';}
 };
 document.getElementById('pauseBtn').onclick=function(){
   if(!audioCtx||!source)return;
   if(audioCtx.state==='running'){
     playOffset=getCurrentTime();
-    audioCtx.suspend();this.textContent='Resume';
-  } else{audioCtx.resume();playStartTime=audioCtx.currentTime;this.textContent='Pause';}
+    audioCtx.suspend();this.innerHTML='&#9654;';this.title='Resume';
+  } else{audioCtx.resume();playStartTime=audioCtx.currentTime;this.innerHTML='&#9208;';this.title='Pause';}
 };
 document.getElementById('clearImgBtn').onclick=function(){
   img=null;imgLoaded=false;imgName='';
@@ -793,6 +814,7 @@ document.getElementById('clearImgBtn').onclick=function(){
   document.getElementById('imgInput').value='';
   document.getElementById('imgLabel').textContent='+ Load Image';
   document.getElementById('imgLabel').classList.remove('loaded');
+  document.getElementById('imgWrap').classList.remove('has-file');
   setStatus('Image cleared');
 };
 document.getElementById('clearAudioBtn').onclick=function(){
@@ -803,11 +825,21 @@ document.getElementById('clearAudioBtn').onclick=function(){
   document.getElementById('audioInput').value='';
   document.getElementById('audioLabel').textContent='+ Load Audio';
   document.getElementById('audioLabel').classList.remove('loaded');
+  document.getElementById('audioWrap').classList.remove('has-file');
   document.getElementById('dlBtn').disabled=true;
-  document.getElementById('pauseBtn').textContent='Pause';
-  document.getElementById('muteBtn').textContent='Mute';
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  document.getElementById('muteBtn').innerHTML='&#128264;';document.getElementById('muteBtn').title='Mute';
   seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
   setStatus('Audio cleared');
+};
+document.getElementById('clearLogoBtn').onclick=function(){
+  logo=null;logoLoaded=false;logoMaskSrc=null;
+  try{sessionStorage.removeItem('mvLogo');sessionStorage.removeItem('mvLogoName');}catch(e){}
+  document.getElementById('logoInput').value='';
+  document.getElementById('logoLabel').textContent='+ Load Logo';
+  document.getElementById('logoLabel').classList.remove('loaded');
+  document.getElementById('logoWrap').classList.remove('has-file');
+  setStatus('Logo cleared');
 };
 document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
@@ -820,18 +852,21 @@ document.getElementById('clearBtn').onclick=function(){
   const oldOpt=sel.querySelector('option[value="imageColors"]');if(oldOpt)oldOpt.remove();
   const oldSep=sel.querySelector('.img-color-sep');if(oldSep)oldSep.remove();
   sel.value='purple';
+  document.getElementById('imgInput').value='';
   document.getElementById('imgLabel').textContent='+ Load Image';
   document.getElementById('imgLabel').classList.remove('loaded');
+  document.getElementById('imgWrap').classList.remove('has-file');
+  document.getElementById('audioInput').value='';
   document.getElementById('audioLabel').textContent='+ Load Audio';
   document.getElementById('audioLabel').classList.remove('loaded');
-  document.getElementById('imgInput').value='';
-  document.getElementById('audioInput').value='';
+  document.getElementById('audioWrap').classList.remove('has-file');
   document.getElementById('logoInput').value='';
   document.getElementById('logoLabel').textContent='+ Load Logo';
   document.getElementById('logoLabel').classList.remove('loaded');
+  document.getElementById('logoWrap').classList.remove('has-file');
   document.getElementById('dlBtn').disabled=true;
-  document.getElementById('pauseBtn').textContent='Pause';
-  document.getElementById('muteBtn').textContent='Mute';
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  document.getElementById('muteBtn').innerHTML='&#128264;';document.getElementById('muteBtn').title='Mute';
   seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
   setStatus('Load an image and audio to begin');
 };
