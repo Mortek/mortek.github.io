@@ -317,7 +317,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.4.5</div>
+<div class="version">v2.4.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -917,11 +917,14 @@ document.getElementById('muteBtn').onclick=function(){
   else{gainNode.gain.value=1;this.innerHTML='&#128264;';this.title='Mute';}
 };
 document.getElementById('pauseBtn').onclick=function(){
-  if(!audioCtx||!source)return;
+  if(!audioCtx||!audioBuffer)return;
   if(audioCtx.state==='running'){
     playOffset=getCurrentTime();
     audioCtx.suspend();this.innerHTML='&#9654;';this.title='Resume';
-  } else{audioCtx.resume();playStartTime=audioCtx.currentTime;this.innerHTML='&#9208;';this.title='Pause';}
+  } else{
+    audioCtx.resume().then(()=>{playPreview(playOffset);});
+    this.innerHTML='&#9208;';this.title='Pause';
+  }
 };
 document.getElementById('clearImgBtn').onclick=function(){
   img=null;imgLoaded=false;imgName='';
