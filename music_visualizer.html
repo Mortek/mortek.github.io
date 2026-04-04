@@ -233,6 +233,15 @@ select:hover{border-color:#a07fff}
       <option value="220">Very Large</option>
     </select>
   </div>
+  <div class="ctrl"><label>Bar Length</label>
+    <select id="barLength">
+      <option value="0.04">Tiny</option>
+      <option value="0.07">Short</option>
+      <option value="0.1" selected>Normal</option>
+      <option value="0.15">Long</option>
+      <option value="0.22">Very Long</option>
+    </select>
+  </div>
   <div class="ctrl"><label>Logo Color <span id="logoTintVal">40%</span></label>
     <input type="range" id="logoTint" min="0" max="100" value="40" style="width:90px">
   </div>
@@ -244,7 +253,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.6</div>
+<div class="version">v1.9.7</div>
 
 <script>
 const C = document.getElementById('c');
@@ -264,7 +273,7 @@ let particles = [];
 let prevBass = 0; // previous frame bass for onset detection
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','innerRadius'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius'];
 const prefRangeIds=['logoTint'];
 function savePrefs(){
   const prefs={};
@@ -584,7 +593,8 @@ function drawCircle(data,p,energy){
   for(let i=0;i<bars;i++){
     const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*.1*bInt+4;
+    const bLen=parseFloat(document.getElementById('barLength').value);
+    const r1=base, r2=base+v*H*bLen*bInt+4;
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
