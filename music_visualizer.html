@@ -310,6 +310,7 @@ select:hover{border-color:#a07fff}
 <canvas id="c" width="1280" height="720"></canvas>
 
 <div class="seek-row">
+  <button class="icon-btn" id="restartBtn" title="Restart">&#8634;</button>
   <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
   <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
   <span class="seek-time" id="seekTime">0:00 / 0:00</span>
@@ -318,7 +319,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.4.1</div>
+<div class="version">v2.4.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -905,7 +906,13 @@ seekBar.addEventListener('change',()=>{
   playPreview(t);
 });
 
-// ---- MUTE / PAUSE / CLEAR ----
+// ---- RESTART / MUTE / PAUSE / CLEAR ----
+document.getElementById('restartBtn').onclick=function(){
+  if(!audioBuffer||!audioCtx)return;
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  playPreview(0);
+};
 document.getElementById('muteBtn').onclick=function(){
   if(!gainNode)return;
   if(gainNode.gain.value>0){gainNode.gain.value=0;this.innerHTML='&#128263;';this.title='Unmute';}
