@@ -137,7 +137,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.8.0</div>
+<div class="version">v1.8.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -145,6 +145,7 @@ const ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false, imgName = '';
 let logo = null, logoLoaded = false;
+const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
 const barMin = new Float32Array(100).fill(0.5);
@@ -354,7 +355,22 @@ function drawCircle(data,p,energy){
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
     if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
-    ctx.drawImage(logo,cx-lw/2,cy-lh/2,lw,lh);
+    // Recolor logo silhouette to palette primary color
+    const lc=logoCanvas, lx=lc.getContext('2d');
+    lc.width=Math.ceil(lw); lc.height=Math.ceil(lh);
+    lx.drawImage(logo,0,0,lc.width,lc.height);
+    lx.globalCompositeOperation='source-in';
+    lx.fillStyle=p[0];
+    lx.fillRect(0,0,lc.width,lc.height);
+    // Glow layer
+    ctx.globalAlpha=0.2+energy*0.25;
+    ctx.shadowColor=p[0];
+    ctx.shadowBlur=25+energy*30;
+    ctx.drawImage(lc,cx-lw/2,cy-lh/2,lw,lh);
+    // Sharp logo on top
+    ctx.shadowBlur=0;
+    ctx.globalAlpha=0.85+energy*0.15;
+    ctx.drawImage(lc,cx-lw/2,cy-lh/2,lw,lh);
     ctx.restore();
   } else {
     ctx.save();
