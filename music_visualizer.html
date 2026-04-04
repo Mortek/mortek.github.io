@@ -265,13 +265,52 @@ select:hover{border-color:#a07fff}
   </div>
   <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
 </div>
+<div class="ctrl-row">
+  <div class="cat-label">Background FX</div>
+  <div class="ctrl"><label>Bass Zoom</label>
+    <select id="bassZoom">
+      <option value="0">Off</option>
+      <option value="0.008">Subtle</option>
+      <option value="0.018" selected>Medium</option>
+      <option value="0.035">Strong</option>
+      <option value="0.06">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Brightness Pulse</label>
+    <select id="brightPulse">
+      <option value="0">Off</option>
+      <option value="0.06">Subtle</option>
+      <option value="0.12" selected>Medium</option>
+      <option value="0.25">Strong</option>
+      <option value="0.4">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Vignette Pulse</label>
+    <select id="vigPulse">
+      <option value="0">Off</option>
+      <option value="0.08">Subtle</option>
+      <option value="0.18" selected>Medium</option>
+      <option value="0.35">Strong</option>
+      <option value="0.5">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Hue Shift</label>
+    <select id="hueShift">
+      <option value="0">Off</option>
+      <option value="0.3">Slow</option>
+      <option value="0.8" selected>Medium</option>
+      <option value="2">Fast</option>
+      <option value="5">Very Fast</option>
+    </select>
+  </div>
+</div>
 
 <div class="download-row">
   <div id="status">Load an image and audio to begin</div>
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.0.0</div>
+<div class="version">v2.1.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -289,9 +328,14 @@ let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
 let prevBass = 0; // previous frame bass for onset detection
+let bgZoom = 0; // current bass zoom amount (eases back to 0)
+let bgBright = 0; // current brightness pulse (eases back to 0)
+let bgVig = 0; // current vignette pulse (eases back to 0)
+let bgHue = 0; // cumulative hue rotation in degrees
+let frameCount = 0;
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','bassZoom','brightPulse','vigPulse','hueShift'];
 const prefRangeIds=['logoTint'];
 function savePrefs(){
   const prefs={};
@@ -625,27 +669,66 @@ function drawCircle(data,p,energy){
 }
 // ---- MAIN DRAW ----
 function drawFrame(data){
+  frameCount++;
   const p=pal();
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
 
+  // Bass onset for background FX
+  const bassFX=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+  const zoomStr=parseFloat(document.getElementById('bassZoom').value);
+  const brightStr=parseFloat(document.getElementById('brightPulse').value);
+  const vigStr=parseFloat(document.getElementById('vigPulse').value);
+  const hueStr=parseFloat(document.getElementById('hueShift').value);
+
+  // Trigger on energy spikes
+  if(energy>0.15){
+    bgZoom=Math.max(bgZoom,bassFX*zoomStr);
+    bgBright=Math.max(bgBright,bassFX*brightStr);
+    bgVig=Math.max(bgVig,bassFX*vigStr);
+  }
+  // Ease back
+  bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
+  // Hue accumulates
+  bgHue+=hueStr;
+
   ctx.clearRect(0,0,W,H);
   if(imgLoaded && img){
+    ctx.save();
+    // Bass zoom: scale from center
+    if(bgZoom>0.0005){
+      const z=1+bgZoom;
+      ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+    }
+    // Hue shift via filter
+    if(hueStr>0) ctx.filter='hue-rotate('+bgHue+'deg)';
     const sc=Math.max(W/img.naturalWidth, H/img.naturalHeight);
     const dw=img.naturalWidth*sc, dh=img.naturalHeight*sc;
     ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+    ctx.filter='none';
+    ctx.restore();
   } else {
     ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
   }
 
+  // Overlay
   if(ov>0){ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);}
+
+  // Brightness pulse: flash lighter on beats
+  if(bgBright>0.005){
+    ctx.fillStyle=`rgba(255,255,255,${bgBright})`;
+    ctx.fillRect(0,0,W,H);
+  }
 
   manageParticles(energy,data);
 
+  // Center shadow + vignette pulse
   const cs=parseFloat(document.getElementById('centerShadow').value);
-  if(cs>0){
-    const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,280);
-    gr.addColorStop(0,`rgba(0,0,0,${cs})`);
+  const vigTotal=Math.min(cs+bgVig,1);
+  if(vigTotal>0){
+    const vigRadius=280-bgVig*80;
+    const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,vigRadius);
+    gr.addColorStop(0,`rgba(0,0,0,${vigTotal})`);
     gr.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
   }
