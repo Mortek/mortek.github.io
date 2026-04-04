@@ -10,9 +10,10 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0d0d18;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 20px;gap:0}
-h1{font-size:15px;font-weight:600;color:#c4a0ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
-canvas{display:block;border-radius:12px;max-width:100%;height:auto;box-shadow:0 4px 40px rgba(108,63,197,0.15)}
-.panel{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-bottom:20px}
+h1{font-size:15px;font-weight:600;color:#c4a0ff;letter-spacing:2px;text-transform:uppercase;margin:0;white-space:nowrap}
+.top-bar{display:flex;align-items:center;gap:20px;width:100%;max-width:960px;margin-bottom:16px}
+canvas{display:block;border-radius:12px;max-width:100%;height:auto;box-shadow:0 4px 40px rgba(108,63,197,0.15);margin-top:14px}
+.panel{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
 .upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1e1e3a;border:1.5px dashed #444;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
 .upload-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 .upload-btn.loaded{border-color:#5cb85c;border-style:solid;color:#7ddb7d}
@@ -54,32 +55,27 @@ select:hover{border-color:#a07fff}
 <a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">&#9829; Donate</a>
 
 <div id="appContent">
-<div class="panel">
-  <span class="upload-wrap" id="imgWrap">
-    <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
-    <input type="file" id="imgInput" accept="image/*">
-    <button class="clear-x" id="clearImgBtn" title="Clear image">&times;</button>
-  </span>
-  <span class="upload-wrap" id="audioWrap">
-    <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
-    <input type="file" id="audioInput" accept="audio/*">
-    <button class="clear-x" id="clearAudioBtn" title="Clear audio">&times;</button>
-  </span>
-  <span class="upload-wrap" id="logoWrap">
-    <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
-    <input type="file" id="logoInput" accept="image/*">
-    <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
-  </span>
-  <button class="sm-btn" id="clearBtn">Clear All</button>
-</div>
 
-<canvas id="c" width="1280" height="720"></canvas>
-
-<div class="seek-row">
-  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
-  <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
-  <span class="seek-time" id="seekTime">0:00 / 0:00</span>
-  <input type="range" id="seekBar" min="0" max="1000" value="0">
+<div class="top-bar">
+  <h1>Music Visualizer</h1>
+  <div class="panel">
+    <span class="upload-wrap" id="imgWrap">
+      <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
+      <input type="file" id="imgInput" accept="image/*">
+      <button class="clear-x" id="clearImgBtn" title="Clear image">&times;</button>
+    </span>
+    <span class="upload-wrap" id="audioWrap">
+      <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
+      <input type="file" id="audioInput" accept="audio/*">
+      <button class="clear-x" id="clearAudioBtn" title="Clear audio">&times;</button>
+    </span>
+    <span class="upload-wrap" id="logoWrap">
+      <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
+      <input type="file" id="logoInput" accept="image/*">
+      <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
+    </span>
+    <button class="sm-btn" id="clearBtn">Clear All</button>
+  </div>
 </div>
 
 <div class="ctrl-row">
@@ -296,12 +292,21 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 
+<canvas id="c" width="1280" height="720"></canvas>
+
+<div class="seek-row">
+  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
+  <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
+  <span class="seek-time" id="seekTime">0:00 / 0:00</span>
+  <input type="range" id="seekBar" min="0" max="1000" value="0">
+</div>
+
 <div class="download-row">
   <div id="status">Load an image and audio to begin</div>
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.2.1</div>
+<div class="version">v2.3.0</div>
 
 <script>
 const C = document.getElementById('c');
