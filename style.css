@@ -297,8 +297,8 @@ h1 span { color: #F7931A; }
   display: block;
   margin: 0 16px 16px;
   padding: 10px;
-  background: #2A2A30;
-  color: #888890;
+  background: #F7931A;
+  color: #141416;
   border-radius: 8px;
   text-align: center;
   font-size: 0.8em;
@@ -307,7 +307,7 @@ h1 span { color: #F7931A; }
   cursor: pointer;
 }
 .book-card .buy-btn:hover {
-  background: #F7931A;
+  background: #e5850f;
   color: #141416;
 }
 
