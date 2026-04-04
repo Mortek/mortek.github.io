@@ -274,6 +274,8 @@ h1 span { color: #F7931A; }
   border: 1px solid #2A2A30;
   overflow: hidden;
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 .book-card:hover {
   border-color: #F7931A;
@@ -288,7 +290,7 @@ h1 span { color: #F7931A; }
   transition: transform 0.3s;
 }
 .book-card:hover img { transform: scale(1.03); }
-.book-card .info { padding: 16px; }
+.book-card .info { padding: 16px; flex: 1; }
 .book-card .info h3 { font-size: 0.95em; color: #fff; margin-bottom: 4px; }
 .book-card .info p { font-size: 0.8em; color: #888890; }
 .book-card .buy-btn {
