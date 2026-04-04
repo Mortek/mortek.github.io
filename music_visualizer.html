@@ -232,6 +232,7 @@ select:hover{border-color:#a07fff}
       <option value="220">Very Large</option>
     </select>
   </div>
+  <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
 </div>
 
 <div class="download-row">
@@ -239,7 +240,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.1</div>
+<div class="version">v1.9.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -257,6 +258,31 @@ let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
 let prevBass = 0; // previous frame bass for onset detection
+
+// ---- PREFERENCES (session cookie) ----
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','innerRadius'];
+function savePrefs(){
+  const prefs={};
+  prefIds.forEach(id=>{prefs[id]=document.getElementById(id).value;});
+  document.cookie='mvPrefs='+encodeURIComponent(JSON.stringify(prefs))+';path=/;SameSite=Lax';
+}
+function loadPrefs(){
+  const m=document.cookie.match(/(?:^|;\s*)mvPrefs=([^;]*)/);
+  if(!m) return;
+  try{
+    const prefs=JSON.parse(decodeURIComponent(m[1]));
+    prefIds.forEach(id=>{
+      const el=document.getElementById(id);
+      if(prefs[id]&&el.querySelector('option[value="'+prefs[id]+'"]')) el.value=prefs[id];
+    });
+  }catch(e){}
+}
+loadPrefs();
+document.getElementById('savePrefBtn').onclick=function(){
+  savePrefs();
+  this.textContent='Saved!';
+  setTimeout(()=>{this.textContent='Save Preferences';},1500);
+};
 
 const palettes = {
   imageColors: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'], // default until image loaded
