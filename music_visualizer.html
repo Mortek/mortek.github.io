@@ -66,6 +66,8 @@ select:hover{border-color:#a07fff}
   <input type="file" id="audioInput" accept="audio/*">
   <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
   <input type="file" id="logoInput" accept="image/*">
+  <button class="sm-btn" id="clearImgBtn">Clear Image</button>
+  <button class="sm-btn" id="clearAudioBtn">Clear Audio</button>
   <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
@@ -137,7 +139,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.8.2</div>
+<div class="version">v1.8.3</div>
 
 <script>
 const C = document.getElementById('c');
@@ -599,6 +601,32 @@ document.getElementById('pauseBtn').onclick=function(){
     playOffset=getCurrentTime();
     audioCtx.suspend();this.textContent='Resume';
   } else{audioCtx.resume();playStartTime=audioCtx.currentTime;this.textContent='Pause';}
+};
+document.getElementById('clearImgBtn').onclick=function(){
+  img=null;imgLoaded=false;imgName='';
+  delete palettes.imageColors;
+  const sel=document.getElementById('colorScheme');
+  const oldOpt=sel.querySelector('option[value="imageColors"]');if(oldOpt)oldOpt.remove();
+  const oldSep=sel.querySelector('.img-color-sep');if(oldSep)oldSep.remove();
+  if(sel.value==='imageColors') sel.value='purple';
+  document.getElementById('imgInput').value='';
+  document.getElementById('imgLabel').textContent='+ Load Image';
+  document.getElementById('imgLabel').classList.remove('loaded');
+  setStatus('Image cleared');
+};
+document.getElementById('clearAudioBtn').onclick=function(){
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
+  if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
+  window.audioBuffer=null;
+  document.getElementById('audioInput').value='';
+  document.getElementById('audioLabel').textContent='+ Load Audio';
+  document.getElementById('audioLabel').classList.remove('loaded');
+  document.getElementById('dlBtn').disabled=true;
+  document.getElementById('pauseBtn').textContent='Pause';
+  document.getElementById('muteBtn').textContent='Mute';
+  seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
+  setStatus('Audio cleared');
 };
 document.getElementById('clearBtn').onclick=function(){
   if(source){try{source.stop();}catch(e){}}
