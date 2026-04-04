@@ -83,8 +83,8 @@ select:hover{border-color:#a07fff}
 <div class="ctrl-row">
   <div class="ctrl"><label>Particles</label>
     <select id="partStyle">
-      <option value="sparks" selected>Sparks</option>
-      <option value="sparksint">Sparks Intensified</option>
+      <option value="sparks">Sparks</option>
+      <option value="sparksint" selected>Sparks Intensified</option>
       <option value="stars">Stars</option>
       <option value="bubbles">Bubbles</option>
       <option value="snow">Snow</option>
@@ -103,17 +103,17 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Part. Intensity</label>
     <select id="partIntensity">
       <option value="0.5">Low</option>
-      <option value="1" selected>Normal</option>
-      <option value="2">High</option>
+      <option value="1">Normal</option>
+      <option value="2" selected>High</option>
       <option value="3.5">Extreme</option>
     </select>
   </div>
   <div class="ctrl"><label>Part. Amount</label>
     <select id="partAmount">
       <option value="50">Few (50)</option>
-      <option value="100" selected>Normal (100)</option>
+      <option value="100">Normal (100)</option>
       <option value="200">Many (200)</option>
-      <option value="350">Lots (350)</option>
+      <option value="350" selected>Lots (350)</option>
     </select>
   </div>
   <div class="ctrl"><label>Part. Speed</label>
@@ -135,18 +135,18 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Part. Lifetime</label>
     <select id="partLife">
       <option value="0.4">Short</option>
-      <option value="1" selected>Normal</option>
+      <option value="1">Normal</option>
       <option value="2">Long</option>
-      <option value="4">Very Long</option>
+      <option value="4" selected>Very Long</option>
     </select>
   </div>
   <div class="ctrl"><label>Bass React</label>
     <select id="bassReact">
       <option value="0">Off</option>
       <option value="15">Subtle</option>
-      <option value="35" selected>Medium</option>
+      <option value="35">Medium</option>
       <option value="70">Strong</option>
-      <option value="120">Extreme</option>
+      <option value="120" selected>Extreme</option>
     </select>
   </div>
   <div class="ctrl"><label>Color Scheme</label>
@@ -174,11 +174,11 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="ctrl"><label>Center Shadow</label>
     <select id="centerShadow">
-      <option value="0" selected>None</option>
+      <option value="0">None</option>
       <option value="0.3">Light</option>
       <option value="0.5">Medium</option>
       <option value="0.7">Dark</option>
-      <option value="0.9">Very Dark</option>
+      <option value="0.9" selected>Very Dark</option>
     </select>
   </div>
 </div>
@@ -186,15 +186,15 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Bar Intensity</label>
     <select id="barIntensity">
       <option value="0.4">Low</option>
-      <option value="1" selected>Normal</option>
-      <option value="2">High</option>
+      <option value="1">Normal</option>
+      <option value="2" selected>High</option>
       <option value="3.5">Extreme</option>
     </select>
   </div>
   <div class="ctrl"><label>Bar Threshold</label>
     <select id="barThreshold">
-      <option value="0" selected>None</option>
-      <option value="0.08">Low</option>
+      <option value="0">None</option>
+      <option value="0.08" selected>Low</option>
       <option value="0.2">Medium</option>
       <option value="0.4">High</option>
     </select>
@@ -218,16 +218,16 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Bar Smoothing</label>
     <select id="barSmoothing">
       <option value="0.05">Snappy</option>
-      <option value="0.01" selected>Normal</option>
+      <option value="0.01">Normal</option>
       <option value="0.003">Smooth</option>
-      <option value="0.001">Very Smooth</option>
+      <option value="0.001" selected>Very Smooth</option>
     </select>
   </div>
   <div class="ctrl"><label>Inner Radius</label>
     <select id="innerRadius">
       <option value="80">Tiny</option>
-      <option value="110">Small</option>
-      <option value="140" selected>Normal</option>
+      <option value="110" selected>Small</option>
+      <option value="140">Normal</option>
       <option value="180">Large</option>
       <option value="220">Very Large</option>
     </select>
@@ -239,7 +239,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.9.0</div>
+<div class="version">v1.9.1</div>
 
 <script>
 const C = document.getElementById('c');
