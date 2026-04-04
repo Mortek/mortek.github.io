@@ -100,6 +100,55 @@ select:hover{border-color:#a07fff}
       <option value="dots">Dots</option>
     </select>
   </div>
+  <div class="ctrl"><label>Part. Intensity</label>
+    <select id="partIntensity">
+      <option value="0.5">Low</option>
+      <option value="1" selected>Normal</option>
+      <option value="2">High</option>
+      <option value="3.5">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Part. Amount</label>
+    <select id="partAmount">
+      <option value="50">Few (50)</option>
+      <option value="100" selected>Normal (100)</option>
+      <option value="200">Many (200)</option>
+      <option value="350">Lots (350)</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Part. Speed</label>
+    <select id="partSpeed">
+      <option value="0.15">Slow</option>
+      <option value="0.5" selected>Normal</option>
+      <option value="1">Fast</option>
+      <option value="2">Very Fast</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Part. Size</label>
+    <select id="partSize">
+      <option value="0.5">Tiny</option>
+      <option value="1" selected>Normal</option>
+      <option value="2">Large</option>
+      <option value="3.5">Huge</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Part. Lifetime</label>
+    <select id="partLife">
+      <option value="0.4">Short</option>
+      <option value="1" selected>Normal</option>
+      <option value="2">Long</option>
+      <option value="4">Very Long</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bass React</label>
+    <select id="bassReact">
+      <option value="0">Off</option>
+      <option value="15">Subtle</option>
+      <option value="35" selected>Medium</option>
+      <option value="70">Strong</option>
+      <option value="120">Extreme</option>
+    </select>
+  </div>
   <div class="ctrl"><label>Color Scheme</label>
     <select id="colorScheme">
       <option value="imageColors" selected>Image Colors</option>
@@ -133,13 +182,64 @@ select:hover{border-color:#a07fff}
     </select>
   </div>
 </div>
+<div class="ctrl-row">
+  <div class="ctrl"><label>Bar Intensity</label>
+    <select id="barIntensity">
+      <option value="0.4">Low</option>
+      <option value="1" selected>Normal</option>
+      <option value="2">High</option>
+      <option value="3.5">Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Threshold</label>
+    <select id="barThreshold">
+      <option value="0" selected>None</option>
+      <option value="0.08">Low</option>
+      <option value="0.2">Medium</option>
+      <option value="0.4">High</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Count</label>
+    <select id="barCount">
+      <option value="50">50</option>
+      <option value="100" selected>100</option>
+      <option value="150">150</option>
+      <option value="200">200</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Width</label>
+    <select id="barWidth">
+      <option value="1">Thin</option>
+      <option value="2.5" selected>Normal</option>
+      <option value="4">Thick</option>
+      <option value="6">Very Thick</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Smoothing</label>
+    <select id="barSmoothing">
+      <option value="0.05">Snappy</option>
+      <option value="0.01" selected>Normal</option>
+      <option value="0.003">Smooth</option>
+      <option value="0.001">Very Smooth</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Inner Radius</label>
+    <select id="innerRadius">
+      <option value="80">Tiny</option>
+      <option value="110">Small</option>
+      <option value="140" selected>Normal</option>
+      <option value="180">Large</option>
+      <option value="220">Very Large</option>
+    </select>
+  </div>
+</div>
 
 <div class="download-row">
   <div id="status">Load an image and audio to begin</div>
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.8.4</div>
+<div class="version">v1.9.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -151,8 +251,8 @@ let logoMaskSrc = null; // pre-processed: bright parts as white with luminosity-
 const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0; // for seek tracking
 // Per-bar auto-gain tracking for even circle spectrum movement
-const barMin = new Float32Array(100).fill(0.5);
-const barMax = new Float32Array(100).fill(0.5);
+const barMin = new Float32Array(200).fill(0.5);
+const barMax = new Float32Array(200).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
@@ -258,16 +358,20 @@ function processLogoMask(){
 const matChars = '01アイウエオカキクケコ';
 function mkParticle(){
   const s = document.getElementById('partStyle').value;
+  const spd=parseFloat(document.getElementById('partSpeed').value);
+  const sz=parseFloat(document.getElementById('partSize').value);
+  const lf=parseFloat(document.getElementById('partLife').value);
   const x=Math.random()*W, y=Math.random()*H;
-  return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+  return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
     ox:0, oy:0, // bass displacement offset
-    age:0, life:150+Math.random()*200, color:randCol(), style:s, r:1+Math.random()*3,
+    age:0, life:(150+Math.random()*200)*lf, color:randCol(), style:s, r:(1+Math.random()*3)*sz,
     rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
 }
 
 function drawP(p, energy){
   const t = 1 - p.age/p.life;
-  const boost = 1 + energy*2.5;
+  const pInt=parseFloat(document.getElementById('partIntensity').value);
+  const boost = 1 + energy*2.5*pInt;
   const r = p.r*boost;
   ctx.save();
   ctx.globalAlpha = t * 0.8;
@@ -345,30 +449,33 @@ function updateP(p){
 }
 
 function manageParticles(energy,data){
-  const ps=document.getElementById('partStyle').value;
-  const maxP=ps==='sparksint'?140:100, spawnR=ps==='sparksint'?3:2;
+  const maxP=parseInt(document.getElementById('partAmount').value);
+  const spawnR=Math.max(1,Math.round(maxP/40));
   for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
   // Bass onset detection: first 8 bins (~0-340 Hz)
-  const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
-  const onset=Math.max(bass-prevBass,0);
-  prevBass+=(bass-prevBass)*0.3;
-  // Push particles away from center on bass hit
-  if(onset>0.05){
-    const cx=W/2, cy=H/2, strength=onset*35;
-    particles.forEach(p=>{
-      let dx=p.hx-cx, dy=p.hy-cy;
-      const dist=Math.sqrt(dx*dx+dy*dy)||1;
-      p.ox+=dx/dist*strength;
-      p.oy+=dy/dist*strength;
-    });
+  const bassStr=parseFloat(document.getElementById('bassReact').value);
+  if(bassStr>0){
+    const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+    const onset=Math.max(bass-prevBass,0);
+    prevBass+=(bass-prevBass)*0.3;
+    if(onset>0.05){
+      const cx=W/2, cy=H/2, strength=onset*bassStr;
+      particles.forEach(p=>{
+        let dx=p.hx-cx, dy=p.hy-cy;
+        const dist=Math.sqrt(dx*dx+dy*dy)||1;
+        p.ox+=dx/dist*strength;
+        p.oy+=dy/dist*strength;
+      });
+    }
   }
   particles.forEach(p=>{updateP(p);drawP(p,energy);});
 }
 
 // ---- VISUALIZERS ----
 function drawCircle(data,p,energy){
-  const cx=W/2,cy=H/2,base=140+energy*30;
+  const baseR=parseFloat(document.getElementById('innerRadius').value);
+  const cx=W/2,cy=H/2,base=baseR+energy*30;
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
@@ -403,7 +510,11 @@ function drawCircle(data,p,energy){
     ctx.restore();
   }
   // Power-curve mapped half-spectrum, mirrored for full 360°
-  const halfBars=100;
+  const halfBars=parseInt(document.getElementById('barCount').value);
+  const bSmooth=parseFloat(document.getElementById('barSmoothing').value);
+  const bThresh=parseFloat(document.getElementById('barThreshold').value);
+  const bInt=parseFloat(document.getElementById('barIntensity').value);
+  const bWidth=parseFloat(document.getElementById('barWidth').value);
   const len=data.length;
   const minBin=4, maxBin=Math.floor(len*0.7); // skip silent high bins
   const half=[];
@@ -414,12 +525,14 @@ function drawCircle(data,p,energy){
     const frac=bin-lo;
     const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
     // Auto-gain: track each bar's own min/max range
-    barMin[i]+=(raw-barMin[i])*0.01;
-    barMax[i]+=(raw-barMax[i])*0.01;
+    barMin[i]+=(raw-barMin[i])*bSmooth;
+    barMax[i]+=(raw-barMax[i])*bSmooth;
     barMin[i]=Math.min(barMin[i],raw);
     barMax[i]=Math.max(barMax[i],raw);
     const range=Math.max(barMax[i]-barMin[i],0.1);
-    half.push(Math.min((raw-barMin[i])/range,1));
+    let v=Math.min((raw-barMin[i])/range,1);
+    if(v<bThresh) v=0;
+    half.push(v);
   }
   // Mirror for full circle
   const vals=[...half,...half.slice().reverse()];
@@ -427,12 +540,12 @@ function drawCircle(data,p,energy){
   for(let i=0;i<bars;i++){
     const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*.1+4;
+    const r1=base, r2=base+v*H*.1*bInt+4;
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
     ctx.strokeStyle=p[i%p.length];
-    ctx.lineWidth=2.5;
+    ctx.lineWidth=bWidth;
     ctx.globalAlpha=0.7+v*.3;
     ctx.stroke();
   }
