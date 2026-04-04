@@ -317,7 +317,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.4.6</div>
+<div class="version">v2.4.7</div>
 
 <script>
 const C = document.getElementById('c');
@@ -918,11 +918,13 @@ document.getElementById('muteBtn').onclick=function(){
 };
 document.getElementById('pauseBtn').onclick=function(){
   if(!audioCtx||!audioBuffer)return;
-  if(audioCtx.state==='running'){
+  if(playing){
     playOffset=getCurrentTime();
-    audioCtx.suspend();this.innerHTML='&#9654;';this.title='Resume';
+    if(source){source.onended=null;try{source.stop();}catch(e){}}
+    playing=false;
+    this.innerHTML='&#9654;';this.title='Resume';
   } else{
-    audioCtx.resume().then(()=>{playPreview(playOffset);});
+    playPreview(playOffset);
     this.innerHTML='&#9208;';this.title='Pause';
   }
 };
