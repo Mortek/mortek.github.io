@@ -45,27 +45,15 @@ select:hover{border-color:#a07fff}
 .seek-time{font-size:11px;color:#666;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
 .download-row{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px}
 .version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
-#loginOverlay{position:fixed;inset:0;background:#0d0d18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:9999}
-#loginOverlay h2{font-size:16px;color:#c4a0ff;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase}
-#loginOverlay input{background:#1a1a30;border:1px solid #333;color:#fff;border-radius:8px;padding:10px 16px;font-size:14px;width:240px;outline:none;transition:border-color .2s}
-#loginOverlay input:focus{border-color:#a07fff}
-#loginOverlay button{background:linear-gradient(135deg,#6c3fc5,#4a90d9);border:none;color:#fff;padding:11px 36px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;width:240px}
-#loginOverlay button:hover{opacity:.85;transform:translateY(-1px)}
-#loginOverlay .login-err{font-size:12px;color:#ff4444;min-height:16px}
-#appContent.hidden{display:none}
+.donate-btn{position:fixed;top:12px;right:16px;background:linear-gradient(135deg,#0070ba,#003087);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s;z-index:100;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.donate-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,112,186,0.3)}
 </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-  <h2>MORTEK MUSIC — VISUALIZER</h2>
-  <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
-  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
-  <button id="loginBtn">Login</button>
-  <div class="login-err" id="loginErr"></div>
-</div>
+<a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=PLACEHOLDER" target="_blank" rel="noopener">&#9829; Donate</a>
 
-<div id="appContent" class="hidden">
+<div id="appContent">
 <div class="panel">
   <span class="upload-wrap" id="imgWrap">
     <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
@@ -313,7 +301,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v2.1.3</div>
+<div class="version">v2.2.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1123,27 +1111,5 @@ loop();
 </script>
 </div>
 
-<script>
-// Login gate
-const H_VALID='cd8c10325c09bbd38f2c66321f2ba7bd29844cc6';
-function sha1(s){return crypto.subtle.digest('SHA-1',new TextEncoder().encode(s)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));}
-async function doLogin(){
-  const u=document.getElementById('loginUser').value;
-  const p=document.getElementById('loginPass').value;
-  const h=await sha1(u+':'+p);
-  if(h!==H_VALID){document.getElementById('loginErr').textContent='Wrong username or password';return;}
-  document.getElementById('loginOverlay').style.display='none';
-  document.getElementById('appContent').classList.remove('hidden');
-  sessionStorage.setItem('mv_auth','1');
-}
-// Check if already authenticated this session
-if(sessionStorage.getItem('mv_auth')==='1'){
-  document.getElementById('loginOverlay').style.display='none';
-  document.getElementById('appContent').classList.remove('hidden');
-}
-document.getElementById('loginBtn').onclick=doLogin;
-document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
-document.getElementById('loginUser').onkeydown=e=>{if(e.key==='Enter')document.getElementById('loginPass').focus();};
-</script>
 </body>
 </html>
