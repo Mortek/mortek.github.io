@@ -137,7 +137,7 @@ select:hover{border-color:#a07fff}
   <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
   <button class="dl-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-<div class="version">v1.7.9</div>
+<div class="version">v1.8.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -152,6 +152,7 @@ const barMax = new Float32Array(100).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
+let prevBass = 0; // previous frame bass for onset detection
 
 const palettes = {
   imageColors: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'], // default until image loaded
@@ -234,7 +235,9 @@ function applyImageColors(image){
 const matChars = '01アイウエオカキクケコ';
 function mkParticle(){
   const s = document.getElementById('partStyle').value;
-  return {x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+  const x=Math.random()*W, y=Math.random()*H;
+  return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+    ox:0, oy:0, // bass displacement offset
     age:0, life:150+Math.random()*200, color:randCol(), style:s, r:1+Math.random()*3,
     rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
 }
@@ -308,13 +311,35 @@ function drawP(p, energy){
   ctx.restore();
 }
 
-function updateP(p){p.age++;p.x+=p.vx;p.y+=p.vy;}
+function updateP(p){
+  p.age++;
+  // Move home position by velocity
+  p.hx+=p.vx; p.hy+=p.vy;
+  // Ease offset back to zero (slow return)
+  p.ox*=0.92; p.oy*=0.92;
+  // Actual position = home + bass offset
+  p.x=p.hx+p.ox; p.y=p.hy+p.oy;
+}
 
-function manageParticles(energy){
+function manageParticles(energy,data){
   const ps=document.getElementById('partStyle').value;
   const maxP=ps==='sparksint'?140:100, spawnR=ps==='sparksint'?3:2;
   for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
+  // Bass onset detection: first 8 bins (~0-340 Hz)
+  const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+  const onset=Math.max(bass-prevBass,0);
+  prevBass+=(bass-prevBass)*0.3;
+  // Push particles away from center on bass hit
+  if(onset>0.05){
+    const cx=W/2, cy=H/2, strength=onset*35;
+    particles.forEach(p=>{
+      let dx=p.hx-cx, dy=p.hy-cy;
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      p.ox+=dx/dist*strength;
+      p.oy+=dy/dist*strength;
+    });
+  }
   particles.forEach(p=>{updateP(p);drawP(p,energy);});
 }
 
@@ -392,7 +417,7 @@ function drawFrame(data){
 
   if(ov>0){ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);}
 
-  manageParticles(energy);
+  manageParticles(energy,data);
 
   const cs=parseFloat(document.getElementById('centerShadow').value);
   if(cs>0){
