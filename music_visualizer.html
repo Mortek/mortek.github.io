@@ -54,13 +54,31 @@ select:hover{border-color:#a07fff}
 .btn-group{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
 .dl-top-btn{background:linear-gradient(135deg,#6c3fc5,#4a90d9)!important;border:none!important;color:#fff!important;font-weight:600;letter-spacing:.5px}
 .dl-top-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,63,197,0.3)}
+.top-bar-fixed{display:contents}
 .dl-top-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+@media(max-width:768px){
+  #appContent{transform:none;width:100%}
+  .back-btn,.donate-btn{position:static;margin:0}
+  .top-bar-fixed{display:flex;justify-content:space-between;width:100%;max-width:100%;padding:0 0 12px;gap:8px}
+  .top-bar{flex-direction:column;gap:10px}
+  .top-bar h1{font-size:13px}
+  .panel{justify-content:center}
+  .btn-group{margin-left:0;justify-content:center}
+  .settings-grid{flex-direction:column}
+  .ctrl-row{justify-content:center}
+  .seek-row{flex-wrap:wrap;gap:6px}
+  .seek-row input[type=range]{min-width:0;width:100%;order:10}
+  .progress-bar{width:100%}
+  body{padding:12px 10px;gap:0}
+}
 </style>
 </head>
 <body>
 
-<a class="back-btn" href="/">&#8592; Back to Website</a>
-<a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">Donate<span class="tooltip">This tool is free and ad-free. If you enjoy it, a small donation helps me keep building and improving it. Completely optional — no pressure!</span></a>
+<div class="top-bar-fixed">
+  <a class="back-btn" href="/">&#8592; Back to Website</a>
+  <a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">Donate<span class="tooltip">This tool is free and ad-free. If you enjoy it, a small donation helps me keep building and improving it. Completely optional — no pressure!</span></a>
+</div>
 
 <div id="appContent">
 
@@ -317,7 +335,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.4.7</div>
+<div class="version">v2.4.8</div>
 
 <script>
 const C = document.getElementById('c');
