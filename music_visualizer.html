@@ -305,9 +305,10 @@ select:hover{border-color:#a07fff}
       <option value="0.5">Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" checked style="vertical-align:middle;margin-right:3px">Hue Shift</label>
+  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" checked style="vertical-align:middle;margin-right:3px">Enable Hue</label>
     <select id="hueShift">
-      <option value="0.3" selected>Slow</option>
+      <option value="0.1" selected>Very Slow</option>
+      <option value="0.3">Slow</option>
       <option value="0.8">Medium</option>
       <option value="2">Fast</option>
       <option value="5">Very Fast</option>
@@ -335,7 +336,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.5.0</div>
+<div class="version">v2.5.1</div>
 
 <script>
 const C = document.getElementById('c');
