@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.1</div>
+<div class="version">v2.7.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -753,12 +753,12 @@ function drawFrame(data){
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
-    if(bassOnset>0.05&&bassFX>0.25){
+    if(bassOnset>0.05&&bassFX>0.35){
       bgZoom=Math.max(bgZoom,scaledOnset*zoomStr*8);
       bgBright=Math.max(bgBright,scaledOnset*brightStr*4);
       bgVig=Math.max(bgVig,scaledOnset*vigStr*4);
     }
-    prevBass+=(bassFX-prevBass)*0.3;
+    prevBass+=(bassFX-prevBass)*0.5;
     bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
   }
   // Hue accumulates (reset when disabled)
@@ -837,7 +837,7 @@ function initAudio(buf){
   audioCtx=new AudioContext();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
-  analyser.fftSize=512;
+  analyser.fftSize=512;analyser.smoothingTimeConstant=0.3;
   gainNode=audioCtx.createGain();
   analyser.connect(gainNode);
   gainNode.connect(audioCtx.destination);
@@ -1102,7 +1102,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Step 1a: Pre-analyze audio offline (separate context for analysis)
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
     const anCtx=new OfflineAudioContext(2,numSamples,sr);
-    const offAn=anCtx.createAnalyser();offAn.fftSize=512;offAn.smoothingTimeConstant=0.9;
+    const offAn=anCtx.createAnalyser();offAn.fftSize=512;offAn.smoothingTimeConstant=0.3;
     const anSrc=anCtx.createBufferSource();anSrc.buffer=buf;
     anSrc.connect(offAn);
     const proc=anCtx.createScriptProcessor(1024,2,2);
@@ -1148,12 +1148,12 @@ document.getElementById('dlBtn').onclick=async function(){
         const bass=fd.slice(0,8).reduce((a,c)=>a+c,0)/8/255;
         const onset=Math.max(bass-pb,0);
         const scaledOnset=Math.pow(onset,0.6)*1.5;
-        if(onset>0.05&&bass>0.25){z=Math.max(z,scaledOnset*zoomStr*8);b=Math.max(b,scaledOnset*brightStr*4);v=Math.max(v,scaledOnset*vigStr*4);}
-        pb+=(bass-pb)*0.3;
+        if(onset>0.05&&bass>0.35){z=Math.max(z,scaledOnset*zoomStr*8);b=Math.max(b,scaledOnset*brightStr*4);v=Math.max(v,scaledOnset*vigStr*4);}
+        pb+=(bass-pb)*0.5;
         z*=0.88;b*=0.85;v*=0.9;
         // Particle bass onset (separate tracker)
         const pOnset=Math.max(bass-pbP,0);
-        pbP+=(bass-pbP)*0.3;
+        pbP+=(bass-pbP)*0.5;
         const pStr=(pOnset>0.05&&bassReactStr>0)?Math.pow(pOnset,0.6)*1.5*bassReactStr:0;
         precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr});
       }
