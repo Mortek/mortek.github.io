@@ -337,7 +337,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.6.4</div>
+<div class="version">v2.6.5</div>
 
 <script>
 const C = document.getElementById('c');
@@ -604,7 +604,10 @@ function updateP(p){
   p.age++;
   // Move home position by velocity
   p.hx+=p.vx; p.hy+=p.vy;
-  // Ease offset back to zero (slow return)
+  // Shift home position 50% toward displaced position before easing back
+  // This makes particles not fully return to their original path
+  p.hx+=p.ox*0.04; p.hy+=p.oy*0.04;
+  // Ease offset back (but home has already shifted, so net return is ~50%)
   p.ox*=0.92; p.oy*=0.92;
   // Actual position = home + bass offset
   p.x=p.hx+p.ox; p.y=p.hy+p.oy;
