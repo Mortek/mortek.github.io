@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.5.8</div>
+<div class="version">v2.5.9</div>
 
 <script>
 const C = document.getElementById('c');
@@ -718,13 +718,16 @@ function drawCircle(data,p,energy){
   ctx.globalAlpha=1;
 }
 // ---- MAIN DRAW ----
+let encodingFPS=0; // 0 = preview (60fps), >0 = encoding at that fps
 function drawFrame(data){
   frameCount++;
   const p=pal();
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
 
-  // Bass onset detection for background FX (reuse prevBass from particles)
+  // FPS correction: decay/smoothing tuned for 60fps, adjust for encoding fps
+  const fpsRatio=encodingFPS>0?(60/encodingFPS):1;
+  // Bass onset detection for background FX
   const bassFX=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
   const bassOnset=Math.max(bassFX-prevBass,0);
   const zoomStr=parseFloat(document.getElementById('bassZoom').value);
@@ -739,9 +742,9 @@ function drawFrame(data){
     bgVig=Math.max(bgVig,bassOnset*vigStr*4);
   }
   // Smooth prevBass for background FX onset detection
-  prevBass+=(bassFX-prevBass)*0.3;
-  // Ease back
-  bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
+  prevBass+=(bassFX-prevBass)*(1-Math.pow(0.7,fpsRatio));
+  // Ease back (adjust decay for fps)
+  bgZoom*=Math.pow(0.88,fpsRatio); bgBright*=Math.pow(0.85,fpsRatio); bgVig*=Math.pow(0.9,fpsRatio);
   // Hue accumulates
   bgHue+=hueStr;
 
@@ -1073,8 +1076,11 @@ document.getElementById('dlBtn').onclick=async function(){
   pBar.style.display='block';pFill.style.width='0%';
   if(source){try{source.stop();}catch(e){}}
   playing=false;
+  // Reset FX state for clean encode
+  prevBass=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
+    encodingFPS=fps;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
@@ -1173,7 +1179,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Restart preview
     initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
+  finally{encodingFPS=0;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
