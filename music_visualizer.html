@@ -337,7 +337,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.6.5</div>
+<div class="version">v2.6.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -618,21 +618,28 @@ function manageParticles(energy,data){
   const spawnR=Math.max(1,Math.round(maxP/40));
   for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
-  // Bass onset detection: first 8 bins (~0-340 Hz)
-  const bassStr=parseFloat(document.getElementById('bassReact').value);
-  if(bassStr>0){
-    const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
-    const onset=Math.max(bass-prevBassParticle,0);
-    prevBassParticle+=(bass-prevBassParticle)*0.3;
-    if(onset>0.05){
-      const cx=W/2, cy=H/2, strength=onset*bassStr;
-      particles.forEach(p=>{
-        let dx=p.hx-cx, dy=p.hy-cy;
-        const dist=Math.sqrt(dx*dx+dy*dy)||1;
-        p.ox+=dx/dist*strength;
-        p.oy+=dy/dist*strength;
-      });
+  // Bass onset: use pre-computed values during encoding, live detection during preview
+  let strength=0;
+  if(precomputedFX){
+    const fx=precomputedFX[Math.min(frameCount-1,precomputedFX.length-1)];
+    strength=fx.particleBass;
+  } else {
+    const bassStr=parseFloat(document.getElementById('bassReact').value);
+    if(bassStr>0){
+      const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+      const onset=Math.max(bass-prevBassParticle,0);
+      prevBassParticle+=(bass-prevBassParticle)*0.3;
+      if(onset>0.05) strength=onset*bassStr;
     }
+  }
+  if(strength>0){
+    const cx=W/2, cy=H/2;
+    particles.forEach(p=>{
+      let dx=p.hx-cx, dy=p.hy-cy;
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      p.ox+=dx/dist*strength;
+      p.oy+=dy/dist*strength;
+    });
   }
   particles.forEach(p=>{updateP(p);drawP(p,energy);});
 }
@@ -1128,7 +1135,8 @@ document.getElementById('dlBtn').onclick=async function(){
     const lastFrame=frames[frames.length-1]||new Uint8Array(256);
     const fadeFrames=fadeOut*fps;
     {
-      let pb=0,z=0,b=0,v=0;
+      const bassReactStr=parseFloat(document.getElementById('bassReact').value);
+      let pb=0,pbP=0,z=0,b=0,v=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
         let fd;
@@ -1139,7 +1147,11 @@ document.getElementById('dlBtn').onclick=async function(){
         if(onset>0.05){z=Math.max(z,onset*zoomStr*8);b=Math.max(b,onset*brightStr*4);v=Math.max(v,onset*vigStr*4);}
         pb+=(bass-pb)*0.3;
         z*=0.88;b*=0.85;v*=0.9;
-        precomputedFX.push({zoom:z,bright:b,vig:v});
+        // Particle bass onset (separate tracker)
+        const pOnset=Math.max(bass-pbP,0);
+        pbP+=(bass-pbP)*0.3;
+        const pStr=(pOnset>0.05&&bassReactStr>0)?pOnset*bassReactStr:0;
+        precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr});
       }
     }
 
