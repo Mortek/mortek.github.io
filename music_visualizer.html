@@ -84,28 +84,28 @@ select:hover{border-color:#a07fff}
 
 <div class="top-bar">
   <h1>Music Visualizer</h1>
-  <div class="panel">
-    <span class="upload-wrap" id="imgWrap">
-      <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
-      <input type="file" id="imgInput" accept="image/*">
-      <button class="clear-x" id="clearImgBtn" title="Clear image">&times;</button>
-    </span>
-    <span class="upload-wrap" id="audioWrap">
-      <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
-      <input type="file" id="audioInput" accept="audio/*">
-      <button class="clear-x" id="clearAudioBtn" title="Clear audio">&times;</button>
-    </span>
-    <span class="upload-wrap" id="logoWrap">
-      <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
-      <input type="file" id="logoInput" accept="image/*">
-      <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
-    </span>
-    <button class="sm-btn" id="clearBtn">Clear All</button>
-    <span style="margin-left:auto;display:flex;gap:8px">
-      <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
-      <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
-    </span>
-  </div>
+  <span style="margin-left:auto;display:flex;gap:8px">
+    <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
+    <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
+  </span>
+</div>
+<div class="panel">
+  <span class="upload-wrap" id="imgWrap">
+    <label class="upload-btn" id="imgLabel" for="imgInput">+ Load Image</label>
+    <input type="file" id="imgInput" accept="image/*">
+    <button class="clear-x" id="clearImgBtn" title="Clear image">&times;</button>
+  </span>
+  <span class="upload-wrap" id="audioWrap">
+    <label class="upload-btn" id="audioLabel" for="audioInput">+ Load Audio</label>
+    <input type="file" id="audioInput" accept="audio/*">
+    <button class="clear-x" id="clearAudioBtn" title="Clear audio">&times;</button>
+  </span>
+  <span class="upload-wrap" id="logoWrap">
+    <label class="upload-btn" id="logoLabel" for="logoInput">+ Load Logo</label>
+    <input type="file" id="logoInput" accept="image/*">
+    <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
+  </span>
+  <button class="sm-btn" id="clearBtn">Clear All</button>
 </div>
 
 <canvas id="c" width="1280" height="720"></canvas>
@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.5.6</div>
+<div class="version">v2.5.7</div>
 
 <script>
 const C = document.getElementById('c');
