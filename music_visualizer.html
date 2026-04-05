@@ -112,7 +112,7 @@ select:hover{border-color:#a07fff}
 
 <div class="seek-row">
   <button class="icon-btn" id="restartBtn" title="Restart">&#8634;</button>
-  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
+  <button class="icon-btn" id="pauseBtn" title="Play">&#9654;</button>
   <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
   <span class="seek-time" id="seekTime">0:00 / 0:00</span>
   <input type="range" id="seekBar" min="0" max="1000" value="0">
@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.5.7</div>
+<div class="version">v2.5.8</div>
 
 <script>
 const C = document.getElementById('c');
@@ -839,7 +839,8 @@ function playPreview(offset){
   source.connect(analyser);
   source.start(0,offset);
   playing=true;
-  source.onended=()=>{playing=false;};
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
 }
 
 function getCurrentTime(){
