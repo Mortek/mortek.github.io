@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.5.5</div>
+<div class="version">v2.5.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -738,6 +738,8 @@ function drawFrame(data){
     bgBright=Math.max(bgBright,bassOnset*brightStr*4);
     bgVig=Math.max(bgVig,bassOnset*vigStr*4);
   }
+  // Smooth prevBass for background FX onset detection
+  prevBass+=(bassFX-prevBass)*0.3;
   // Ease back
   bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
   // Hue accumulates
