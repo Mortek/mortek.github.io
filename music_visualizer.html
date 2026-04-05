@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.6.0</div>
+<div class="version">v2.6.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -745,8 +745,8 @@ function drawFrame(data){
   prevBass+=(bassFX-prevBass)*(1-Math.pow(0.7,fpsRatio));
   // Ease back (adjust decay for fps)
   bgZoom*=Math.pow(0.88,fpsRatio); bgBright*=Math.pow(0.85,fpsRatio); bgVig*=Math.pow(0.9,fpsRatio);
-  // Hue accumulates
-  bgHue+=hueStr;
+  // Hue accumulates (reset when disabled)
+  if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
   ctx.clearRect(0,0,W,H);
   if(imgLoaded && img){
