@@ -101,8 +101,23 @@ select:hover{border-color:#a07fff}
       <button class="clear-x" id="clearLogoBtn" title="Clear logo">&times;</button>
     </span>
     <button class="sm-btn" id="clearBtn">Clear All</button>
+    <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
+    <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
   </div>
 </div>
+
+<canvas id="c" width="1280" height="720"></canvas>
+
+<div class="seek-row">
+  <button class="icon-btn" id="restartBtn" title="Restart">&#8634;</button>
+  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
+  <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
+  <span class="seek-time" id="seekTime">0:00 / 0:00</span>
+  <input type="range" id="seekBar" min="0" max="1000" value="0">
+  <span id="status" style="font-size:11px;color:#666;margin-left:8px;white-space:nowrap"></span>
+</div>
+
+<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 
 <div class="settings-grid">
 <div class="ctrl-row">
@@ -318,25 +333,8 @@ select:hover{border-color:#a07fff}
     <input type="range" id="hueSat" min="0" max="100" value="100" style="width:90px">
   </div>
 </div>
-<div class="settings-actions">
-  <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
-  <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
 </div>
-</div>
-
-<canvas id="c" width="1280" height="720"></canvas>
-
-<div class="seek-row">
-  <button class="icon-btn" id="restartBtn" title="Restart">&#8634;</button>
-  <button class="icon-btn" id="pauseBtn" title="Pause">&#9208;</button>
-  <button class="icon-btn" id="muteBtn" title="Mute">&#128264;</button>
-  <span class="seek-time" id="seekTime">0:00 / 0:00</span>
-  <input type="range" id="seekBar" min="0" max="1000" value="0">
-  <span id="status" style="font-size:11px;color:#666;margin-left:8px;white-space:nowrap"></span>
-</div>
-
-<div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.5.1</div>
+<div class="version">v2.5.2</div>
 
 <script>
 const C = document.getElementById('c');
