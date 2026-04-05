@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.6.2</div>
+<div class="version">v2.6.3</div>
 
 <script>
 const C = document.getElementById('c');
@@ -719,33 +719,34 @@ function drawCircle(data,p,energy){
   ctx.globalAlpha=1;
 }
 // ---- MAIN DRAW ----
-let encodingFPS=0; // 0 = preview (60fps), >0 = encoding at that fps
+let precomputedFX=null; // pre-computed FX values for encoding
 function drawFrame(data){
   frameCount++;
   const p=pal();
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
 
-  // FPS correction: decay/smoothing tuned for 60fps, adjust for encoding fps
-  const fpsRatio=encodingFPS>0?(60/encodingFPS):1;
-  // Bass onset detection for background FX
-  const bassFX=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
-  const bassOnset=Math.max(bassFX-prevBass,0);
-  const zoomStr=parseFloat(document.getElementById('bassZoom').value);
-  const brightStr=parseFloat(document.getElementById('brightPulse').value);
-  const vigStr=parseFloat(document.getElementById('vigPulse').value);
   const hueStr=document.getElementById('hueShiftOn').checked?parseFloat(document.getElementById('hueShift').value):0;
 
-  // Only trigger on actual bass onset
-  if(bassOnset>0.05){
-    bgZoom=Math.max(bgZoom,bassOnset*zoomStr*8);
-    bgBright=Math.max(bgBright,bassOnset*brightStr*4);
-    bgVig=Math.max(bgVig,bassOnset*vigStr*4);
+  if(precomputedFX){
+    // Use pre-computed values during encoding
+    const fx=precomputedFX[Math.min(frameCount-1,precomputedFX.length-1)];
+    bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
+  } else {
+    // Live preview: compute from analyser data
+    const bassFX=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
+    const bassOnset=Math.max(bassFX-prevBass,0);
+    const zoomStr=parseFloat(document.getElementById('bassZoom').value);
+    const brightStr=parseFloat(document.getElementById('brightPulse').value);
+    const vigStr=parseFloat(document.getElementById('vigPulse').value);
+    if(bassOnset>0.05){
+      bgZoom=Math.max(bgZoom,bassOnset*zoomStr*8);
+      bgBright=Math.max(bgBright,bassOnset*brightStr*4);
+      bgVig=Math.max(bgVig,bassOnset*vigStr*4);
+    }
+    prevBass+=(bassFX-prevBass)*0.3;
+    bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
   }
-  // Smooth prevBass for background FX onset detection
-  prevBass+=(bassFX-prevBass)*(1-Math.pow(0.7,fpsRatio));
-  // Ease back (adjust decay for fps)
-  bgZoom*=Math.pow(0.88,fpsRatio); bgBright*=Math.pow(0.85,fpsRatio); bgVig*=Math.pow(0.9,fpsRatio);
   // Hue accumulates (reset when disabled)
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
@@ -1078,10 +1079,9 @@ document.getElementById('dlBtn').onclick=async function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   // Reset FX state for clean encode
-  prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];
+  prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];frameCount=0;
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
-    encodingFPS=fps;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
@@ -1116,13 +1116,34 @@ document.getElementById('dlBtn').onclick=async function(){
     const rendered=await audioCtx2.startRendering();
     pFill.style.width='10%';
 
-    // Step 2: Encode video (music frames + fade-out)
+    // Step 2: Pre-compute background FX (zoom/bright/vig) from captured frames
+    // This matches preview logic at 60fps equivalent, avoiding offline analyser quirks
+    const zoomStr=parseFloat(document.getElementById('bassZoom').value);
+    const brightStr=parseFloat(document.getElementById('brightPulse').value);
+    const vigStr=parseFloat(document.getElementById('vigPulse').value);
+    const lastFrame=frames[frames.length-1]||new Uint8Array(256);
+    const fadeFrames=fadeOut*fps;
+    {
+      let pb=0,z=0,b=0,v=0;
+      precomputedFX=[];
+      for(let i=0;i<totalFrames;i++){
+        let fd;
+        if(i<totalMusic){fd=frames[i]||new Uint8Array(256);}
+        else{const t=1-(i-totalMusic)/fadeFrames;fd=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)fd[j]=Math.round(lastFrame[j]*t*t);}
+        const bass=fd.slice(0,8).reduce((a,c)=>a+c,0)/8/255;
+        const onset=Math.max(bass-pb,0);
+        if(onset>0.05){z=Math.max(z,onset*zoomStr*8);b=Math.max(b,onset*brightStr*4);v=Math.max(v,onset*vigStr*4);}
+        pb+=(bass-pb)*0.3;
+        z*=0.88;b*=0.85;v*=0.9;
+        precomputedFX.push({zoom:z,bright:b,vig:v});
+      }
+    }
+
+    // Step 3: Encode video (music frames + fade-out)
     setStatus('Encoding video...');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
-    const lastFrame=frames[frames.length-1]||new Uint8Array(256);
-    const fadeFrames=fadeOut*fps;
     for(let i=0;i<totalFrames;i++){
       let frameData;
       if(i<totalMusic){
@@ -1180,7 +1201,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Restart preview
     initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{encodingFPS=0;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
+  finally{precomputedFX=null;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
