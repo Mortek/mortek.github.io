@@ -336,7 +336,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.6.1</div>
+<div class="version">v2.6.2</div>
 
 <script>
 const C = document.getElementById('c');
@@ -353,7 +353,8 @@ const barMax = new Float32Array(200).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
-let prevBass = 0; // previous frame bass for onset detection
+let prevBass = 0; // previous frame bass for background FX onset detection
+let prevBassParticle = 0; // separate bass tracker for particle burst
 let bgZoom = 0; // current bass zoom amount (eases back to 0)
 let bgBright = 0; // current brightness pulse (eases back to 0)
 let bgVig = 0; // current vignette pulse (eases back to 0)
@@ -617,8 +618,8 @@ function manageParticles(energy,data){
   const bassStr=parseFloat(document.getElementById('bassReact').value);
   if(bassStr>0){
     const bass=data.slice(0,8).reduce((a,b)=>a+b,0)/8/255;
-    const onset=Math.max(bass-prevBass,0);
-    prevBass+=(bass-prevBass)*0.3;
+    const onset=Math.max(bass-prevBassParticle,0);
+    prevBassParticle+=(bass-prevBassParticle)*0.3;
     if(onset>0.05){
       const cx=W/2, cy=H/2, strength=onset*bassStr;
       particles.forEach(p=>{
@@ -1077,7 +1078,7 @@ document.getElementById('dlBtn').onclick=async function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   // Reset FX state for clean encode
-  prevBass=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];
+  prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
     encodingFPS=fps;
@@ -1087,7 +1088,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Step 1a: Pre-analyze audio offline (separate context for analysis)
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
     const anCtx=new OfflineAudioContext(2,numSamples,sr);
-    const offAn=anCtx.createAnalyser();offAn.fftSize=512;
+    const offAn=anCtx.createAnalyser();offAn.fftSize=512;offAn.smoothingTimeConstant=0.9;
     const anSrc=anCtx.createBufferSource();anSrc.buffer=buf;
     anSrc.connect(offAn);
     const proc=anCtx.createScriptProcessor(1024,2,2);
