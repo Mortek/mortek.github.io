@@ -305,9 +305,8 @@ select:hover{border-color:#a07fff}
       <option value="0.5">Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label>Hue Shift</label>
+  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" checked style="vertical-align:middle;margin-right:3px">Hue Shift</label>
     <select id="hueShift">
-      <option value="0">Off</option>
       <option value="0.3" selected>Slow</option>
       <option value="0.8">Medium</option>
       <option value="2">Fast</option>
@@ -336,7 +335,7 @@ select:hover{border-color:#a07fff}
 </div>
 
 <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-<div class="version">v2.4.9</div>
+<div class="version">v2.5.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -363,10 +362,12 @@ let frameCount = 0;
 // ---- PREFERENCES (session cookie) ----
 const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','bassZoom','brightPulse','vigPulse','hueShift'];
 const prefRangeIds=['logoTint','hueSat'];
+const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
   const prefs={};
   prefIds.forEach(id=>{prefs[id]=document.getElementById(id).value;});
   prefRangeIds.forEach(id=>{prefs[id]=document.getElementById(id).value;});
+  prefCheckIds.forEach(id=>{prefs[id]=document.getElementById(id).checked;});
   document.cookie='mvPrefs='+encodeURIComponent(JSON.stringify(prefs))+';path=/;SameSite=Lax';
 }
 function loadPrefs(){
@@ -380,6 +381,9 @@ function loadPrefs(){
     });
     prefRangeIds.forEach(id=>{
       if(prefs[id]!=null) document.getElementById(id).value=prefs[id];
+    });
+    prefCheckIds.forEach(id=>{
+      if(prefs[id]!=null) document.getElementById(id).checked=prefs[id];
     });
   }catch(e){}
 }
@@ -725,7 +729,7 @@ function drawFrame(data){
   const zoomStr=parseFloat(document.getElementById('bassZoom').value);
   const brightStr=parseFloat(document.getElementById('brightPulse').value);
   const vigStr=parseFloat(document.getElementById('vigPulse').value);
-  const hueStr=parseFloat(document.getElementById('hueShift').value);
+  const hueStr=document.getElementById('hueShiftOn').checked?parseFloat(document.getElementById('hueShift').value):0;
 
   // Only trigger on actual bass onset
   if(bassOnset>0.05){
