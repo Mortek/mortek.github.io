@@ -338,11 +338,11 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.8.1</div>
+<div class="version">v2.8.2</div>
 
 <script>
 const C = document.getElementById('c');
-const ctx = C.getContext('2d');
+let ctx = C.getContext('2d');
 const W = C.width, H = C.height;
 let img = null, imgLoaded = false, imgName = '';
 let logo = null, logoLoaded = false;
@@ -1163,16 +1163,21 @@ document.getElementById('dlBtn').onclick=async function(){
     prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
+    // Use offscreen canvas so encoding doesn't overwrite the visible preview
+    const offC=new OffscreenCanvas(W,H);
+    const savedCtx=ctx;
+    ctx=offC.getContext('2d');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
       drawFrame(frames[i]);
-      const vf=new VideoFrame(C,{timestamp:Math.round(i*1000000/fps)});
+      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
       vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
       if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
       if(i%30===0){pFill.style.width=(10+i/totalFrames*55)+'%';btn.textContent='Encoding video... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));}
     }
+    ctx=savedCtx;
     await vEnc.flush();vEnc.close();
     pFill.style.width='70%';
 
@@ -1213,7 +1218,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Restart preview
     await initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{precomputedFX=null;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
+  finally{precomputedFX=null;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
