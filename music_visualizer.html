@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.6</div>
+<div class="version">v2.7.7</div>
 
 <script>
 const C = document.getElementById('c');
@@ -751,7 +751,7 @@ function drawFrame(data){
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
-    if(bassRatio>1.8&&bassFX>0.3){
+    if(bassRatio>1.4&&bassFX>0.15){
       const strength=(bassRatio-1)*bassFX;
       const scaledStr=Math.pow(strength,0.6)*1.5;
       bgZoom=Math.max(bgZoom,scaledStr*zoomStr*8);
@@ -1147,7 +1147,7 @@ document.getElementById('dlBtn').onclick=async function(){
         else{const t=1-(i-totalMusic)/fadeFrames;fd=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)fd[j]=Math.round(lastFrame[j]*t*t);}
         const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
         const ratio=bass/Math.max(pb,0.01);
-        if(ratio>1.8&&bass>0.3){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);}
+        if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);}
         pb+=(bass-pb)*0.15;
         z*=0.88;b*=0.85;v*=0.9;
         // Particle bass onset (separate tracker)
