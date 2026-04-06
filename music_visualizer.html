@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.8.0</div>
+<div class="version">v2.8.1</div>
 
 <script>
 const C = document.getElementById('c');
@@ -832,9 +832,10 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-function initAudio(buf){
+async function initAudio(buf){
   if(audioCtx) audioCtx.close();
   audioCtx=new AudioContext();
+  if(audioCtx.state==='suspended') await audioCtx.resume();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=1024;analyser.smoothingTimeConstant=0.3;
@@ -1210,7 +1211,7 @@ document.getElementById('dlBtn').onclick=async function(){
     setTimeout(()=>URL.revokeObjectURL(url),5000);
     setStatus('Done! Video saved.');
     // Restart preview
-    initAudio(buf);
+    await initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
   finally{precomputedFX=null;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
 };
