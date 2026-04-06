@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.8</div>
+<div class="version">v2.7.9</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1099,52 +1099,52 @@ document.getElementById('dlBtn').onclick=async function(){
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
-    // Step 1a: Pre-analyze audio offline (separate context for analysis)
-    setStatus('Analyzing audio...');btn.textContent='Analyzing...';
-    const anCtx=new OfflineAudioContext(2,numSamples,sr);
-    const offAn=anCtx.createAnalyser();offAn.fftSize=1024;offAn.smoothingTimeConstant=0.3;
-    const anSrc=anCtx.createBufferSource();anSrc.buffer=buf;
-    anSrc.connect(offAn);
-    const proc=anCtx.createScriptProcessor(1024,2,2);
-    offAn.connect(proc);proc.connect(anCtx.destination);
-    const frames=[];
-    const samplesPerFrame=Math.round(sr/fps);
-    let sampleCount=0,nextFrame=0;
-    proc.onaudioprocess=()=>{
-      sampleCount+=1024;
-      while(sampleCount>=nextFrame&&frames.length<totalFrames){
-        const d=new Uint8Array(offAn.frequencyBinCount);
-        offAn.getByteFrequencyData(d);
-        frames.push(d);
-        nextFrame+=samplesPerFrame;
-      }
-    };
-    anSrc.start(0);
-    await anCtx.startRendering();
-    while(frames.length<totalFrames)frames.push(new Uint8Array(offAn.frequencyBinCount));
-
-    // Step 1b: Clean audio render (separate context, no processor in path)
+    // Step 1: Render audio offline
+    setStatus('Rendering audio...');btn.textContent='Rendering...';
     const audioCtx2=new OfflineAudioContext(2,numSamples,sr);
     const audioSrc=audioCtx2.createBufferSource();audioSrc.buffer=buf;
     audioSrc.connect(audioCtx2.destination);audioSrc.start(0);
     const rendered=await audioCtx2.startRendering();
+    const nCh=rendered.numberOfChannels,nF=rendered.length;
+    const ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
+
+    // Step 2: Compute per-frame frequency data via manual FFT (sample-accurate timing)
+    setStatus('Analyzing audio...');btn.textContent='Analyzing...';
+    const fftN=1024,binCount=fftN/2;
+    // Blackman window (matches AnalyserNode)
+    const bWin=new Float32Array(fftN);
+    for(let i=0;i<fftN;i++){const a=2*Math.PI*i/fftN;bWin[i]=0.42-0.5*Math.cos(a)+0.08*Math.cos(2*a);}
+    // Radix-2 Cooley-Tukey FFT (in-place)
+    function fftCalc(re,im){for(let i=1,j=0;i<fftN;i++){let b=fftN>>1;while(j&b){j^=b;b>>=1;}j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}for(let len=2;len<=fftN;len*=2){const half=len>>1,ang=-2*Math.PI/len;for(let i=0;i<fftN;i+=len){let wr=1,wi=0;const wpr=Math.cos(ang),wpi=Math.sin(ang);for(let j=0;j<half;j++){const tr=wr*re[i+j+half]-wi*im[i+j+half],ti=wr*im[i+j+half]+wi*re[i+j+half];re[i+j+half]=re[i+j]-tr;im[i+j+half]=im[i+j]-ti;re[i+j]+=tr;im[i+j]+=ti;const nw=wr*wpr-wi*wpi;wi=wr*wpi+wi*wpr;wr=nw;}}}}
+    const minDb=-100,maxDb=-30,dbRange=maxDb-minDb;
+    const frames=[],re=new Float32Array(fftN),im=new Float32Array(fftN);
+    for(let i=0;i<totalMusic;i++){
+      const center=Math.round(i*sr/fps);
+      const start=center-fftN+1;
+      re.fill(0);im.fill(0);
+      for(let j=0;j<fftN;j++){const si=start+j;if(si>=0&&si<nF)re[j]=(ch0[si]+ch1[si])/nCh*bWin[j];}
+      fftCalc(re,im);
+      const d=new Uint8Array(binCount);
+      for(let j=0;j<binCount;j++){const mag=Math.sqrt(re[j]*re[j]+im[j]*im[j])/fftN;const db=mag>1e-20?20*Math.log10(mag):minDb;d[j]=Math.max(0,Math.min(255,Math.round((db-minDb)/dbRange*255)));}
+      frames.push(d);
+      if(i%150===0){pFill.style.width=(i/totalMusic*10)+'%';await new Promise(r=>setTimeout(r,0));}
+    }
+    // Fade-out frames: attenuate last music frame toward silence
+    const lastFrame=frames[frames.length-1]||new Uint8Array(binCount);
+    const fadeFrames=fadeOut*fps;
+    for(let i=0;i<fadeFrames;i++){const t=1-i/fadeFrames;const d=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)d[j]=Math.round(lastFrame[j]*t*t);frames.push(d);}
     pFill.style.width='10%';
 
-    // Step 2: Pre-compute background FX (zoom/bright/vig) from captured frames
-    // This matches preview logic at 60fps equivalent, avoiding offline analyser quirks
+    // Step 3: Pre-compute background FX (zoom/bright/vig) from captured frames
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
-    const lastFrame=frames[frames.length-1]||new Uint8Array(256);
-    const fadeFrames=fadeOut*fps;
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
       let pb=0,pbP=0,z=0,b=0,v=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
-        let fd;
-        if(i<totalMusic){fd=frames[i]||new Uint8Array(256);}
-        else{const t=1-(i-totalMusic)/fadeFrames;fd=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)fd[j]=Math.round(lastFrame[j]*t*t);}
+        const fd=frames[i];
         const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
         const ratio=bass/Math.max(pb,0.01);
         if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);}
@@ -1158,22 +1158,13 @@ document.getElementById('dlBtn').onclick=async function(){
       }
     }
 
-    // Step 3: Encode video (music frames + fade-out)
+    // Step 4: Encode video
     setStatus('Encoding video...');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
-      let frameData;
-      if(i<totalMusic){
-        frameData=frames[i]||new Uint8Array(256);
-      } else {
-        // Fade out: lerp last frame data toward zero
-        const t=1-(i-totalMusic)/fadeFrames;
-        frameData=new Uint8Array(lastFrame.length);
-        for(let j=0;j<lastFrame.length;j++) frameData[j]=Math.round(lastFrame[j]*t*t);
-      }
-      drawFrame(frameData);
+      drawFrame(frames[i]);
       const vf=new VideoFrame(C,{timestamp:Math.round(i*1000000/fps)});
       vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
       if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
@@ -1182,12 +1173,11 @@ document.getElementById('dlBtn').onclick=async function(){
     await vEnc.flush();vEnc.close();
     pFill.style.width='70%';
 
-    // Step 3: Encode audio from clean render
+    // Step 5: Encode audio from rendered buffer
     setStatus('Encoding audio...');btn.textContent='Encoding audio...';
     let opusPriv=null;const aOut=[];
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
     aEnc.configure({codec:'opus',sampleRate:sr,numberOfChannels:2,bitrate:128000});
-    const nCh=rendered.numberOfChannels,nF=rendered.length,ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
     const totalAudioSamples=nF+fadeOut*sr;
     for(let o=0;o<totalAudioSamples;o+=960){
       const n=Math.min(960,totalAudioSamples-o),d=new Float32Array(2*n);
@@ -1207,7 +1197,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Default OpusHead if encoder didn't provide one
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
-    // Step 4: Mux & download
+    // Step 6: Mux & download
     setStatus('Building file...');btn.textContent='Building file...';
     const webm=buildWebM(vOut,aOut,W,H,(dur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
