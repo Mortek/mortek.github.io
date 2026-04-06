@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.4</div>
+<div class="version">v2.7.5</div>
 
 <script>
 const C = document.getElementById('c');
@@ -747,18 +747,18 @@ function drawFrame(data){
   } else {
     // Live preview: compute from analyser data
     const bassFX=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
-    const bassOnset=Math.max(bassFX-prevBass,0);
-    // Power curve: harder bass hits react disproportionately more
-    const scaledOnset=Math.pow(bassOnset,0.6)*1.5;
+    const bassRatio=bassFX/Math.max(prevBass,0.01);
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
-    if(bassOnset>0.05&&bassFX>0.35){
-      bgZoom=Math.max(bgZoom,scaledOnset*zoomStr*8);
-      bgBright=Math.max(bgBright,scaledOnset*brightStr*4);
-      bgVig=Math.max(bgVig,scaledOnset*vigStr*4);
+    if(bassRatio>1.8&&bassFX>0.3){
+      const strength=(bassRatio-1)*bassFX;
+      const scaledStr=Math.pow(strength,0.6)*1.5;
+      bgZoom=Math.max(bgZoom,scaledStr*zoomStr*8);
+      bgBright=Math.max(bgBright,scaledStr*brightStr*4);
+      bgVig=Math.max(bgVig,scaledStr*vigStr*4);
     }
-    prevBass+=(bassFX-prevBass)*0.5;
+    prevBass+=(bassFX-prevBass)*0.15;
     bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
   }
   // Hue accumulates (reset when disabled)
@@ -1146,14 +1146,13 @@ document.getElementById('dlBtn').onclick=async function(){
         if(i<totalMusic){fd=frames[i]||new Uint8Array(256);}
         else{const t=1-(i-totalMusic)/fadeFrames;fd=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)fd[j]=Math.round(lastFrame[j]*t*t);}
         const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
-        const onset=Math.max(bass-pb,0);
-        const scaledOnset=Math.pow(onset,0.6)*1.5;
-        if(onset>0.05&&bass>0.35){z=Math.max(z,scaledOnset*zoomStr*8);b=Math.max(b,scaledOnset*brightStr*4);v=Math.max(v,scaledOnset*vigStr*4);}
-        pb+=(bass-pb)*0.5;
+        const ratio=bass/Math.max(pb,0.01);
+        if(ratio>1.8&&bass>0.3){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);}
+        pb+=(bass-pb)*0.15;
         z*=0.88;b*=0.85;v*=0.9;
         // Particle bass onset (separate tracker)
         const pOnset=Math.max(bass-pbP,0);
-        pbP+=(bass-pbP)*0.5;
+        pbP+=(bass-pbP)*0.15;
         const pStr=(pOnset>0.05&&bassReactStr>0)?Math.pow(pOnset,0.6)*1.5*bassReactStr:0;
         precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr});
       }
