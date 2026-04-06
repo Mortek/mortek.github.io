@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.9</div>
+<div class="version">v2.8.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1092,8 +1092,8 @@ document.getElementById('dlBtn').onclick=async function(){
   pBar.style.display='block';pFill.style.width='0%';
   if(source){try{source.stop();}catch(e){}}
   playing=false;
-  // Reset FX state for clean encode
-  prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];frameCount=0;
+  // Stop animation loop so it doesn't increment frameCount during async analysis
+  if(animId){cancelAnimationFrame(animId);animId=null;}
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
@@ -1158,7 +1158,9 @@ document.getElementById('dlBtn').onclick=async function(){
       }
     }
 
-    // Step 4: Encode video
+    // Step 4: Encode video — reset all FX state for clean frame-by-frame render
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];frameCount=0;
+    barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
@@ -1210,7 +1212,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Restart preview
     initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{precomputedFX=null;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';}
+  finally{precomputedFX=null;btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
