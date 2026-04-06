@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.3</div>
+<div class="version">v2.7.4</div>
 
 <script>
 const C = document.getElementById('c');
@@ -627,7 +627,7 @@ function manageParticles(energy,data){
   } else {
     const bassStr=parseFloat(document.getElementById('bassReact').value);
     if(bassStr>0){
-      const bass=data.slice(0,3).reduce((a,b)=>a+b,0)/3/255;
+      const bass=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
       const onset=Math.max(bass-prevBassParticle,0);
       prevBassParticle+=(bass-prevBassParticle)*0.3;
       if(onset>0.05) strength=Math.pow(onset,0.6)*1.5*bassStr;
@@ -746,7 +746,7 @@ function drawFrame(data){
     bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
   } else {
     // Live preview: compute from analyser data
-    const bassFX=data.slice(0,3).reduce((a,b)=>a+b,0)/3/255;
+    const bassFX=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
     const bassOnset=Math.max(bassFX-prevBass,0);
     // Power curve: harder bass hits react disproportionately more
     const scaledOnset=Math.pow(bassOnset,0.6)*1.5;
@@ -1145,7 +1145,7 @@ document.getElementById('dlBtn').onclick=async function(){
         let fd;
         if(i<totalMusic){fd=frames[i]||new Uint8Array(256);}
         else{const t=1-(i-totalMusic)/fadeFrames;fd=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)fd[j]=Math.round(lastFrame[j]*t*t);}
-        const bass=fd.slice(0,3).reduce((a,c)=>a+c,0)/3/255;
+        const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
         const onset=Math.max(bass-pb,0);
         const scaledOnset=Math.pow(onset,0.6)*1.5;
         if(onset>0.05&&bass>0.35){z=Math.max(z,scaledOnset*zoomStr*8);b=Math.max(b,scaledOnset*brightStr*4);v=Math.max(v,scaledOnset*vigStr*4);}
