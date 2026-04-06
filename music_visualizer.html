@@ -338,7 +338,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.7.5</div>
+<div class="version">v2.7.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -837,7 +837,7 @@ function initAudio(buf){
   audioCtx=new AudioContext();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
-  analyser.fftSize=512;analyser.smoothingTimeConstant=0.3;
+  analyser.fftSize=1024;analyser.smoothingTimeConstant=0.3;
   gainNode=audioCtx.createGain();
   analyser.connect(gainNode);
   gainNode.connect(audioCtx.destination);
@@ -1102,7 +1102,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Step 1a: Pre-analyze audio offline (separate context for analysis)
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
     const anCtx=new OfflineAudioContext(2,numSamples,sr);
-    const offAn=anCtx.createAnalyser();offAn.fftSize=512;offAn.smoothingTimeConstant=0.3;
+    const offAn=anCtx.createAnalyser();offAn.fftSize=1024;offAn.smoothingTimeConstant=0.3;
     const anSrc=anCtx.createBufferSource();anSrc.buffer=buf;
     anSrc.connect(offAn);
     const proc=anCtx.createScriptProcessor(1024,2,2);
