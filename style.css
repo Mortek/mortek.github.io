@@ -262,6 +262,19 @@ h1 span { color: #F7931A; }
 }
 .bio-text h2 { font-size: 1.4em; color: #fff; margin-bottom: 8px; }
 .bio-text p { font-size: 0.95em; color: #888890; line-height: 1.7; }
+.bio-text .buy-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: #F7931A;
+  color: #141416;
+  font-weight: 700;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  transition: background .2s;
+}
+.bio-text .buy-btn:hover { background: #e5850f; color: #141416; }
 .books-main h1 { text-align: center; margin-bottom: 32px; }
 .books-grid {
   display: grid;
