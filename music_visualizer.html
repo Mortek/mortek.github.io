@@ -44,7 +44,6 @@ select:hover{border-color:#a07fff}
 .seek-row input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#a07fff;border:none;cursor:pointer}
 .seek-row input[type=range]::-moz-range-track{background:#1e1e3a;height:4px;border-radius:2px}
 .seek-time{font-size:11px;color:#666;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
-.version{position:fixed;bottom:8px;right:12px;font-size:11px;color:#555;pointer-events:none}
 .back-btn{position:fixed;top:12px;left:16px;background:#1e1e3a;border:1px solid #333;color:#aaa;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s;z-index:100;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .back-btn:hover{border-color:#a07fff;background:#2a2a4a;color:#ccc}
 .donate-btn{position:fixed;top:12px;right:16px;background:linear-gradient(135deg,#0070ba,#003087);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s;z-index:100;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
@@ -95,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer</h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.2.0</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -474,7 +473,6 @@ select:hover{border-color:#a07fff}
   <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
 </div>
 
-<div class="version">v3.2.0</div>
 
 <script>
 const C = document.getElementById('c');
