@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.3</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.4</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1846,7 +1846,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const webm=buildWebM(vOut,aOut,SW,SH,(actualDur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
-    const dlName=(portraitName||imgName||'mortek-short')+'-short.webm';
+    const dlName=(portraitName||imgName||'mortek-short')+'.webm';
     const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url),5000);
