@@ -649,7 +649,7 @@ function processLogoMask(){
 // ---- PARTICLES ----
 const matChars = '01アイウエオカキクケコ';
 const noteChars = ['\u2669','\u266A','\u266B','\u266C'];
-function mkParticle(){
+function mkParticle(data){
   const s = document.getElementById('partStyle').value;
   const spd=parseFloat(document.getElementById('partSpeed').value);
   const sz=parseFloat(document.getElementById('partSize').value);
@@ -657,10 +657,14 @@ function mkParticle(){
   const x=Math.random()*W, y=Math.random()*H;
   const fc=document.getElementById('freqColor').value;
   let color;
-  if(fc==='1'){
-    const band=Math.floor(Math.random()*3);
+  if(fc==='1'&&data&&data.length>40){
+    const bassE=data.slice(1,8).reduce((a,b)=>a+b,0)/7;
+    const midE=data.slice(8,40).reduce((a,b)=>a+b,0)/32;
+    const highE=data.slice(40,100).reduce((a,b)=>a+b,0)/60;
     const p=getCycledPal();
-    color=band===0?p[0]:band===1?p[Math.floor(p.length/2)]:p[p.length-1];
+    if(bassE>=midE&&bassE>=highE) color=p[0];
+    else if(midE>=highE) color=p[Math.floor(p.length/2)];
+    else color=p[p.length-1];
   } else {
     color=randCol();
   }
@@ -783,7 +787,7 @@ function updateP(p){
 function manageParticles(energy,data){
   const maxP=parseInt(document.getElementById('partAmount').value);
   const spawnR=Math.max(1,Math.round(maxP/40));
-  for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
+  for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle(data));
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
   let strength=0;
   if(precomputedFX){
