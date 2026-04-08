@@ -448,8 +448,9 @@ select:hover{border-color:#a07fff}
   <div class="shorts-row">
     <div class="ctrl"><label>Start</label>
       <span class="shorts-time" id="shortsStartTime">0:00</span>
-      <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current</button>
-      <button class="sm-btn shorts-set-btn" id="shortsSetZero">Start at 0:00</button>
+    </div>
+    <div class="ctrl"><label>End</label>
+      <span class="shorts-time" id="shortsEndTime">3:00</span>
     </div>
     <div class="ctrl"><label>Duration</label>
       <select id="shortsDur">
@@ -464,10 +465,11 @@ select:hover{border-color:#a07fff}
         <option value="180" selected>3 min</option>
       </select>
     </div>
-    <div class="ctrl"><label>End</label>
-      <span class="shorts-time" id="shortsEndTime">3:00</span>
-    </div>
     <button class="sm-btn dl-top-btn" id="shortsDlBtn" disabled>Download Short</button>
+  </div>
+  <div class="shorts-row">
+    <button class="sm-btn shorts-set-btn" id="shortsSetZero">0:00</button>
+    <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current</button>
   </div>
   <div class="progress-bar" id="shortsProgressBar"><div class="progress-fill" id="shortsProgressFill"></div></div>
   <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
