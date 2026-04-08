@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.2</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.3</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1582,13 +1582,13 @@ function switchTab(tab){
     _savedLogo=logo;_savedLogoLoaded=logoLoaded;_savedLogoMask=logoMaskSrc;
     if(portraitLoaded){img=portraitImg;imgLoaded=true;applyImageColors(portraitImg);}
     if(shortsLogoLoaded){logo=shortsLogo;logoLoaded=true;logoMaskSrc=shortsLogoMask;}
-    C.width=405;C.height=720;
-    W=405;H=720;trailC.width=405;trailC.height=720;
+    C.width=1080;C.height=1920;C.style.maxHeight='720px';
+    W=1080;H=1920;trailC.width=1080;trailC.height=1920;
   } else {
     img=_savedImg;imgLoaded=_savedImgLoaded;
     logo=_savedLogo;logoLoaded=_savedLogoLoaded;logoMaskSrc=_savedLogoMask;
     if(imgLoaded&&img)applyImageColors(img);
-    C.width=1280;C.height=720;
+    C.width=1280;C.height=720;C.style.maxHeight='';
     W=1280;H=720;trailC.width=1280;trailC.height=720;
   }
   ctx=C.getContext('2d');
@@ -1858,7 +1858,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
       img=portraitLoaded?portraitImg:savedImg;imgLoaded=portraitLoaded||savedImgLoaded;
       logo=shortsLogoLoaded?shortsLogo:savedLogo;logoLoaded=shortsLogoLoaded||savedLogoLoaded;
       logoMaskSrc=shortsLogoLoaded?shortsLogoMask:savedLogoMask;
-      W=405;H=720;trailC.width=405;trailC.height=720;
+      W=1080;H=1920;trailC.width=1080;trailC.height=1920;
     } else {
       img=savedImg;imgLoaded=savedImgLoaded;
       logo=savedLogo;logoLoaded=savedLogoLoaded;logoMaskSrc=savedLogoMask;
@@ -1874,7 +1874,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
       img=portraitLoaded?portraitImg:savedImg;imgLoaded=portraitLoaded||savedImgLoaded;
       logo=shortsLogoLoaded?shortsLogo:savedLogo;logoLoaded=shortsLogoLoaded||savedLogoLoaded;
       logoMaskSrc=shortsLogoLoaded?shortsLogoMask:savedLogoMask;
-      W=405;H=720;trailC.width=405;trailC.height=720;
+      W=1080;H=1920;trailC.width=1080;trailC.height=1920;
     } else {
       img=savedImg;imgLoaded=savedImgLoaded;
       logo=savedLogo;logoLoaded=savedLogoLoaded;logoMaskSrc=savedLogoMask;
