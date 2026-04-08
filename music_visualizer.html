@@ -346,6 +346,8 @@ select:hover{border-color:#a07fff}
     <select id="partTrails">
       <option value="0" selected>Off</option>
       <option value="0.82">Light</option>
+      <option value="0.88">Mild</option>
+      <option value="0.91">Moderate</option>
       <option value="0.94">Medium</option>
       <option value="0.98">Heavy</option>
     </select>
@@ -411,39 +413,15 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Cam Shake <span class="new-badge">NEW</span></label>
     <select id="cameraShake">
       <option value="0" selected>Off</option>
+      <option value="1">Very Subtle</option>
       <option value="3">Subtle</option>
       <option value="7">Medium</option>
       <option value="15">Strong</option>
     </select>
   </div>
-<div class="ctrl"><label>Ken Burns <span class="new-badge">NEW</span></label>
-    <select id="kenBurns">
-      <option value="0" selected>Off</option>
-      <option value="0.04">Subtle</option>
-      <option value="0.1">Medium</option>
-      <option value="0.2">Strong</option>
-    </select>
-  </div>
-</div>
-<div class="ctrl-row">
-  <div class="cat-label">Export <span class="new-badge">NEW</span></div>
-<div class="ctrl"><label>Resolution <span class="new-badge">NEW</span></label>
-    <select id="exportRes">
-      <option value="720" selected>720p</option>
-      <option value="1080">1080p</option>
-      <option value="1440">1440p</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Bitrate <span class="new-badge">NEW</span></label>
-    <select id="exportBitrate">
-      <option value="8000000" selected>Normal (8 Mbps)</option>
-      <option value="16000000">High (16 Mbps)</option>
-      <option value="32000000">Ultra (32 Mbps)</option>
-    </select>
-  </div>
 </div>
 </div>
-<div class="version">v2.9.4</div>
+<div class="version">v2.9.5</div>
 
 <script>
 const C = document.getElementById('c');
@@ -468,13 +446,14 @@ let bgHue = 0;
 let frameCount = 0;
 let shakeX = 0, shakeY = 0;
 let colorCycleT = 0;
+let freqTintColor = null;
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','kenBurns','exportRes','exportBitrate'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake'];
 const prefRangeIds=['logoTint','hueSat'];
 const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
@@ -647,19 +626,7 @@ function mkParticle(data){
   const sz=parseFloat(document.getElementById('partSize').value);
   const lf=parseFloat(document.getElementById('partLife').value);
   const x=Math.random()*W, y=Math.random()*H;
-  const fc=document.getElementById('freqColor').value;
-  let color;
-  if(fc==='1'&&data&&data.length>40){
-    const bassE=data.slice(1,8).reduce((a,b)=>a+b,0)/7;
-    const midE=data.slice(8,40).reduce((a,b)=>a+b,0)/32;
-    const highE=data.slice(40,100).reduce((a,b)=>a+b,0)/60;
-    const p=getCycledPal();
-    if(bassE>=midE&&bassE>=highE) color=p[0];
-    else if(midE>=highE) color=p[Math.floor(p.length/2)];
-    else color=p[p.length-1];
-  } else {
-    color=randCol();
-  }
+  const color=randCol();
   return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
     ox:0, oy:0,
     age:0, life:(150+Math.random()*200)*lf, color, style:s, r:(1+Math.random()*3)*sz,
@@ -673,10 +640,11 @@ function drawP(p, energy){
   const r = p.r*boost;
   ctx.save();
   ctx.globalAlpha = t * 0.8;
-  ctx.fillStyle = p.color;
-  ctx.strokeStyle = p.color;
+  const pCol=freqTintColor||p.color;
+  ctx.fillStyle = pCol;
+  ctx.strokeStyle = pCol;
   const glowVal=parseFloat(document.getElementById('partGlow').value);
-  if(glowVal>0){ctx.shadowColor=p.color;ctx.shadowBlur=glowVal*(0.5+energy);}
+  if(glowVal>0){ctx.shadowColor=pCol;ctx.shadowBlur=glowVal*(0.5+energy);}
   const s = p.style;
 
   if(s==='stars'){
@@ -802,6 +770,18 @@ function manageParticles(energy,data){
       p.ox+=dx/dist*strength;
       p.oy+=dy/dist*strength;
     });
+  }
+  // Freq color: compute tint from current frequency bands
+  if(document.getElementById('freqColor').value==='1'&&data&&data.length>40){
+    const bassE=data.slice(1,8).reduce((a,b)=>a+b,0)/7/255;
+    const midE=data.slice(8,40).reduce((a,b)=>a+b,0)/32/255;
+    const highE=data.slice(40,100).reduce((a,b)=>a+b,0)/60/255;
+    const total=Math.max(bassE+midE+highE,0.01);
+    const h=Math.round((bassE*15+midE*120+highE*240)/total);
+    const l=Math.round(55+Math.max(bassE,midE,highE)*20);
+    freqTintColor=`hsl(${h},85%,${Math.min(l,75)}%)`;
+  } else {
+    freqTintColor=null;
   }
   const trailVal=parseFloat(document.getElementById('partTrails').value);
   if(trailVal>0){
@@ -977,13 +957,6 @@ function drawFrame(data){
   // Camera shake + Ken Burns: applied to entire frame
   ctx.save();
   if(Math.abs(shakeX)>0.5||Math.abs(shakeY)>0.5) ctx.translate(shakeX,shakeY);
-  const kb=parseFloat(document.getElementById('kenBurns').value);
-  if(kb>0){
-    const kx=Math.sin(frameCount*0.001)*kb*W*0.5;
-    const ky=Math.cos(frameCount*0.0008)*kb*H*0.5;
-    const kz=1+kb*0.15+Math.sin(frameCount*0.0006)*kb*0.15;
-    ctx.translate(W/2,H/2);ctx.scale(kz,kz);ctx.translate(-W/2+kx,-H/2+ky);
-  }
   if(imgLoaded && img){
     ctx.save();
     // Bass zoom
@@ -1317,13 +1290,7 @@ document.getElementById('dlBtn').onclick=async function(){
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
-  // Export settings
-  const expRes=parseInt(document.getElementById('exportRes').value);
-  const expBitrate=parseInt(document.getElementById('exportBitrate').value);
-  const encW=expRes===1440?2560:expRes===1080?1920:1280;
-  const encH=expRes===1440?1440:expRes===1080?1080:720;
   const savedW=W,savedH=H;
-  W=encW;H=encH;
   // Resize trail canvas for encoding resolution
   trailC.width=W;trailC.height=H;
   try{
@@ -1388,7 +1355,7 @@ document.getElementById('dlBtn').onclick=async function(){
     }
 
     // Step 4: Encode video
-    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;freqTintColor=null;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
@@ -1396,7 +1363,7 @@ document.getElementById('dlBtn').onclick=async function(){
     ctx=offC.getContext('2d');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
-    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:expBitrate,framerate:fps});
+    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
       drawFrame(frames[i]);
       const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
