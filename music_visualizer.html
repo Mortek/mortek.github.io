@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.3.0</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.3.1</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1446,16 +1446,17 @@ document.getElementById('dlBtn').onclick=async function(){
 function setStatus(t){document.getElementById('status').textContent=t;}
 
 // ---- SHORTS GENERATOR ----
-let portraitImg=null,portraitLoaded=false,shortsStart=0;
+let portraitImg=null,portraitLoaded=false,portraitName='',shortsStart=0;
 let shortsAudioBuffer=null,shortsLogo=null,shortsLogoLoaded=false,shortsLogoMask=null;
 document.getElementById('portraitInput').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
+  portraitName=f.name.replace(/\.[^.]+$/,'');
   portraitImg=new Image();
   portraitImg.onload=()=>{portraitLoaded=true;document.getElementById('portraitLabel').textContent='\u2713 '+f.name;document.getElementById('portraitLabel').classList.add('loaded');document.getElementById('portraitWrap').classList.add('has-file');};
   portraitImg.src=URL.createObjectURL(f);
 };
 document.getElementById('clearPortraitBtn').onclick=function(){
-  portraitImg=null;portraitLoaded=false;
+  portraitImg=null;portraitLoaded=false;portraitName='';
   document.getElementById('portraitInput').value='';
   document.getElementById('portraitLabel').textContent='+ Portrait Image';
   document.getElementById('portraitLabel').classList.remove('loaded');
@@ -1651,7 +1652,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const webm=buildWebM(vOut,aOut,SW,SH,(actualDur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
-    const dlName=(imgName||'mortek-short')+'-short.webm';
+    const dlName=(portraitName||imgName||'mortek-short')+'-short.webm';
     const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url),5000);
