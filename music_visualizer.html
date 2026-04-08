@@ -416,20 +416,12 @@ select:hover{border-color:#a07fff}
       <option value="15">Strong</option>
     </select>
   </div>
-  <div class="ctrl"><label>BG Ripple <span class="new-badge">NEW</span></label>
-    <select id="bgRipple">
-      <option value="0" selected>Off</option>
-      <option value="10">Subtle</option>
-      <option value="25">Medium</option>
-      <option value="45">Strong</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Ken Burns <span class="new-badge">NEW</span></label>
+<div class="ctrl"><label>Ken Burns <span class="new-badge">NEW</span></label>
     <select id="kenBurns">
       <option value="0" selected>Off</option>
-      <option value="0.02">Subtle</option>
-      <option value="0.05">Medium</option>
-      <option value="0.1">Strong</option>
+      <option value="0.04">Subtle</option>
+      <option value="0.1">Medium</option>
+      <option value="0.2">Strong</option>
     </select>
   </div>
 </div>
@@ -482,7 +474,7 @@ trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','bgRipple','kenBurns','exportRes','exportBitrate'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','kenBurns','exportRes','exportBitrate'];
 const prefRangeIds=['logoTint','hueSat'];
 const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
@@ -947,7 +939,7 @@ function drawFrame(data){
   frameCount++;
   // Color cycle
   const ccRate=parseFloat(document.getElementById('colorCycle').value);
-  if(ccRate>0) colorCycleT+=ccRate;
+  if(ccRate>0) colorCycleT+=ccRate; else colorCycleT=0;
   const p=getCycledPal();
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
@@ -982,18 +974,18 @@ function drawFrame(data){
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
   ctx.clearRect(0,0,W,H);
+  // Camera shake + Ken Burns: applied to entire frame
+  ctx.save();
+  if(Math.abs(shakeX)>0.5||Math.abs(shakeY)>0.5) ctx.translate(shakeX,shakeY);
+  const kb=parseFloat(document.getElementById('kenBurns').value);
+  if(kb>0){
+    const kx=Math.sin(frameCount*0.001)*kb*W*0.5;
+    const ky=Math.cos(frameCount*0.0008)*kb*H*0.5;
+    const kz=1+kb*0.15+Math.sin(frameCount*0.0006)*kb*0.15;
+    ctx.translate(W/2,H/2);ctx.scale(kz,kz);ctx.translate(-W/2+kx,-H/2+ky);
+  }
   if(imgLoaded && img){
     ctx.save();
-    // Camera shake (applied to background only)
-    if(Math.abs(shakeX)>0.5||Math.abs(shakeY)>0.5) ctx.translate(shakeX,shakeY);
-    // Ken Burns: slow pan/zoom drift
-    const kb=parseFloat(document.getElementById('kenBurns').value);
-    if(kb>0){
-      const kx=Math.sin(frameCount*0.002)*kb*W*0.3;
-      const ky=Math.cos(frameCount*0.0015)*kb*H*0.3;
-      const kz=1+(1+Math.sin(frameCount*0.001))*kb*0.3;
-      ctx.translate(W/2,H/2);ctx.scale(kz,kz);ctx.translate(-W/2+kx,-H/2+ky);
-    }
     // Bass zoom
     if(bgZoom>0.0005){
       const z=1+bgZoom;
@@ -1008,19 +1000,6 @@ function drawFrame(data){
     ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
     ctx.filter='none';
     ctx.restore();
-    // BG Ripple: wave displacement applied in pixel space after transforms
-    const rippleStr=parseFloat(document.getElementById('bgRipple').value);
-    if(rippleStr>0){
-      const midE=data.slice(10,40).reduce((a,b)=>a+b,0)/30/255;
-      const amp=midE*rippleStr;
-      if(amp>0.5){
-        const sH=6;
-        for(let y=0;y<H;y+=sH){
-          const xOff=Math.sin(y*0.02+frameCount*0.1)*amp;
-          if(Math.abs(xOff)>0.5) ctx.drawImage(ctx.canvas,0,y,W,sH,xOff,y,W,sH);
-        }
-      }
-    }
   } else {
     ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
   }
@@ -1056,6 +1035,7 @@ function drawFrame(data){
   }
 
   drawCircle(data,p,energy);
+  ctx.restore(); // camera shake + ken burns
 }
 
 // ---- ANIMATION LOOP ----
