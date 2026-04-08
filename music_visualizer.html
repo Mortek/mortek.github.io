@@ -440,18 +440,23 @@ select:hover{border-color:#a07fff}
     <div class="ctrl"><label>Start</label>
       <span class="shorts-time" id="shortsStartTime">0:00</span>
       <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current</button>
+      <button class="sm-btn shorts-set-btn" id="shortsSetZero">Start at 0:00</button>
     </div>
     <div class="ctrl"><label>Duration</label>
       <select id="shortsDur">
         <option value="15">15 sec</option>
         <option value="20">20 sec</option>
-        <option value="30" selected>30 sec</option>
+        <option value="30">30 sec</option>
         <option value="45">45 sec</option>
         <option value="60">60 sec</option>
+        <option value="90">90 sec</option>
+        <option value="120">2 min</option>
+        <option value="150">2:30 min</option>
+        <option value="180" selected>3 min</option>
       </select>
     </div>
     <div class="ctrl"><label>End</label>
-      <span class="shorts-time" id="shortsEndTime">0:30</span>
+      <span class="shorts-time" id="shortsEndTime">3:00</span>
     </div>
     <button class="sm-btn dl-top-btn" id="shortsDlBtn" disabled>Download Short</button>
   </div>
@@ -459,7 +464,7 @@ select:hover{border-color:#a07fff}
   <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
 </div>
 
-<div class="version">v3.0.0</div>
+<div class="version">v3.1.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1447,6 +1452,10 @@ document.getElementById('clearPortraitBtn').onclick=function(){
 document.getElementById('shortsSetStart').onclick=function(){
   if(!audioBuffer)return;
   shortsStart=getCurrentTime();
+  updateShortsEnd();
+};
+document.getElementById('shortsSetZero').onclick=function(){
+  shortsStart=0;
   updateShortsEnd();
 };
 document.getElementById('shortsDur').onchange=updateShortsEnd;
