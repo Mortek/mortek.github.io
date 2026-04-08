@@ -199,12 +199,6 @@ select:hover{border-color:#a07fff}
       <option value="120" selected>Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label>Freq Color <span class="new-badge">NEW</span></label>
-    <select id="freqColor">
-      <option value="0" selected>Off</option>
-      <option value="1">On</option>
-    </select>
-  </div>
 </div>
 <div class="ctrl-row">
   <div class="cat-label">Spectrum Bars</div>
@@ -264,12 +258,6 @@ select:hover{border-color:#a07fff}
       <option value="140">Normal</option>
       <option value="180">Large</option>
       <option value="220">Very Large</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Mirror <span class="new-badge">NEW</span></label>
-    <select id="barMirror">
-      <option value="0" selected>Off</option>
-      <option value="1">On</option>
     </select>
   </div>
   <div class="ctrl"><label>Bar Caps <span class="new-badge">NEW</span></label>
@@ -421,7 +409,7 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.9.5</div>
+<div class="version">v2.9.6</div>
 
 <script>
 const C = document.getElementById('c');
@@ -446,14 +434,13 @@ let bgHue = 0;
 let frameCount = 0;
 let shakeX = 0, shakeY = 0;
 let colorCycleT = 0;
-let freqTintColor = null;
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake'];
 const prefRangeIds=['logoTint','hueSat'];
 const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
@@ -640,11 +627,10 @@ function drawP(p, energy){
   const r = p.r*boost;
   ctx.save();
   ctx.globalAlpha = t * 0.8;
-  const pCol=freqTintColor||p.color;
-  ctx.fillStyle = pCol;
-  ctx.strokeStyle = pCol;
+  ctx.fillStyle = p.color;
+  ctx.strokeStyle = p.color;
   const glowVal=parseFloat(document.getElementById('partGlow').value);
-  if(glowVal>0){ctx.shadowColor=pCol;ctx.shadowBlur=glowVal*(0.5+energy);}
+  if(glowVal>0){ctx.shadowColor=p.color;ctx.shadowBlur=glowVal*(1+energy*2);}
   const s = p.style;
 
   if(s==='stars'){
@@ -771,18 +757,6 @@ function manageParticles(energy,data){
       p.oy+=dy/dist*strength;
     });
   }
-  // Freq color: compute tint from current frequency bands
-  if(document.getElementById('freqColor').value==='1'&&data&&data.length>40){
-    const bassE=data.slice(1,8).reduce((a,b)=>a+b,0)/7/255;
-    const midE=data.slice(8,40).reduce((a,b)=>a+b,0)/32/255;
-    const highE=data.slice(40,100).reduce((a,b)=>a+b,0)/60/255;
-    const total=Math.max(bassE+midE+highE,0.01);
-    const h=Math.round((bassE*15+midE*120+highE*240)/total);
-    const l=Math.round(55+Math.max(bassE,midE,highE)*20);
-    freqTintColor=`hsl(${h},85%,${Math.min(l,75)}%)`;
-  } else {
-    freqTintColor=null;
-  }
   const trailVal=parseFloat(document.getElementById('partTrails').value);
   if(trailVal>0){
     // Fade existing trails
@@ -812,7 +786,6 @@ function drawCircle(data,p,energy){
   const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6;
   const innerBase=base+bassPulse;
   const barGlowVal=parseFloat(document.getElementById('barGlow').value);
-  const barMirrorOn=document.getElementById('barMirror').value==='1';
   const barCapsVal=parseFloat(document.getElementById('barCaps').value);
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
@@ -888,26 +861,12 @@ function drawCircle(data,p,energy){
     ctx.lineWidth=bWidth;
     ctx.globalAlpha=0.7+v*.3;
     ctx.stroke();
-    // Mirror bars (extend inward)
-    if(barMirrorOn){
-      const r0=base-(r2-base)*0.6;
-      ctx.beginPath();
-      ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
-      ctx.lineTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);
-      ctx.stroke();
-    }
     // Bar caps
     if(barCapsVal>0&&v>0.01){
       ctx.beginPath();
       ctx.arc(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2,barCapsVal,0,Math.PI*2);
       ctx.fillStyle=p[i%p.length];
       ctx.fill();
-      if(barMirrorOn){
-        const r0=base-(r2-base)*0.6;
-        ctx.beginPath();
-        ctx.arc(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0,barCapsVal*0.7,0,Math.PI*2);
-        ctx.fill();
-      }
     }
     if(barGlowVal>0) ctx.shadowBlur=0;
   }
@@ -1355,7 +1314,7 @@ document.getElementById('dlBtn').onclick=async function(){
     }
 
     // Step 4: Encode video
-    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;freqTintColor=null;particles=[];frameCount=0;
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
