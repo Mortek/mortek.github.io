@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.0</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.1</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1864,7 +1864,8 @@ document.getElementById('shortsDlBtn').onclick=async function(){
       logo=savedLogo;logoLoaded=savedLogoLoaded;logoMaskSrc=savedLogoMask;
       W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
     }
-    if(window.audioBuffer)await initAudio(window.audioBuffer);
+    if(activeTab==='shorts'&&shortsAudioBuffer) await initShortsAudio(shortsAudioBuffer);
+    else if(window.audioBuffer) await initAudio(window.audioBuffer);
   }catch(err){setShortsStatus('Error: '+err.message);console.error(err);}
   finally{
     _savedImg=savedImg;_savedImgLoaded=savedImgLoaded;
