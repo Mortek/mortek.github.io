@@ -837,14 +837,15 @@ function drawCircle(data,p,energy){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
   const reactR=parseFloat(document.getElementById('reactRadius').value);
   const bassPulse=reactR>0?data.slice(1,5).reduce((a,b)=>a+b,0)/4/255*reactR*50:0;
-  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6+bassPulse;
+  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6;
+  const innerBase=base+bassPulse;
   const barGlowVal=parseFloat(document.getElementById('barGlow').value);
   const barMirrorOn=document.getElementById('barMirror').value==='1';
   const barCapsVal=parseFloat(document.getElementById('barCaps').value);
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
-    ctx.beginPath();ctx.arc(cx,cy,base*.9,0,Math.PI*2);ctx.clip();
+    ctx.beginPath();ctx.arc(cx,cy,innerBase*.9,0,Math.PI*2);ctx.clip();
     const lSize=baseR*1.8;
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
@@ -872,8 +873,8 @@ function drawCircle(data,p,energy){
     ctx.save();
     ctx.globalAlpha=0.15+energy*.3;
     ctx.strokeStyle=p[0];
-    ctx.lineWidth=base*.8;
-    ctx.beginPath();ctx.arc(cx,cy,base*.5,0,Math.PI*2);ctx.stroke();
+    ctx.lineWidth=innerBase*.8;
+    ctx.beginPath();ctx.arc(cx,cy,innerBase*.5,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   }
   // Power-curve mapped half-spectrum, mirrored for full 360°
