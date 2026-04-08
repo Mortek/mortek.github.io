@@ -57,7 +57,7 @@ select:hover{border-color:#a07fff}
 .dl-top-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
 .new-badge{display:inline-block;background:linear-gradient(135deg,#ff4da6,#ff6b6b);color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:.5px;text-transform:uppercase}
 .shorts-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
-.shorts-time{font-size:12px;color:#ccc;font-variant-numeric:tabular-nums;background:#1a1a30;border:1px solid #333;border-radius:6px;padding:5px 10px;min-width:50px;text-align:center;display:block;margin-bottom:4px}
+.shorts-time{font-size:12px;color:#ccc;font-variant-numeric:tabular-nums;background:#1a1a30;border:1px solid #333;border-radius:6px;padding:5px 10px;min-width:50px;text-align:center;display:block}
 .shorts-set-btn{font-size:10px!important;padding:4px 10px!important}
 .shorts-controls .progress-bar{width:100%;margin-top:10px}
 .tab-nav{display:flex;gap:6px;width:100%;max-width:1280px;background:#0a0a15;border-radius:10px;padding:5px;margin:16px 0 10px}
@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.1</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.5.2</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -178,7 +178,7 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="shorts-row">
     <button class="sm-btn shorts-set-btn" id="shortsSetZero">0:00</button>
-    <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current</button>
+    <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current Time</button>
   </div>
   <div class="progress-bar" id="shortsProgressBar"><div class="progress-fill" id="shortsProgressFill"></div></div>
   <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
