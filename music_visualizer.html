@@ -435,13 +435,7 @@ select:hover{border-color:#a07fff}
 </div>
 <div class="ctrl-row">
   <div class="cat-label">Export <span class="new-badge">NEW</span></div>
-  <div class="ctrl"><label>FPS <span class="new-badge">NEW</span></label>
-    <select id="exportFps">
-      <option value="30" selected>30</option>
-      <option value="60">60</option>
-    </select>
-  </div>
-  <div class="ctrl"><label>Resolution <span class="new-badge">NEW</span></label>
+<div class="ctrl"><label>Resolution <span class="new-badge">NEW</span></label>
     <select id="exportRes">
       <option value="720" selected>720p</option>
       <option value="1080">1080p</option>
@@ -488,7 +482,7 @@ trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','bgRipple','kenBurns','exportFps','exportRes','exportBitrate'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','bgRipple','kenBurns','exportRes','exportBitrate'];
 const prefRangeIds=['logoTint','hueSat'];
 const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
@@ -1339,7 +1333,6 @@ document.getElementById('dlBtn').onclick=async function(){
   playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   // Export settings
-  const expFps=parseInt(document.getElementById('exportFps').value);
   const expRes=parseInt(document.getElementById('exportRes').value);
   const expBitrate=parseInt(document.getElementById('exportBitrate').value);
   const encW=expRes===1440?2560:expRes===1080?1920:1280;
@@ -1349,7 +1342,7 @@ document.getElementById('dlBtn').onclick=async function(){
   // Resize trail canvas for encoding resolution
   trailC.width=W;trailC.height=H;
   try{
-    const buf=window.audioBuffer,fps=expFps,dur=buf.duration,fadeOut=5;
+    const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
