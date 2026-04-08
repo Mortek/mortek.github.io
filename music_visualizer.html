@@ -30,7 +30,7 @@ input[type=file]{display:none}
 .ctrl label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
 select{background:#1a1a30;border:1px solid #333;color:#ccc;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;transition:border-color .2s}
 select:hover{border-color:#a07fff}
-.settings-grid{display:flex;gap:10px;width:100%;max-width:1280px;margin-top:12px}
+.settings-grid{display:flex;gap:10px;width:100%;max-width:1280px;margin-top:12px;flex-wrap:wrap}
 .settings-grid .ctrl-row{flex:1}
 .settings-actions{display:flex;flex-direction:column;gap:8px;justify-content:flex-end}
 .ctrl-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:8px 10px;background:#111128;border-radius:10px;border:1px solid #1e1e3a}
@@ -56,6 +56,7 @@ select:hover{border-color:#a07fff}
 .dl-top-btn:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,63,197,0.3)}
 .top-bar-fixed{display:contents}
 .dl-top-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.new-badge{display:inline-block;background:linear-gradient(135deg,#ff4da6,#ff6b6b);color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:.5px;text-transform:uppercase}
 @media(max-width:768px){
   #appContent{transform:none;width:100%}
   .back-btn,.donate-btn{position:static;margin:0}
@@ -141,6 +142,11 @@ select:hover{border-color:#a07fff}
       <option value="hearts">Hearts</option>
       <option value="arrows">Arrows</option>
       <option value="dots">Dots</option>
+      <option disabled>── New ──</option>
+      <option value="lightning">Lightning</option>
+      <option value="spiral">Spiral</option>
+      <option value="notes">Notes</option>
+      <option value="pixeldust">Pixel Dust</option>
     </select>
   </div>
   <div class="ctrl"><label>Intensity</label>
@@ -191,6 +197,12 @@ select:hover{border-color:#a07fff}
       <option value="35">Medium</option>
       <option value="70">Strong</option>
       <option value="120" selected>Extreme</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Freq Color <span class="new-badge">NEW</span></label>
+    <select id="freqColor">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
     </select>
   </div>
 </div>
@@ -254,6 +266,36 @@ select:hover{border-color:#a07fff}
       <option value="220">Very Large</option>
     </select>
   </div>
+  <div class="ctrl"><label>Mirror <span class="new-badge">NEW</span></label>
+    <select id="barMirror">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Caps <span class="new-badge">NEW</span></label>
+    <select id="barCaps">
+      <option value="0" selected>Off</option>
+      <option value="2">Small</option>
+      <option value="3.5">Medium</option>
+      <option value="5">Large</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bar Glow <span class="new-badge">NEW</span></label>
+    <select id="barGlow">
+      <option value="0" selected>Off</option>
+      <option value="6">Subtle</option>
+      <option value="14">Medium</option>
+      <option value="25">Strong</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Reactive Radius <span class="new-badge">NEW</span></label>
+    <select id="reactRadius">
+      <option value="0" selected>Off</option>
+      <option value="0.1">Subtle</option>
+      <option value="0.25">Medium</option>
+      <option value="0.5">Strong</option>
+    </select>
+  </div>
 </div>
 <div class="ctrl-row">
   <div class="cat-label">Visual</div>
@@ -291,6 +333,36 @@ select:hover{border-color:#a07fff}
   </div>
   <div class="ctrl"><label>Logo Color <span id="logoTintVal">40%</span></label>
     <input type="range" id="logoTint" min="0" max="100" value="40" style="width:90px">
+  </div>
+  <div class="ctrl"><label>Part. Glow <span class="new-badge">NEW</span></label>
+    <select id="partGlow">
+      <option value="0" selected>Off</option>
+      <option value="8">Subtle</option>
+      <option value="18">Medium</option>
+      <option value="35">Strong</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Part. Trails <span class="new-badge">NEW</span></label>
+    <select id="partTrails">
+      <option value="0" selected>Off</option>
+      <option value="0.82">Light</option>
+      <option value="0.94">Medium</option>
+      <option value="0.98">Heavy</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Vig. Color <span class="new-badge">NEW</span></label>
+    <select id="vigColor">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Color Cycle <span class="new-badge">NEW</span></label>
+    <select id="colorCycle">
+      <option value="0" selected>Off</option>
+      <option value="0.003">Slow</option>
+      <option value="0.008">Medium</option>
+      <option value="0.02">Fast</option>
+    </select>
   </div>
 </div>
 <div class="ctrl-row">
@@ -336,35 +408,87 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Hue Intensity <span id="hueSatVal">50%</span></label>
     <input type="range" id="hueSat" min="0" max="100" value="100" style="width:90px">
   </div>
+  <div class="ctrl"><label>Cam Shake <span class="new-badge">NEW</span></label>
+    <select id="cameraShake">
+      <option value="0" selected>Off</option>
+      <option value="3">Subtle</option>
+      <option value="7">Medium</option>
+      <option value="15">Strong</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>BG Ripple <span class="new-badge">NEW</span></label>
+    <select id="bgRipple">
+      <option value="0" selected>Off</option>
+      <option value="10">Subtle</option>
+      <option value="25">Medium</option>
+      <option value="45">Strong</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Ken Burns <span class="new-badge">NEW</span></label>
+    <select id="kenBurns">
+      <option value="0" selected>Off</option>
+      <option value="0.02">Subtle</option>
+      <option value="0.05">Medium</option>
+      <option value="0.1">Strong</option>
+    </select>
+  </div>
+</div>
+<div class="ctrl-row">
+  <div class="cat-label">Export <span class="new-badge">NEW</span></div>
+  <div class="ctrl"><label>FPS <span class="new-badge">NEW</span></label>
+    <select id="exportFps">
+      <option value="30" selected>30</option>
+      <option value="60">60</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Resolution <span class="new-badge">NEW</span></label>
+    <select id="exportRes">
+      <option value="720" selected>720p</option>
+      <option value="1080">1080p</option>
+      <option value="1440">1440p</option>
+    </select>
+  </div>
+  <div class="ctrl"><label>Bitrate <span class="new-badge">NEW</span></label>
+    <select id="exportBitrate">
+      <option value="8000000" selected>Normal (8 Mbps)</option>
+      <option value="16000000">High (16 Mbps)</option>
+      <option value="32000000">Ultra (32 Mbps)</option>
+    </select>
+  </div>
 </div>
 </div>
-<div class="version">v2.8.2</div>
+<div class="version">v2.9.0</div>
 
 <script>
 const C = document.getElementById('c');
 let ctx = C.getContext('2d');
-const W = C.width, H = C.height;
+let W = C.width, H = C.height;
 let img = null, imgLoaded = false, imgName = '';
 let logo = null, logoLoaded = false;
-let logoMaskSrc = null; // pre-processed: bright parts as white with luminosity-alpha
+let logoMaskSrc = null;
 const logoCanvas = document.createElement('canvas');
-let playStartTime=0, playOffset=0; // for seek tracking
-// Per-bar auto-gain tracking for even circle spectrum movement
+let playStartTime=0, playOffset=0;
 const barMin = new Float32Array(200).fill(0.5);
 const barMax = new Float32Array(200).fill(0.5);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let particles = [];
-let prevBass = 0; // previous frame bass for background FX onset detection
-let prevBassParticle = 0; // separate bass tracker for particle burst
-let bgZoom = 0; // current bass zoom amount (eases back to 0)
-let bgBright = 0; // current brightness pulse (eases back to 0)
-let bgVig = 0; // current vignette pulse (eases back to 0)
-let bgHue = 0; // cumulative hue rotation in degrees
+let prevBass = 0;
+let prevBassParticle = 0;
+let bgZoom = 0;
+let bgBright = 0;
+let bgVig = 0;
+let bgHue = 0;
 let frameCount = 0;
+let shakeX = 0, shakeY = 0;
+let colorCycleT = 0;
+// Trail canvas for particle trails
+const trailC = document.createElement('canvas');
+trailC.width = 1280; trailC.height = 720;
+const trailX = trailC.getContext('2d');
 
 // ---- PREFERENCES (session cookie) ----
-const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','bassZoom','brightPulse','vigPulse','hueShift'];
+const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','freqColor','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barMirror','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake','bgRipple','kenBurns','exportFps','exportRes','exportBitrate'];
 const prefRangeIds=['logoTint','hueSat'];
 const prefCheckIds=['hueShiftOn'];
 function savePrefs(){
@@ -392,7 +516,6 @@ function loadPrefs(){
   }catch(e){}
 }
 loadPrefs();
-// Update slider label
 const logoTintEl=document.getElementById('logoTint'),logoTintVal=document.getElementById('logoTintVal');
 logoTintVal.textContent=logoTintEl.value+'%';
 logoTintEl.oninput=function(){logoTintVal.textContent=this.value+'%';};
@@ -406,7 +529,7 @@ document.getElementById('savePrefBtn').onclick=function(){
 };
 
 const palettes = {
-  imageColors: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'], // default until image loaded
+  imageColors: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'],
   purple: ['#b44fff','#7c3aed','#818cf8','#c084fc','#6366f1'],
   fire:   ['#ff6b00','#ff3d00','#ffcc00','#ff9100','#ff4500'],
   teal:   ['#00e5ff','#00bcd4','#26c6da','#4dd0e1','#00acc1'],
@@ -417,6 +540,7 @@ const palettes = {
   sunset: ['#ff7043','#ffa726','#ff5722','#ef5350','#ffca28'],
   rainbow:['#ff0080','#ff8c00','#ffe600','#00ff80','#00bfff']
 };
+const cycleOrder=['purple','fire','teal','gold','pink','neon','arctic','sunset','rainbow'];
 
 function hueRotateHex(hex,deg){
   let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
@@ -430,12 +554,30 @@ function hueRotateHex(hex,deg){
   else if(h<240){r1=0;g1=x;b1=c;}else if(h<300){r1=x;g1=0;b1=c;}else{r1=c;g1=0;b1=x;}
   return '#'+[r1+m,g1+m,b1+m].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');
 }
+function lerpColor(c1,c2,t){
+  const r1=parseInt(c1.slice(1,3),16),g1=parseInt(c1.slice(3,5),16),b1=parseInt(c1.slice(5,7),16);
+  const r2=parseInt(c2.slice(1,3),16),g2=parseInt(c2.slice(3,5),16),b2=parseInt(c2.slice(5,7),16);
+  const r=Math.round(r1+(r2-r1)*t),g=Math.round(g1+(g2-g1)*t),b=Math.round(b1+(b2-b1)*t);
+  return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');
+}
 function pal(){
   const base=palettes[document.getElementById('colorScheme').value]||palettes.purple;
   if(bgHue%360===0)return base;
   return base.map(c=>hueRotateHex(c,bgHue));
 }
-function randCol(){ const p=pal(); return p[Math.floor(Math.random()*p.length)]; }
+function getCycledPal(){
+  const rate=parseFloat(document.getElementById('colorCycle').value);
+  if(rate<=0) return pal();
+  const n=cycleOrder.length;
+  const idx=colorCycleT%n;
+  const i0=Math.floor(idx),i1=(i0+1)%n;
+  const frac=idx-i0;
+  const p0=palettes[cycleOrder[i0]],p1=palettes[cycleOrder[i1]];
+  const blended=p0.map((c,i)=>lerpColor(c,p1[i%p1.length],frac));
+  if(bgHue%360!==0) return blended.map(c=>hueRotateHex(c,bgHue));
+  return blended;
+}
+function randCol(){ const p=getCycledPal(); return p[Math.floor(Math.random()*p.length)]; }
 
 // ---- EXTRACT COLORS FROM IMAGE ----
 function extractColors(image,count){
@@ -444,7 +586,6 @@ function extractColors(image,count){
   const tx=tc.getContext('2d');
   tx.drawImage(image,0,0,sz,sz);
   const d=tx.getImageData(0,0,sz,sz).data;
-  // Collect pixels, skip very dark and very bright
   const pixels=[];
   for(let i=0;i<d.length;i+=4){
     const r=d[i],g=d[i+1],b=d[i+2];
@@ -452,7 +593,6 @@ function extractColors(image,count){
     if(lum>30&&lum<235) pixels.push([r,g,b]);
   }
   if(pixels.length<10) return null;
-  // Simple k-means clustering
   let centers=[];
   for(let i=0;i<count;i++) centers.push(pixels[Math.floor(Math.random()*pixels.length)].slice());
   for(let iter=0;iter<20;iter++){
@@ -471,7 +611,6 @@ function extractColors(image,count){
       centers[c]=[0,1,2].map(ch=>Math.round(clusters[c].reduce((s,p)=>s+p[ch],0)/clusters[c].length));
     }
   }
-  // Sort by saturation (most colorful first)
   centers.sort((a,b)=>{
     const satA=Math.max(...a)-Math.min(...a),satB=Math.max(...b)-Math.min(...b);
     return satB-satA;
@@ -484,12 +623,10 @@ function applyImageColors(image){
   if(!colors) return;
   palettes.imageColors=colors;
   const sel=document.getElementById('colorScheme');
-  // Remove old image colors option if exists
   const old=sel.querySelector('option[value="imageColors"]');
   if(old) old.remove();
   const oldSep=sel.querySelector('.img-color-sep');
   if(oldSep) oldSep.remove();
-  // Add at top
   const sep=document.createElement('option');sep.disabled=true;sep.textContent='── Uploaded Image ──';sep.className='img-color-sep';
   const opt=document.createElement('option');opt.value='imageColors';opt.textContent='Image Colors';
   sel.insertBefore(opt,sel.firstChild);
@@ -497,7 +634,7 @@ function applyImageColors(image){
   sel.value='imageColors';
 }
 
-// ---- LOGO MASK: extract bright parts as luminosity-alpha silhouette ----
+// ---- LOGO MASK ----
 function processLogoMask(){
   const tc=document.createElement('canvas');
   tc.width=logo.naturalWidth; tc.height=logo.naturalHeight;
@@ -507,7 +644,6 @@ function processLogoMask(){
   for(let i=0;i<d.length;i+=4){
     const lum=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;
     const a=d[i+3]/255;
-    // Dark pixels become transparent, bright pixels become opaque white
     const t=lum<20?0:Math.min(Math.pow((lum-20)/160,0.7),1);
     d[i]=d[i+1]=d[i+2]=255;
     d[i+3]=Math.round(a*t*255);
@@ -517,17 +653,26 @@ function processLogoMask(){
 }
 
 // ---- PARTICLES ----
-// All particles use the same stars-style drift & lifecycle, just different shapes
 const matChars = '01アイウエオカキクケコ';
+const noteChars = ['\u2669','\u266A','\u266B','\u266C'];
 function mkParticle(){
   const s = document.getElementById('partStyle').value;
   const spd=parseFloat(document.getElementById('partSpeed').value);
   const sz=parseFloat(document.getElementById('partSize').value);
   const lf=parseFloat(document.getElementById('partLife').value);
   const x=Math.random()*W, y=Math.random()*H;
+  const fc=document.getElementById('freqColor').value;
+  let color;
+  if(fc==='1'){
+    const band=Math.floor(Math.random()*3);
+    const p=getCycledPal();
+    color=band===0?p[0]:band===1?p[Math.floor(p.length/2)]:p[p.length-1];
+  } else {
+    color=randCol();
+  }
   return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
-    ox:0, oy:0, // bass displacement offset
-    age:0, life:(150+Math.random()*200)*lf, color:randCol(), style:s, r:(1+Math.random()*3)*sz,
+    ox:0, oy:0,
+    age:0, life:(150+Math.random()*200)*lf, color, style:s, r:(1+Math.random()*3)*sz,
     rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
 }
 
@@ -540,6 +685,8 @@ function drawP(p, energy){
   ctx.globalAlpha = t * 0.8;
   ctx.fillStyle = p.color;
   ctx.strokeStyle = p.color;
+  const glowVal=parseFloat(document.getElementById('partGlow').value);
+  if(glowVal>0){ctx.shadowColor=p.color;ctx.shadowBlur=glowVal*(0.5+energy);}
   const s = p.style;
 
   if(s==='stars'){
@@ -555,7 +702,6 @@ function drawP(p, energy){
   } else if(s==='sparks'||s==='sparksint'){
     ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*6,p.y-p.vy*6);ctx.lineWidth=r*.6;ctx.stroke();
   } else if(s==='snow'){
-    // snowflake: 6 lines from center
     ctx.lineWidth=1;
     for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+Math.cos(a)*r*1.5,p.y+Math.sin(a)*r*1.5);ctx.stroke();}
   } else if(s==='fireflies'){
@@ -597,20 +743,46 @@ function drawP(p, energy){
     ctx.lineTo(p.x+nx*r+ny*r,p.y+ny*r-nx*r);ctx.stroke();
   } else if(s==='dots'){
     ctx.beginPath();ctx.arc(p.x,p.y,r*.5,0,Math.PI*2);ctx.fill();
+  } else if(s==='lightning'){
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    let lx=p.x-r*2,ly=p.y;
+    ctx.moveTo(lx,ly);
+    for(let i=1;i<=4;i++){
+      lx=p.x-r*2+i*r;
+      ly=p.y+((i%2)*2-1)*r*(0.5+Math.sin(p.age*0.2+i)*0.5);
+      ctx.lineTo(lx,ly);
+    }
+    ctx.stroke();
+  } else if(s==='spiral'){
+    ctx.lineWidth=1.2;
+    ctx.beginPath();
+    for(let i=0;i<20;i++){
+      const a=p.age*0.15+i*0.3;
+      const sr=r*0.15*i;
+      const sx=p.x+Math.cos(a)*sr,sy=p.y+Math.sin(a)*sr;
+      i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
+    }
+    ctx.stroke();
+  } else if(s==='notes'){
+    ctx.font=(8+r*2)+'px serif';
+    ctx.fillText(noteChars[Math.floor(p.rot)%4],p.x,p.y);
+  } else if(s==='pixeldust'){
+    const sz=r*0.5;
+    for(let i=0;i<4;i++){
+      const a=(p.rot+i*90)*Math.PI/180;
+      const d=r*(0.5+i*0.3)*(1+p.age*0.02);
+      ctx.fillRect(p.x+Math.cos(a)*d-sz/2,p.y+Math.sin(a)*d-sz/2,sz,sz);
+    }
   }
   ctx.restore();
 }
 
 function updateP(p){
   p.age++;
-  // Move home position by velocity
   p.hx+=p.vx; p.hy+=p.vy;
-  // Shift home position 50% toward displaced position before easing back
-  // This makes particles not fully return to their original path
   p.hx+=p.ox*0.04; p.hy+=p.oy*0.04;
-  // Ease offset back (but home has already shifted, so net return is ~50%)
   p.ox*=0.92; p.oy*=0.92;
-  // Actual position = home + bass offset
   p.x=p.hx+p.ox; p.y=p.hy+p.oy;
 }
 
@@ -619,7 +791,6 @@ function manageParticles(energy,data){
   const spawnR=Math.max(1,Math.round(maxP/40));
   for(let i=0;i<spawnR&&particles.length<maxP;i++) particles.push(mkParticle());
   particles=particles.filter(p=>p.age<p.life && p.x>-50&&p.x<W+50&&p.y>-50&&p.y<H+50);
-  // Bass onset: use pre-computed values during encoding, live detection during preview
   let strength=0;
   if(precomputedFX){
     const fx=precomputedFX[Math.min(frameCount-1,precomputedFX.length-1)];
@@ -642,13 +813,36 @@ function manageParticles(energy,data){
       p.oy+=dy/dist*strength;
     });
   }
-  particles.forEach(p=>{updateP(p);drawP(p,energy);});
+  const trailVal=parseFloat(document.getElementById('partTrails').value);
+  if(trailVal>0){
+    // Fade existing trails
+    trailX.globalCompositeOperation='destination-out';
+    trailX.globalAlpha=1-trailVal;
+    trailX.fillStyle='#000';
+    trailX.fillRect(0,0,trailC.width,trailC.height);
+    trailX.globalCompositeOperation='source-over';
+    trailX.globalAlpha=1;
+    // Draw particles to trail canvas
+    const origCtx=ctx;
+    ctx=trailX;
+    particles.forEach(p=>{updateP(p);drawP(p,energy);});
+    ctx=origCtx;
+    // Composite onto main
+    ctx.drawImage(trailC,0,0);
+  } else {
+    particles.forEach(p=>{updateP(p);drawP(p,energy);});
+  }
 }
 
 // ---- VISUALIZERS ----
 function drawCircle(data,p,energy){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
-  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6;
+  const reactR=parseFloat(document.getElementById('reactRadius').value);
+  const bassPulse=reactR>0?data.slice(1,5).reduce((a,b)=>a+b,0)/4/255*reactR*50:0;
+  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6+bassPulse;
+  const barGlowVal=parseFloat(document.getElementById('barGlow').value);
+  const barMirrorOn=document.getElementById('barMirror').value==='1';
+  const barCapsVal=parseFloat(document.getElementById('barCaps').value);
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
@@ -657,7 +851,6 @@ function drawCircle(data,p,energy){
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
     if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
-    // Tint luminosity mask: blend palette color ↔ white via slider
     const tint=parseInt(document.getElementById('logoTint').value)/100;
     const pc=p[0];
     const pr=parseInt(pc.slice(1,3),16),pg=parseInt(pc.slice(3,5),16),pb=parseInt(pc.slice(5,7),16);
@@ -669,12 +862,10 @@ function drawCircle(data,p,energy){
     lx.globalCompositeOperation='source-in';
     lx.fillStyle=logoCol;
     lx.fillRect(0,0,lc.width,lc.height);
-    // Glow layer
     ctx.globalAlpha=0.2+energy*0.25;
     ctx.shadowColor=logoCol;
     ctx.shadowBlur=25+energy*30;
     ctx.drawImage(lc,cx-lw/2,cy-lh/2,lw,lh);
-    // Sharp logo on top
     ctx.shadowBlur=0;
     ctx.globalAlpha=0.95+energy*0.05;
     ctx.drawImage(lc,cx-lw/2,cy-lh/2,lw,lh);
@@ -694,7 +885,7 @@ function drawCircle(data,p,energy){
   const bInt=parseFloat(document.getElementById('barIntensity').value);
   const bWidth=parseFloat(document.getElementById('barWidth').value);
   const len=data.length;
-  const minBin=4, maxBin=Math.floor(len*0.7); // skip silent high bins
+  const minBin=4, maxBin=Math.floor(len*0.7);
   const half=[];
   for(let i=0;i<halfBars;i++){
     const t=i/(halfBars-1);
@@ -702,7 +893,6 @@ function drawCircle(data,p,energy){
     const lo=Math.floor(bin), hi=Math.min(lo+1,maxBin);
     const frac=bin-lo;
     const raw=(data[lo]*(1-frac)+data[hi]*frac)/255;
-    // Auto-gain: track each bar's own min/max range
     barMin[i]+=(raw-barMin[i])*bSmooth;
     barMax[i]+=(raw-barMax[i])*bSmooth;
     barMin[i]=Math.min(barMin[i],raw);
@@ -712,14 +902,14 @@ function drawCircle(data,p,energy){
     if(v<bThresh) v=0;
     half.push(v);
   }
-  // Mirror for full circle
   const vals=[...half,...half.slice().reverse()];
   const bars=vals.length;
+  const bLen=parseFloat(document.getElementById('barLength').value);
   for(let i=0;i<bars;i++){
     const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const bLen=parseFloat(document.getElementById('barLength').value);
     const r1=base, r2=base+v*H*bLen*bInt+4;
+    if(barGlowVal>0){ctx.shadowColor=p[i%p.length];ctx.shadowBlur=barGlowVal*(0.5+v);}
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
     ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
@@ -727,52 +917,89 @@ function drawCircle(data,p,energy){
     ctx.lineWidth=bWidth;
     ctx.globalAlpha=0.7+v*.3;
     ctx.stroke();
+    // Mirror bars (extend inward)
+    if(barMirrorOn){
+      const r0=base-(r2-base)*0.6;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
+      ctx.lineTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);
+      ctx.stroke();
+    }
+    // Bar caps
+    if(barCapsVal>0&&v>0.01){
+      ctx.beginPath();
+      ctx.arc(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2,barCapsVal,0,Math.PI*2);
+      ctx.fillStyle=p[i%p.length];
+      ctx.fill();
+      if(barMirrorOn){
+        const r0=base-(r2-base)*0.6;
+        ctx.beginPath();
+        ctx.arc(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0,barCapsVal*0.7,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+    if(barGlowVal>0) ctx.shadowBlur=0;
   }
   ctx.globalAlpha=1;
 }
 // ---- MAIN DRAW ----
-let precomputedFX=null; // pre-computed FX values for encoding
+let precomputedFX=null;
 function drawFrame(data){
   frameCount++;
-  const p=pal();
+  // Color cycle
+  const ccRate=parseFloat(document.getElementById('colorCycle').value);
+  if(ccRate>0) colorCycleT+=ccRate;
+  const p=getCycledPal();
   const energy=data.slice(0,64).reduce((a,b)=>a+b,0)/64/255;
   const ov=parseFloat(document.getElementById('overlay').value);
-
   const hueStr=document.getElementById('hueShiftOn').checked?parseFloat(document.getElementById('hueShift').value):0;
 
   if(precomputedFX){
-    // Use pre-computed values during encoding
     const fx=precomputedFX[Math.min(frameCount-1,precomputedFX.length-1)];
     bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
+    shakeX=fx.shakeX||0;shakeY=fx.shakeY||0;
   } else {
-    // Live preview: compute from analyser data
     const bassFX=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
     const bassRatio=bassFX/Math.max(prevBass,0.01);
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
+    const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     if(bassRatio>1.4&&bassFX>0.15){
       const strength=(bassRatio-1)*bassFX;
       const scaledStr=Math.pow(strength,0.6)*1.5;
       bgZoom=Math.max(bgZoom,scaledStr*zoomStr*8);
       bgBright=Math.max(bgBright,scaledStr*brightStr*4);
       bgVig=Math.max(bgVig,scaledStr*vigStr*4);
+      if(shakeStr>0){
+        shakeX+=(Math.random()-0.5)*scaledStr*shakeStr*10;
+        shakeY+=(Math.random()-0.5)*scaledStr*shakeStr*10;
+      }
     }
     prevBass+=(bassFX-prevBass)*0.15;
     bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
+    shakeX*=0.85; shakeY*=0.85;
   }
-  // Hue accumulates (reset when disabled)
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
   ctx.clearRect(0,0,W,H);
   if(imgLoaded && img){
     ctx.save();
-    // Bass zoom: scale from center
+    // Camera shake (applied to background only)
+    if(Math.abs(shakeX)>0.5||Math.abs(shakeY)>0.5) ctx.translate(shakeX,shakeY);
+    // Ken Burns: slow pan/zoom drift
+    const kb=parseFloat(document.getElementById('kenBurns').value);
+    if(kb>0){
+      const kx=Math.sin(frameCount*0.002)*kb*W*0.3;
+      const ky=Math.cos(frameCount*0.0015)*kb*H*0.3;
+      const kz=1+(1+Math.sin(frameCount*0.001))*kb*0.3;
+      ctx.translate(W/2,H/2);ctx.scale(kz,kz);ctx.translate(-W/2+kx,-H/2+ky);
+    }
+    // Bass zoom
     if(bgZoom>0.0005){
       const z=1+bgZoom;
       ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
     }
-    // Hue shift via filter
     if(hueStr>0){
       const hueSat=parseInt(document.getElementById('hueSat').value)/100;
       ctx.filter='hue-rotate('+bgHue+'deg) saturate('+hueSat+')';
@@ -782,6 +1009,19 @@ function drawFrame(data){
     ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
     ctx.filter='none';
     ctx.restore();
+    // BG Ripple: wave displacement applied in pixel space after transforms
+    const rippleStr=parseFloat(document.getElementById('bgRipple').value);
+    if(rippleStr>0){
+      const midE=data.slice(10,40).reduce((a,b)=>a+b,0)/30/255;
+      const amp=midE*rippleStr;
+      if(amp>0.5){
+        const sH=6;
+        for(let y=0;y<H;y+=sH){
+          const xOff=Math.sin(y*0.02+frameCount*0.1)*amp;
+          if(Math.abs(xOff)>0.5) ctx.drawImage(ctx.canvas,0,y,W,sH,xOff,y,W,sH);
+        }
+      }
+    }
   } else {
     ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
   }
@@ -789,7 +1029,7 @@ function drawFrame(data){
   // Overlay
   if(ov>0){ctx.fillStyle=`rgba(0,0,0,${ov})`;ctx.fillRect(0,0,W,H);}
 
-  // Brightness pulse: flash lighter on beats
+  // Brightness pulse
   if(bgBright>0.005){
     ctx.fillStyle=`rgba(255,255,255,${bgBright})`;
     ctx.fillRect(0,0,W,H);
@@ -797,19 +1037,26 @@ function drawFrame(data){
 
   manageParticles(energy,data);
 
-  // Center shadow + vignette pulse
+  // Center shadow + vignette pulse (with optional palette tint)
   const cs=parseFloat(document.getElementById('centerShadow').value);
   const vigTotal=Math.min(cs+bgVig,1);
   if(vigTotal>0){
+    const vigColorOn=document.getElementById('vigColor').value==='1';
     const vigRadius=Math.max(280-bgVig*80,0);
     const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,vigRadius);
-    gr.addColorStop(0,`rgba(0,0,0,${vigTotal})`);
-    gr.addColorStop(1,'rgba(0,0,0,0)');
+    if(vigColorOn){
+      const vc=p[0];
+      const vr=parseInt(vc.slice(1,3),16),vg=parseInt(vc.slice(3,5),16),vb=parseInt(vc.slice(5,7),16);
+      gr.addColorStop(0,`rgba(${vr},${vg},${vb},${vigTotal})`);
+      gr.addColorStop(1,`rgba(${vr},${vg},${vb},0)`);
+    } else {
+      gr.addColorStop(0,`rgba(0,0,0,${vigTotal})`);
+      gr.addColorStop(1,'rgba(0,0,0,0)');
+    }
     ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
   }
 
   drawCircle(data,p,energy);
-
 }
 
 // ---- ANIMATION LOOP ----
@@ -821,7 +1068,6 @@ function loop(){
   const data=new Uint8Array(analyser?analyser.frequencyBinCount:256);
   if(analyser&&playing) analyser.getByteFrequencyData(data);
   drawFrame(data);
-  // Update seek bar
   if(audioBuffer&&!seeking){
     const total=audioBuffer.duration;
     const cur=Math.min(getCurrentTime(),total);
@@ -914,7 +1160,6 @@ document.getElementById('logoInput').onchange=e=>{
   };
   reader.readAsDataURL(f);
 };
-// Restore logo from session storage on load
 (function(){
   const saved=sessionStorage.getItem('mvLogo');
   if(saved) loadLogoFromSrc(saved,sessionStorage.getItem('mvLogoName'));
@@ -1058,7 +1303,6 @@ function buildWebM(vChunks,aChunks,w,h,durMs,opusPriv){
   const vTrack=el(0xAE,cat(elU(0xD7,1),elU(0x73C5,1,4),elU(0x9C,0),elU(0x83,1),elS(0x86,'V_VP8'),el(0xE0,cat(elU(0xB0,w,2),elU(0xBA,h,2)))));
   const aTrack=el(0xAE,cat(elU(0xD7,2),elU(0x73C5,2,4),elU(0x9C,0),elU(0x83,2),elS(0x86,'A_OPUS'),elU(0x56AA,6500000,4),elU(0x56BB,80000000,4),el(0x63A2,opusPriv),el(0xE1,cat(elF(0xB5,48000),elU(0x9F,2)))));
   const tracks=el(0x1654AE6B,cat(vTrack,aTrack));
-  // Build clusters (1s each)
   const all=[];
   for(const c of vChunks)all.push({trk:1,t:c.ts/1000,d:c.data,kf:c.kf});
   for(const c of aChunks)all.push({trk:2,t:c.ts/1000,d:c.data,kf:true});
@@ -1093,10 +1337,19 @@ document.getElementById('dlBtn').onclick=async function(){
   pBar.style.display='block';pFill.style.width='0%';
   if(source){try{source.stop();}catch(e){}}
   playing=false;
-  // Stop animation loop so it doesn't increment frameCount during async analysis
   if(animId){cancelAnimationFrame(animId);animId=null;}
+  // Export settings
+  const expFps=parseInt(document.getElementById('exportFps').value);
+  const expRes=parseInt(document.getElementById('exportRes').value);
+  const expBitrate=parseInt(document.getElementById('exportBitrate').value);
+  const encW=expRes===1440?2560:expRes===1080?1920:1280;
+  const encH=expRes===1440?1440:expRes===1080?1080:720;
+  const savedW=W,savedH=H;
+  W=encW;H=encH;
+  // Resize trail canvas for encoding resolution
+  trailC.width=W;trailC.height=H;
   try{
-    const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
+    const buf=window.audioBuffer,fps=expFps,dur=buf.duration,fadeOut=5;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
     const sr=48000,numSamples=Math.ceil(dur*sr);
 
@@ -1109,13 +1362,11 @@ document.getElementById('dlBtn').onclick=async function(){
     const nCh=rendered.numberOfChannels,nF=rendered.length;
     const ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
 
-    // Step 2: Compute per-frame frequency data via manual FFT (sample-accurate timing)
+    // Step 2: Compute per-frame frequency data via manual FFT
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
     const fftN=1024,binCount=fftN/2;
-    // Blackman window (matches AnalyserNode)
     const bWin=new Float32Array(fftN);
     for(let i=0;i<fftN;i++){const a=2*Math.PI*i/fftN;bWin[i]=0.42-0.5*Math.cos(a)+0.08*Math.cos(2*a);}
-    // Radix-2 Cooley-Tukey FFT (in-place)
     function fftCalc(re,im){for(let i=1,j=0;i<fftN;i++){let b=fftN>>1;while(j&b){j^=b;b>>=1;}j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}for(let len=2;len<=fftN;len*=2){const half=len>>1,ang=-2*Math.PI/len;for(let i=0;i<fftN;i+=len){let wr=1,wi=0;const wpr=Math.cos(ang),wpi=Math.sin(ang);for(let j=0;j<half;j++){const tr=wr*re[i+j+half]-wi*im[i+j+half],ti=wr*im[i+j+half]+wi*re[i+j+half];re[i+j+half]=re[i+j]-tr;im[i+j+half]=im[i+j]-ti;re[i+j]+=tr;im[i+j]+=ti;const nw=wr*wpr-wi*wpi;wi=wr*wpi+wi*wpr;wr=nw;}}}}
     const minDb=-100,maxDb=-30,dbRange=maxDb-minDb;
     const frames=[],re=new Float32Array(fftN),im=new Float32Array(fftN);
@@ -1130,46 +1381,44 @@ document.getElementById('dlBtn').onclick=async function(){
       frames.push(d);
       if(i%150===0){pFill.style.width=(i/totalMusic*10)+'%';await new Promise(r=>setTimeout(r,0));}
     }
-    // Fade-out frames: attenuate last music frame toward silence
     const lastFrame=frames[frames.length-1]||new Uint8Array(binCount);
     const fadeFrames=fadeOut*fps;
     for(let i=0;i<fadeFrames;i++){const t=1-i/fadeFrames;const d=new Uint8Array(lastFrame.length);for(let j=0;j<lastFrame.length;j++)d[j]=Math.round(lastFrame[j]*t*t);frames.push(d);}
     pFill.style.width='10%';
 
-    // Step 3: Pre-compute background FX (zoom/bright/vig) from captured frames
+    // Step 3: Pre-compute background FX (zoom/bright/vig/shake) from captured frames
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
+    const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      let pb=0,pbP=0,z=0,b=0,v=0;
+      let pb=0,pbP=0,z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
         const fd=frames[i];
         const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
         const ratio=bass/Math.max(pb,0.01);
-        if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);}
+        if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
         pb+=(bass-pb)*0.15;
-        z*=0.88;b*=0.85;v*=0.9;
-        // Particle bass onset (separate tracker)
+        z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
         const pOnset=Math.max(bass-pbP,0);
         pbP+=(bass-pbP)*0.15;
         const pStr=(pOnset>0.05&&bassReactStr>0)?Math.pow(pOnset,0.6)*1.5*bassReactStr:0;
-        precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr});
+        precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr,shakeX:sx,shakeY:sy});
       }
     }
 
-    // Step 4: Encode video — reset all FX state for clean frame-by-frame render
-    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;particles=[];frameCount=0;
+    // Step 4: Encode video
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
-    // Use offscreen canvas so encoding doesn't overwrite the visible preview
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
     ctx=offC.getContext('2d');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
-    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
+    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:expBitrate,framerate:fps});
     for(let i=0;i<totalFrames;i++){
       drawFrame(frames[i]);
       const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
@@ -1181,7 +1430,7 @@ document.getElementById('dlBtn').onclick=async function(){
     await vEnc.flush();vEnc.close();
     pFill.style.width='70%';
 
-    // Step 5: Encode audio from rendered buffer
+    // Step 5: Encode audio
     setStatus('Encoding audio...');btn.textContent='Encoding audio...';
     let opusPriv=null;const aOut=[];
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
@@ -1190,19 +1439,15 @@ document.getElementById('dlBtn').onclick=async function(){
     for(let o=0;o<totalAudioSamples;o+=960){
       const n=Math.min(960,totalAudioSamples-o),d=new Float32Array(2*n);
       if(o<nF){
-        const end=Math.min(o+n,nF),count=end-o;
+        const end=Math.min(o+n,nF);
         d.set(ch0.subarray(o,end),0);d.set(ch1.subarray(o,end),n);
-        // Zero-fill remainder if chunk straddles the boundary
-        // (already zero from Float32Array init)
       }
-      // Samples beyond nF are silence (already zero)
       const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
     await aEnc.flush();aEnc.close();
     pFill.style.width='85%';
 
-    // Default OpusHead if encoder didn't provide one
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
     // Step 6: Mux & download
@@ -1215,10 +1460,9 @@ document.getElementById('dlBtn').onclick=async function(){
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url),5000);
     setStatus('Done! Video saved.');
-    // Restart preview
     await initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{precomputedFX=null;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
+  finally{precomputedFX=null;W=savedW;H=savedH;trailC.width=W;trailC.height=H;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
