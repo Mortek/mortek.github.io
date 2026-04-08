@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.2.0</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.3.0</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1323,8 +1323,9 @@ document.getElementById('dlBtn').onclick=async function(){
   playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const savedW=W,savedH=H;
-  // Resize trail canvas for encoding resolution
-  trailC.width=W;trailC.height=H;
+  // Render at 1440p (2560x1440)
+  const VW=2560,VH=1440;
+  W=VW;H=VH;trailC.width=VW;trailC.height=VH;
   try{
     const buf=window.audioBuffer,fps=30,dur=buf.duration,fadeOut=5;
     const totalMusic=Math.ceil(dur*fps),totalFrames=totalMusic+fadeOut*fps;
@@ -1395,7 +1396,7 @@ document.getElementById('dlBtn').onclick=async function(){
     ctx=offC.getContext('2d');
     const vOut=[];
     const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
-    vEnc.configure({codec:'vp8',width:W,height:H,bitrate:8000000,framerate:fps});
+    vEnc.configure({codec:'vp8',width:VW,height:VH,bitrate:20000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
       drawFrame(frames[i]);
       const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
@@ -1429,7 +1430,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 6: Mux & download
     setStatus('Building file...');btn.textContent='Building file...';
-    const webm=buildWebM(vOut,aOut,W,H,(dur+fadeOut)*1000,opusPriv);
+    const webm=buildWebM(vOut,aOut,VW,VH,(dur+fadeOut)*1000,opusPriv);
     pFill.style.width='100%';
     const blob=new Blob([webm],{type:'video/webm'});
     const dlName=(imgName||'mortek-music-video')+'.webm';
