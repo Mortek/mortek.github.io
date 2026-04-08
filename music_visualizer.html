@@ -57,6 +57,15 @@ select:hover{border-color:#a07fff}
 .top-bar-fixed{display:contents}
 .dl-top-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
 .new-badge{display:inline-block;background:linear-gradient(135deg,#ff4da6,#ff6b6b);color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;letter-spacing:.5px;text-transform:uppercase}
+.shorts-section{width:100%;max-width:1280px;margin-top:20px;padding:20px 24px;background:#111128;border-radius:12px;border:1px solid #1e1e3a}
+.shorts-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.shorts-header h2{font-size:13px;font-weight:600;color:#c4a0ff;letter-spacing:1.5px;text-transform:uppercase;margin:0}
+.shorts-badge{background:linear-gradient(135deg,#ff4da6,#ff6b6b);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.5px}
+.shorts-desc{font-size:11px;color:#666;margin-bottom:14px;line-height:1.5}
+.shorts-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}
+.shorts-time{font-size:12px;color:#ccc;font-variant-numeric:tabular-nums;background:#1a1a30;border:1px solid #333;border-radius:6px;padding:5px 10px;min-width:50px;text-align:center;display:block;margin-bottom:4px}
+.shorts-set-btn{font-size:10px!important;padding:4px 10px!important}
+.shorts-section .progress-bar{width:100%;margin-top:10px}
 @media(max-width:768px){
   #appContent{transform:none;width:100%}
   .back-btn,.donate-btn{position:static;margin:0}
@@ -71,6 +80,8 @@ select:hover{border-color:#a07fff}
   .seek-row input[type=range]{min-width:0;width:100%;order:10}
   .progress-bar{width:100%}
   body{padding:12px 10px;gap:0}
+  .shorts-row{flex-direction:column;align-items:stretch;gap:8px}
+  .shorts-section{padding:16px}
 }
 </style>
 </head>
@@ -411,7 +422,44 @@ select:hover{border-color:#a07fff}
   </div>
 </div>
 </div>
-<div class="version">v2.9.8</div>
+
+<div class="shorts-section">
+  <div class="shorts-header">
+    <h2>Shorts Generator</h2>
+    <span class="shorts-badge">9:16</span>
+  </div>
+  <p class="shorts-desc">Create a 1080&times;1920 vertical clip for YouTube Shorts &amp; TikTok. Uses your current visualizer settings.</p>
+  <div class="shorts-row">
+    <span class="upload-wrap" id="portraitWrap">
+      <label class="upload-btn" id="portraitLabel" for="portraitInput">+ Portrait Image (optional)</label>
+      <input type="file" id="portraitInput" accept="image/*">
+      <button class="clear-x" id="clearPortraitBtn" title="Clear portrait image">&times;</button>
+    </span>
+  </div>
+  <div class="shorts-row">
+    <div class="ctrl"><label>Start</label>
+      <span class="shorts-time" id="shortsStartTime">0:00</span>
+      <button class="sm-btn shorts-set-btn" id="shortsSetStart">Use Current</button>
+    </div>
+    <div class="ctrl"><label>Duration</label>
+      <select id="shortsDur">
+        <option value="15">15 sec</option>
+        <option value="20">20 sec</option>
+        <option value="30" selected>30 sec</option>
+        <option value="45">45 sec</option>
+        <option value="60">60 sec</option>
+      </select>
+    </div>
+    <div class="ctrl"><label>End</label>
+      <span class="shorts-time" id="shortsEndTime">0:30</span>
+    </div>
+    <button class="sm-btn dl-top-btn" id="shortsDlBtn" disabled>Download Short</button>
+  </div>
+  <div class="progress-bar" id="shortsProgressBar"><div class="progress-fill" id="shortsProgressFill"></div></div>
+  <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
+</div>
+
+<div class="version">v3.0.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1091,6 +1139,7 @@ document.getElementById('audioInput').onchange=e=>{
       document.getElementById('audioLabel').classList.add('loaded');
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
+      document.getElementById('shortsDlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
       initAudio(buf);
     }, ()=>setStatus('Error decoding audio'));
@@ -1156,6 +1205,7 @@ document.getElementById('clearAudioBtn').onclick=function(){
   document.getElementById('audioLabel').classList.remove('loaded');
   document.getElementById('audioWrap').classList.remove('has-file');
   document.getElementById('dlBtn').disabled=true;
+  document.getElementById('shortsDlBtn').disabled=true;
   document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
   document.getElementById('muteBtn').innerHTML='&#128264;';document.getElementById('muteBtn').title='Mute';
   seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
@@ -1194,6 +1244,11 @@ document.getElementById('clearBtn').onclick=function(){
   document.getElementById('logoLabel').classList.remove('loaded');
   document.getElementById('logoWrap').classList.remove('has-file');
   document.getElementById('dlBtn').disabled=true;
+  document.getElementById('shortsDlBtn').disabled=true;
+  document.getElementById('portraitInput').value='';
+  document.getElementById('portraitLabel').textContent='+ Portrait Image (optional)';
+  document.getElementById('portraitLabel').classList.remove('loaded');
+  document.getElementById('portraitWrap').classList.remove('has-file');
   document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
   document.getElementById('muteBtn').innerHTML='&#128264;';document.getElementById('muteBtn').title='Mute';
   seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
@@ -1246,6 +1301,7 @@ document.getElementById('dlBtn').onclick=async function(){
   if(typeof VideoEncoder==='undefined'){setStatus('Fast encoding requires Chrome or Edge.');return;}
   const btn=this;
   btn.disabled=true;
+  document.getElementById('shortsDlBtn').disabled=true;
   const pBar=document.getElementById('progressBar'),pFill=document.getElementById('progressFill');
   pBar.style.display='block';pFill.style.width='0%';
   if(source){try{source.stop();}catch(e){}}
@@ -1368,10 +1424,167 @@ document.getElementById('dlBtn').onclick=async function(){
     setStatus('Done! Video saved.');
     await initAudio(buf);
   }catch(err){setStatus('Error: '+err.message);console.error(err);}
-  finally{precomputedFX=null;W=savedW;H=savedH;trailC.width=W;trailC.height=H;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';pBar.style.display='none';if(!animId)loop();}
+  finally{precomputedFX=null;W=savedW;H=savedH;trailC.width=W;trailC.height=H;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';document.getElementById('shortsDlBtn').disabled=!window.audioBuffer;pBar.style.display='none';if(!animId)loop();}
 };
 
 function setStatus(t){document.getElementById('status').textContent=t;}
+
+// ---- SHORTS GENERATOR ----
+let portraitImg=null,portraitLoaded=false,shortsStart=0;
+document.getElementById('portraitInput').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  portraitImg=new Image();
+  portraitImg.onload=()=>{portraitLoaded=true;document.getElementById('portraitLabel').textContent='\u2713 '+f.name;document.getElementById('portraitLabel').classList.add('loaded');document.getElementById('portraitWrap').classList.add('has-file');};
+  portraitImg.src=URL.createObjectURL(f);
+};
+document.getElementById('clearPortraitBtn').onclick=function(){
+  portraitImg=null;portraitLoaded=false;
+  document.getElementById('portraitInput').value='';
+  document.getElementById('portraitLabel').textContent='+ Portrait Image (optional)';
+  document.getElementById('portraitLabel').classList.remove('loaded');
+  document.getElementById('portraitWrap').classList.remove('has-file');
+};
+document.getElementById('shortsSetStart').onclick=function(){
+  if(!audioBuffer)return;
+  shortsStart=getCurrentTime();
+  updateShortsEnd();
+};
+document.getElementById('shortsDur').onchange=updateShortsEnd;
+function updateShortsEnd(){
+  const dur=parseInt(document.getElementById('shortsDur').value);
+  const maxDur=audioBuffer?audioBuffer.duration:9999;
+  const end=Math.min(shortsStart+dur,maxDur);
+  document.getElementById('shortsStartTime').textContent=fmtTime(shortsStart);
+  document.getElementById('shortsEndTime').textContent=fmtTime(end);
+}
+function setShortsStatus(t){document.getElementById('shortsStatus').textContent=t;}
+
+document.getElementById('shortsDlBtn').onclick=async function(){
+  if(!window.audioBuffer)return;
+  if(typeof VideoEncoder==='undefined'){setShortsStatus('Requires Chrome or Edge.');return;}
+  const btn=this;btn.disabled=true;
+  document.getElementById('dlBtn').disabled=true;
+  const pBar=document.getElementById('shortsProgressBar'),pFill=document.getElementById('shortsProgressFill');
+  pBar.style.display='block';pFill.style.width='0%';
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
+  if(animId){cancelAnimationFrame(animId);animId=null;}
+  const savedW=W,savedH=H,savedImg=img,savedImgLoaded=imgLoaded;
+  const SW=1080,SH=1920;
+  W=SW;H=SH;trailC.width=SW;trailC.height=SH;
+  if(portraitLoaded){img=portraitImg;imgLoaded=true;}
+  try{
+    const buf=window.audioBuffer,fps=30,sr=48000;
+    const clipStart=shortsStart;
+    const clipDur=parseInt(document.getElementById('shortsDur').value);
+    const clipEnd=Math.min(clipStart+clipDur,buf.duration);
+    const actualDur=clipEnd-clipStart;
+    if(actualDur<0.5){setShortsStatus('Clip too short. Load audio and set a valid start time.');return;}
+    const fadeOut=1,clipFrames=Math.ceil(actualDur*fps),fadeFrames=fadeOut*fps,totalFrames=clipFrames+fadeFrames;
+
+    // Step 1: Render audio offline
+    setShortsStatus('Rendering audio...');btn.textContent='Rendering...';
+    const numSamples=Math.ceil(buf.duration*sr);
+    const offAC=new OfflineAudioContext(2,numSamples,sr);
+    const offSrc=offAC.createBufferSource();offSrc.buffer=buf;offSrc.connect(offAC.destination);offSrc.start(0);
+    const rendered=await offAC.startRendering();
+    const nCh=rendered.numberOfChannels,nF=rendered.length;
+    const ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
+
+    // Step 2: FFT analysis with 2s warmup for bass tracking accuracy
+    setShortsStatus('Analyzing audio...');btn.textContent='Analyzing...';
+    const fftN=1024,binCount=fftN/2;
+    const bWin=new Float32Array(fftN);
+    for(let i=0;i<fftN;i++){const a=2*Math.PI*i/fftN;bWin[i]=0.42-0.5*Math.cos(a)+0.08*Math.cos(2*a);}
+    function sFFT(re,im){for(let i=1,j=0;i<fftN;i++){let b=fftN>>1;while(j&b){j^=b;b>>=1;}j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}for(let len=2;len<=fftN;len*=2){const half=len>>1,ang=-2*Math.PI/len;for(let i=0;i<fftN;i+=len){let wr=1,wi=0;const wpr=Math.cos(ang),wpi=Math.sin(ang);for(let j=0;j<half;j++){const tr=wr*re[i+j+half]-wi*im[i+j+half],ti=wr*im[i+j+half]+wi*re[i+j+half];re[i+j+half]=re[i+j]-tr;im[i+j+half]=im[i+j]-ti;re[i+j]+=tr;im[i+j]+=ti;const nw=wr*wpr-wi*wpi;wi=wr*wpi+wi*wpr;wr=nw;}}}}
+    const minDb=-100,maxDb=-30,dbRange=maxDb-minDb;
+    const warmup=Math.min(2,clipStart),warmupFrames=Math.ceil(warmup*fps);
+    const analysisStart=clipStart-warmup,totalAnalysis=warmupFrames+clipFrames;
+    const frames=[],re=new Float32Array(fftN),im=new Float32Array(fftN);
+    for(let i=0;i<totalAnalysis;i++){
+      const center=Math.round((analysisStart+i/fps)*sr),start=center-fftN+1;
+      re.fill(0);im.fill(0);
+      for(let j=0;j<fftN;j++){const si=start+j;if(si>=0&&si<nF)re[j]=(ch0[si]+ch1[si])/nCh*bWin[j];}
+      sFFT(re,im);
+      const d=new Uint8Array(binCount);
+      for(let j=0;j<binCount;j++){const mag=Math.sqrt(re[j]*re[j]+im[j]*im[j])/fftN;const db=mag>1e-20?20*Math.log10(mag):minDb;d[j]=Math.max(0,Math.min(255,Math.round((db-minDb)/dbRange*255)));}
+      frames.push(d);
+      if(i%150===0){pFill.style.width=(i/totalAnalysis*10)+'%';await new Promise(r=>setTimeout(r,0));}
+    }
+    const lastFr=frames[frames.length-1]||new Uint8Array(binCount);
+    for(let i=0;i<fadeFrames;i++){const t=1-i/fadeFrames;const d=new Uint8Array(lastFr.length);for(let j=0;j<lastFr.length;j++)d[j]=Math.round(lastFr[j]*t*t);frames.push(d);}
+    pFill.style.width='10%';
+
+    // Step 3: Pre-compute background FX
+    const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
+    const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
+    const brStr=parseFloat(document.getElementById('bassReact').value);
+    {let pb=0,pbP=0,z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    for(let i=0;i<frames.length;i++){const fd=frames[i];const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;const ratio=bass/Math.max(pb,0.01);
+    if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
+    pb+=(bass-pb)*0.15;z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
+    const pOnset=Math.max(bass-pbP,0);pbP+=(bass-pbP)*0.15;
+    const pS=(pOnset>0.05&&brStr>0)?Math.pow(pOnset,0.6)*1.5*brStr:0;
+    precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pS,shakeX:sx,shakeY:sy});}}
+
+    // Step 4: Encode video at 1080x1920
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    setShortsStatus('Encoding video...');
+    const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
+    // Run warmup frames to prime particles and bass tracking (not encoded)
+    for(let i=0;i<warmupFrames;i++) drawFrame(frames[i]);
+    const vOut=[];
+    const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
+    vEnc.configure({codec:'vp8',width:SW,height:SH,bitrate:12000000,framerate:fps});
+    for(let i=0;i<totalFrames;i++){
+      drawFrame(frames[warmupFrames+i]);
+      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
+      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
+      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      if(i%30===0){pFill.style.width=(10+i/totalFrames*55)+'%';btn.textContent='Encoding... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));}
+    }
+    ctx=savedCtx;await vEnc.flush();vEnc.close();pFill.style.width='70%';
+
+    // Step 5: Encode audio (clip portion + 1s fade)
+    setShortsStatus('Encoding audio...');btn.textContent='Encoding audio...';
+    let opusPriv=null;const aOut=[];
+    const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
+    aEnc.configure({codec:'opus',sampleRate:sr,numberOfChannels:2,bitrate:128000});
+    const aStart=Math.round(clipStart*sr),aClip=Math.round(actualDur*sr),aFade=fadeOut*sr,aTotal=aClip+aFade;
+    for(let o=0;o<aTotal;o+=960){
+      const n=Math.min(960,aTotal-o),d=new Float32Array(2*n);
+      const abs=aStart+o;
+      if(abs<nF){const end=Math.min(abs+n,nF),cnt=end-abs;if(cnt>0){d.set(ch0.subarray(abs,end),0);d.set(ch1.subarray(abs,end),n);}}
+      if(o>=aClip){const fp=o-aClip;for(let s=0;s<n;s++){const t=Math.max(1-(fp+s)/aFade,0);d[s]*=t*t;d[n+s]*=t*t;}}
+      const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
+      aEnc.encode(ad);ad.close();
+    }
+    await aEnc.flush();aEnc.close();pFill.style.width='85%';
+    if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
+
+    // Step 6: Mux & download
+    setShortsStatus('Building file...');btn.textContent='Building file...';
+    const webm=buildWebM(vOut,aOut,SW,SH,(actualDur+fadeOut)*1000,opusPriv);
+    pFill.style.width='100%';
+    const blob=new Blob([webm],{type:'video/webm'});
+    const dlName=(imgName||'mortek-short')+'-short.webm';
+    const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    setShortsStatus('Done! Saved as '+dlName);
+    // Restore state before initAudio
+    img=savedImg;imgLoaded=savedImgLoaded;W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
+    await initAudio(buf);
+  }catch(err){setShortsStatus('Error: '+err.message);console.error(err);}
+  finally{
+    img=savedImg;imgLoaded=savedImgLoaded;
+    precomputedFX=null;W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
+    ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Short';
+    document.getElementById('dlBtn').disabled=!window.audioBuffer;
+    pBar.style.display='none';if(!animId)loop();
+  }
+};
+
 loop();
 </script>
 </div>
