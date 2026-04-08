@@ -428,12 +428,22 @@ select:hover{border-color:#a07fff}
     <h2>Shorts Generator</h2>
     <span class="shorts-badge">9:16</span>
   </div>
-  <p class="shorts-desc">Create a 1080&times;1920 vertical clip for YouTube Shorts &amp; TikTok. Uses your current visualizer settings.</p>
+  <p class="shorts-desc">Create a 1080&times;1920 vertical clip for YouTube Shorts &amp; TikTok. Uses your current visualizer settings. Optionally load separate audio and logo below, or use the main ones.</p>
   <div class="shorts-row">
     <span class="upload-wrap" id="portraitWrap">
-      <label class="upload-btn" id="portraitLabel" for="portraitInput">+ Portrait Image (optional)</label>
+      <label class="upload-btn" id="portraitLabel" for="portraitInput">+ Portrait Image</label>
       <input type="file" id="portraitInput" accept="image/*">
       <button class="clear-x" id="clearPortraitBtn" title="Clear portrait image">&times;</button>
+    </span>
+    <span class="upload-wrap" id="shortsAudioWrap">
+      <label class="upload-btn" id="shortsAudioLabel" for="shortsAudioInput">+ Audio</label>
+      <input type="file" id="shortsAudioInput" accept="audio/*">
+      <button class="clear-x" id="clearShortsAudioBtn" title="Clear shorts audio">&times;</button>
+    </span>
+    <span class="upload-wrap" id="shortsLogoWrap">
+      <label class="upload-btn" id="shortsLogoLabel" for="shortsLogoInput">+ Logo</label>
+      <input type="file" id="shortsLogoInput" accept="image/*">
+      <button class="clear-x" id="clearShortsLogoBtn" title="Clear shorts logo">&times;</button>
     </span>
   </div>
   <div class="shorts-row">
@@ -464,7 +474,7 @@ select:hover{border-color:#a07fff}
   <span id="shortsStatus" style="font-size:11px;color:#666;margin-top:6px;display:block;text-align:center"></span>
 </div>
 
-<div class="version">v3.1.0</div>
+<div class="version">v3.2.0</div>
 
 <script>
 const C = document.getElementById('c');
@@ -1436,6 +1446,7 @@ function setStatus(t){document.getElementById('status').textContent=t;}
 
 // ---- SHORTS GENERATOR ----
 let portraitImg=null,portraitLoaded=false,shortsStart=0;
+let shortsAudioBuffer=null,shortsLogo=null,shortsLogoLoaded=false,shortsLogoMask=null;
 document.getElementById('portraitInput').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   portraitImg=new Image();
@@ -1445,12 +1456,70 @@ document.getElementById('portraitInput').onchange=e=>{
 document.getElementById('clearPortraitBtn').onclick=function(){
   portraitImg=null;portraitLoaded=false;
   document.getElementById('portraitInput').value='';
-  document.getElementById('portraitLabel').textContent='+ Portrait Image (optional)';
+  document.getElementById('portraitLabel').textContent='+ Portrait Image';
   document.getElementById('portraitLabel').classList.remove('loaded');
   document.getElementById('portraitWrap').classList.remove('has-file');
 };
+document.getElementById('shortsAudioInput').onchange=function(e){
+  const f=e.target.files[0];if(!f)return;
+  setShortsStatus('Loading audio...');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const tmp=new AudioContext();
+    tmp.decodeAudioData(ev.target.result.slice(0),buf=>{
+      tmp.close();
+      shortsAudioBuffer=buf;
+      document.getElementById('shortsAudioLabel').textContent='\u2713 '+f.name;
+      document.getElementById('shortsAudioLabel').classList.add('loaded');
+      document.getElementById('shortsAudioWrap').classList.add('has-file');
+      document.getElementById('shortsDlBtn').disabled=false;
+      setShortsStatus('Audio loaded!');
+      updateShortsEnd();
+    },()=>setShortsStatus('Error decoding audio'));
+  };
+  reader.readAsArrayBuffer(f);
+};
+document.getElementById('clearShortsAudioBtn').onclick=function(){
+  shortsAudioBuffer=null;
+  document.getElementById('shortsAudioInput').value='';
+  document.getElementById('shortsAudioLabel').textContent='+ Audio';
+  document.getElementById('shortsAudioLabel').classList.remove('loaded');
+  document.getElementById('shortsAudioWrap').classList.remove('has-file');
+  if(!window.audioBuffer)document.getElementById('shortsDlBtn').disabled=true;
+  updateShortsEnd();
+};
+document.getElementById('shortsLogoInput').onchange=function(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    shortsLogo=new Image();
+    shortsLogo.onload=()=>{
+      shortsLogoLoaded=true;
+      // process mask for shorts logo
+      const tc=document.createElement('canvas');
+      tc.width=shortsLogo.naturalWidth;tc.height=shortsLogo.naturalHeight;
+      const tx=tc.getContext('2d');tx.drawImage(shortsLogo,0,0);
+      const id=tx.getImageData(0,0,tc.width,tc.height),d=id.data;
+      for(let i=0;i<d.length;i+=4){const lum=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;const a=d[i+3]/255;const t=lum<20?0:Math.min(Math.pow((lum-20)/160,0.7),1);d[i]=d[i+1]=d[i+2]=255;d[i+3]=Math.round(a*t*255);}
+      tx.putImageData(id,0,0);shortsLogoMask=tc;
+      document.getElementById('shortsLogoLabel').textContent='\u2713 '+f.name;
+      document.getElementById('shortsLogoLabel').classList.add('loaded');
+      document.getElementById('shortsLogoWrap').classList.add('has-file');
+      setShortsStatus('Logo loaded!');
+    };
+    shortsLogo.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+};
+document.getElementById('clearShortsLogoBtn').onclick=function(){
+  shortsLogo=null;shortsLogoLoaded=false;shortsLogoMask=null;
+  document.getElementById('shortsLogoInput').value='';
+  document.getElementById('shortsLogoLabel').textContent='+ Logo';
+  document.getElementById('shortsLogoLabel').classList.remove('loaded');
+  document.getElementById('shortsLogoWrap').classList.remove('has-file');
+};
 document.getElementById('shortsSetStart').onclick=function(){
-  if(!audioBuffer)return;
+  if(!getShortsAudio())return;
   shortsStart=getCurrentTime();
   updateShortsEnd();
 };
@@ -1459,9 +1528,11 @@ document.getElementById('shortsSetZero').onclick=function(){
   updateShortsEnd();
 };
 document.getElementById('shortsDur').onchange=updateShortsEnd;
+function getShortsAudio(){return shortsAudioBuffer||window.audioBuffer;}
 function updateShortsEnd(){
   const dur=parseInt(document.getElementById('shortsDur').value);
-  const maxDur=audioBuffer?audioBuffer.duration:9999;
+  const ab=getShortsAudio();
+  const maxDur=ab?ab.duration:9999;
   const end=Math.min(shortsStart+dur,maxDur);
   document.getElementById('shortsStartTime').textContent=fmtTime(shortsStart);
   document.getElementById('shortsEndTime').textContent=fmtTime(end);
@@ -1469,7 +1540,8 @@ function updateShortsEnd(){
 function setShortsStatus(t){document.getElementById('shortsStatus').textContent=t;}
 
 document.getElementById('shortsDlBtn').onclick=async function(){
-  if(!window.audioBuffer)return;
+  const shortsBuf=getShortsAudio();
+  if(!shortsBuf)return;
   if(typeof VideoEncoder==='undefined'){setShortsStatus('Requires Chrome or Edge.');return;}
   const btn=this;btn.disabled=true;
   document.getElementById('dlBtn').disabled=true;
@@ -1479,11 +1551,13 @@ document.getElementById('shortsDlBtn').onclick=async function(){
   playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const savedW=W,savedH=H,savedImg=img,savedImgLoaded=imgLoaded;
+  const savedLogo=logo,savedLogoLoaded=logoLoaded,savedLogoMask=logoMaskSrc;
   const SW=1080,SH=1920;
   W=SW;H=SH;trailC.width=SW;trailC.height=SH;
   if(portraitLoaded){img=portraitImg;imgLoaded=true;}
+  if(shortsLogoLoaded){logo=shortsLogo;logoLoaded=true;logoMaskSrc=shortsLogoMask;}
   try{
-    const buf=window.audioBuffer,fps=30,sr=48000;
+    const buf=shortsBuf,fps=30,sr=48000;
     const clipStart=shortsStart;
     const clipDur=parseInt(document.getElementById('shortsDur').value);
     const clipEnd=Math.min(clipStart+clipDur,buf.duration);
@@ -1582,11 +1656,14 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     setTimeout(()=>URL.revokeObjectURL(url),5000);
     setShortsStatus('Done! Saved as '+dlName);
     // Restore state before initAudio
-    img=savedImg;imgLoaded=savedImgLoaded;W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
-    await initAudio(buf);
+    img=savedImg;imgLoaded=savedImgLoaded;
+    logo=savedLogo;logoLoaded=savedLogoLoaded;logoMaskSrc=savedLogoMask;
+    W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
+    if(window.audioBuffer)await initAudio(window.audioBuffer);
   }catch(err){setShortsStatus('Error: '+err.message);console.error(err);}
   finally{
     img=savedImg;imgLoaded=savedImgLoaded;
+    logo=savedLogo;logoLoaded=savedLogoLoaded;logoMaskSrc=savedLogoMask;
     precomputedFX=null;W=savedW;H=savedH;trailC.width=savedW;trailC.height=savedH;
     ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Short';
     document.getElementById('dlBtn').disabled=!window.audioBuffer;
