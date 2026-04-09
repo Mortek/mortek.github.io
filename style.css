@@ -1502,6 +1502,11 @@ h1 span { color: var(--accent); }
   border: 1px solid var(--apps-color);
   border-radius: 20px;
 }
+.changelog-date {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  margin-left: 10px;
+}
 .changelog-list {
   list-style: none;
   padding: 0;
