@@ -728,10 +728,15 @@ h1 span { color: var(--accent); }
   max-width: 420px;
 }
 .playlist h2 {
-  font-size: 1.1em;
-  color: var(--text);
-  margin-bottom: 12px;
-  letter-spacing: 0.5px;
+  font-size: 1.2em;
+  color: #fff;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: inline-block;
 }
 .yt-embed {
   position: relative;
