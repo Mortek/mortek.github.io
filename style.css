@@ -1465,8 +1465,7 @@ h1 span { color: var(--accent); }
 }
 .blog-cta img {
   width: 100px;
-  aspect-ratio: 2 / 3;
-  object-fit: contain;
+  height: auto;
   border-radius: 8px;
   flex-shrink: 0;
 }
