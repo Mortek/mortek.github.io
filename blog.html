@@ -3,17 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mortek Blog — Articles on personal development, productivity, and creative living by Maurice Moret.">
 <meta name="theme-color" content="#141416">
 <meta name="view-transition" content="same-origin">
+<meta property="og:title" content="Blog — Mortek">
+<meta property="og:description" content="Articles on personal development, productivity, and creative living.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mortek.github.io/blog.html">
+<meta property="og:image" content="https://mortek.github.io/og-home.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blog — Mortek">
+<meta name="twitter:description" content="Articles on personal development, productivity, and creative living.">
+<meta name="twitter:image" content="https://mortek.github.io/og-home.png">
+<link rel="canonical" href="https://mortek.github.io/blog.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="style.min.css?v=8">
 <noscript><style>.fade-in{opacity:1 !important;transform:none !important;transition:none !important}</style></noscript>
-<title>Page Not Found — Mortek</title>
+<title>Blog — Mortek</title>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
@@ -24,19 +38,34 @@
     <a href="apps.html">Apps &amp; Games</a> &nbsp;&middot;&nbsp;
     <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
     <a href="music.html">Music</a> &nbsp;&middot;&nbsp;
-    <a href="blog.html">Blog</a> &nbsp;&middot;&nbsp;
+    <a href="blog.html" class="active">Blog</a> &nbsp;&middot;&nbsp;
     <a href="about.html">About</a>
   </nav>
   <a href="music_visualizer.html" class="vis-btn">Visualizer</a>
 </header>
 
-<main id="main-content" class="songs-main">
-  <div class="icon" aria-hidden="true">&#128269;</div>
-  <h1>Page Not <span>Found</span></h1>
-  <p class="message">The page you're looking for doesn't exist or has been moved.</p>
-  <p class="fun-fact" id="funFact"></p>
-  <br>
-  <a class="btn" href="/">Back to Home</a>
+<main id="main-content" class="blog-main">
+  <div class="icon" aria-hidden="true">&#9997;&#65039;</div>
+  <h1>The <span>Blog</span></h1>
+  <p class="blog-intro">Articles on personal development, productivity, and creative living. New posts coming soon.</p>
+
+  <div class="article-grid">
+    <div class="article-card fade-in">
+      <span class="article-badge">Coming Soon</span>
+      <h3>The Science of Breaking Bad Habits</h3>
+      <p>Why willpower alone fails and what neuroscience says actually works for lasting change.</p>
+    </div>
+    <div class="article-card fade-in">
+      <span class="article-badge">Coming Soon</span>
+      <h3>Stoic Principles for the Digital Age</h3>
+      <p>How ancient philosophy can help you navigate modern distractions, anxiety, and information overload.</p>
+    </div>
+    <div class="article-card fade-in">
+      <span class="article-badge">Coming Soon</span>
+      <h3>How to Read Body Language in Everyday Life</h3>
+      <p>Practical tips for understanding what people really mean — beyond the words they say.</p>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -50,7 +79,7 @@
 </footer>
 
 <script>
-var f=["Crypto Mining Tycoon supports 12 languages and has over 50 skins!","Maurice has published 7 self-help books on personal development.","The Music Visualizer has 20+ particle effects you can customize.","Mortek Music spans from epic anime gaming to chill lo-fi beats.","You can create and export music videos with the Visualizer!"];document.getElementById('funFact').textContent="Did you know? "+f[Math.floor(Math.random()*f.length)];if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
 </script>
 </body>
 </html>

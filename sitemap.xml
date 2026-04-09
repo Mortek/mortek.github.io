@@ -1,27 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mortek.github.io/</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://mortek.github.io/og-home.png</image:loc>
+      <image:title>Mortek — Apps, Books &amp; Music by Maurice Moret</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/apps.html</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://mortek.github.io/og-apps.png</image:loc>
+      <image:title>Apps &amp; Games — Mortek</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/books.html</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://mortek.github.io/og-books.png</image:loc>
+      <image:title>Books — Mortek</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Stop_Overthinking.jpg</image:loc>
+      <image:title>Stop Overthinking by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/The_Stoic_Mind.jpg</image:loc>
+      <image:title>The Stoic Mind by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Dopamine_Detox.jpg</image:loc>
+      <image:title>Dopamine Detox by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/The_Discipline_Blueprint.jpg</image:loc>
+      <image:title>The Discipline Blueprint by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Wealth_Without_Permission.jpg</image:loc>
+      <image:title>Wealth Without Permission by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Read_People_Like_a_Book.jpg</image:loc>
+      <image:title>Read People Like a Book by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Whole.jpg</image:loc>
+      <image:title>Whole by Maurice Moret</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/music.html</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://mortek.github.io/og-music.png</image:loc>
+      <image:title>Music — Mortek</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://mortek.github.io/about.html</loc>
+    <loc>https://mortek.github.io/blog.html</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/about.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/profielfoto.jpeg</image:loc>
+      <image:title>Maurice Moret</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/music_visualizer.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/privacy_policy.html</loc>
+    <lastmod>2026-04-09</lastmod>
     <priority>0.3</priority>
   </url>
 </urlset>

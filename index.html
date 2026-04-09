@@ -23,12 +23,14 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" as="style">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="style.min.css?v=7">
+<link rel="stylesheet" href="style.min.css?v=8">
 <noscript><style>.fade-in{opacity:1 !important;transform:none !important;transition:none !important}</style></noscript>
 <title>Mortek — Apps, Books & Music by Maurice Moret</title>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <header>
   <a href="/" class="logo" aria-label="Mortek home">Mortek</a>
@@ -36,12 +38,13 @@
     <a href="apps.html">Apps &amp; Games</a> &nbsp;&middot;&nbsp;
     <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
     <a href="music.html">Music</a> &nbsp;&middot;&nbsp;
+    <a href="blog.html">Blog</a> &nbsp;&middot;&nbsp;
     <a href="about.html">About</a>
   </nav>
   <a href="music_visualizer.html" class="vis-btn">Visualizer</a>
 </header>
 
-<main class="home-main">
+<main id="main-content" class="home-main">
   <h1>Welcome to <span>Mortek</span></h1>
   <p class="subtitle">Apps, books, and music by Maurice Moret.</p>
 
@@ -65,14 +68,13 @@
 </main>
 
 <footer>
-  &copy; 2026 Mortek &nbsp;&middot;&nbsp;
-  <a href="mailto:mauricemoret1991@gmail.com">Contact</a>
-  &nbsp;&middot;&nbsp;
-  <a href="https://www.youtube.com/@MortekMusic" target="_blank" rel="noopener">YouTube</a>
-  &nbsp;&middot;&nbsp;
-  <a href="https://www.amazon.com/stores/author/B0GVRHDKBW" target="_blank" rel="noopener">Amazon</a>
-  &nbsp;&middot;&nbsp;
-  <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener">BookBub</a>
+  <div class="footer-icons">
+    <a href="mailto:mauricemoret1991@gmail.com" aria-label="Email" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
+    <a href="https://www.youtube.com/@MortekMusic" target="_blank" rel="noopener" aria-label="YouTube" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+    <a href="https://www.amazon.com/stores/author/B0GVRHDKBW" target="_blank" rel="noopener" aria-label="Amazon" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a>
+    <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener" aria-label="BookBub" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></a>
+  </div>
+  <p>&copy; 2026 Mortek &nbsp;&middot;&nbsp; <a href="privacy_policy.html">Privacy Policy</a></p>
 </footer>
 
 <script>
