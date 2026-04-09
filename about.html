@@ -21,7 +21,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.min.css?v=12">
+<link rel="stylesheet" href="style.min.css?v=13">
 <noscript><style>.fade-in{opacity:1 !important;transform:none !important;transition:none !important}</style></noscript>
 <title>About — Mortek</title>
 <script type="application/ld+json">
@@ -67,6 +67,13 @@
     Maurice Moret is a self-help author dedicated to helping people live with more clarity, intention, and freedom. His writing combines insights from psychology, neuroscience, and practical lived experience to create books that are grounded, honest, and immediately useful.
     Beyond writing, Maurice builds mobile games and creates original music — all under the Mortek brand.
   </p>
+
+  <div class="author-stats fade-in">
+    <div class="stat"><span class="stat-number" data-target="7">0</span><span class="stat-label">Books Published</span></div>
+    <div class="stat"><span class="stat-number" data-target="12">0</span><span class="stat-label">Languages</span></div>
+    <div class="stat"><span class="stat-number" data-target="50">0</span><span class="stat-label">Game Skins</span></div>
+    <div class="stat"><span class="stat-number" data-target="20">0</span><span class="stat-label">Visualizer Effects</span></div>
+  </div>
 
   <h2 class="timeline-heading fade-in">Journey</h2>
   <div class="timeline">
@@ -127,7 +134,7 @@
 </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');const co=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){const t=parseInt(i.target.dataset.target),d=Math.max(30,1500/t);let c=0;const iv=setInterval(()=>{c++;i.target.textContent=c>=t?t+'+':c;if(c>=t)clearInterval(iv)},d);co.unobserve(i.target)}})},{threshold:0.5});document.querySelectorAll('[data-target]').forEach(e=>co.observe(e))});
 </script>
 </body>
 </html>

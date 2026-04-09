@@ -21,9 +21,22 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.min.css?v=12">
+<link rel="stylesheet" href="style.min.css?v=13">
 <noscript><style>.fade-in{opacity:1 !important;transform:none !important;transition:none !important}</style></noscript>
 <title>Books — Mortek</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Do I need to read the books in order?", "acceptedAnswer": {"@type": "Answer", "text": "No. Each book in The Clarity Series is completely standalone. You can start with whichever topic interests you most and read them in any order."}},
+    {"@type": "Question", "name": "Who are these books for?", "acceptedAnswer": {"@type": "Answer", "text": "Anyone looking for practical, no-nonsense guidance on personal development. The books are grounded in psychology and neuroscience, written for people who want clear tools they can apply immediately."}},
+    {"@type": "Question", "name": "Are audiobook versions available?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. Audiobook editions are being explored for the future. Currently all books are available as Kindle eBooks and paperbacks on Amazon."}},
+    {"@type": "Question", "name": "How long are the books?", "acceptedAnswer": {"@type": "Answer", "text": "Each book is designed to be read in a few focused sittings. They average around 150-200 pages with 9-10 chapters and include practical exercises you can start immediately."}},
+    {"@type": "Question", "name": "Is there a blog with free content?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! The Mortek Blog has articles on every book's core themes — from overthinking and dopamine to Stoic philosophy and financial freedom."}}
+  ]
+}
+</script>
 <script type="application/ld+json">
 [
   {"@context":"https://schema.org","@type":"Book","name":"Stop Overthinking","alternativeHeadline":"A Practical Guide to Quieting Your Mind","author":{"@type":"Person","name":"Maurice Moret"},"image":"https://mortek.github.io/books/book_covers/Stop_Overthinking.jpg","isbn":"9798255084449"},
@@ -155,6 +168,30 @@
       <a href="https://www.amazon.com/dp/B0D8JTZCHP" target="_blank" rel="noopener" class="buy-btn">Buy on Amazon</a>
     </div>
   </div>
+
+  <section class="faq-section fade-in">
+    <h2 class="section-heading">Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Do I need to read the books in order?</button>
+      <div class="faq-answer"><p>No. Each book in The Clarity Series is completely standalone. You can start with whichever topic interests you most and read them in any order.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Who are these books for?</button>
+      <div class="faq-answer"><p>Anyone looking for practical, no-nonsense guidance on personal development. The books are grounded in psychology and neuroscience, written for people who want clear tools they can apply immediately — not vague motivation.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Are audiobook versions available?</button>
+      <div class="faq-answer"><p>Not yet. Audiobook editions are being explored for the future. Currently all books are available as Kindle eBooks and paperbacks on Amazon.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">How long are the books?</button>
+      <div class="faq-answer"><p>Each book is designed to be read in a few focused sittings. They average around 150-200 pages with 9-10 chapters and include practical exercises you can start immediately.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Is there a blog with free content?</button>
+      <div class="faq-answer"><p>Yes! The <a href="blog.html" style="color:var(--accent)">Mortek Blog</a> has articles on every book's core themes — from overthinking and dopamine to Stoic philosophy and financial freedom.</p></div>
+    </div>
+  </section>
 
   <div class="more-apps">
     <p>More books coming soon.</p>

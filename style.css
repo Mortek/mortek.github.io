@@ -1395,6 +1395,183 @@ h1 span { color: var(--accent); }
   background-size: cover;
 }
 
+/* === Author stats === */
+.author-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+.stat {
+  text-align: center;
+}
+.stat-number {
+  font-family: var(--font-heading);
+  font-size: 2em;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+}
+.stat-label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* === FAQ accordion === */
+.faq-section { margin-top: 48px; margin-bottom: 32px; }
+.faq-section h2 { text-align: center; margin-bottom: 24px; }
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 0.95em;
+  font-weight: 600;
+  padding: 16px 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: color 0.15s;
+}
+.faq-question:hover { color: var(--accent); }
+.faq-question::after {
+  content: '+';
+  font-size: 1.2em;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.faq-item.open .faq-question::after {
+  content: '\2212';
+  color: var(--accent);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.faq-item.open .faq-answer {
+  max-height: 200px;
+}
+.faq-answer p {
+  padding: 0 20px 16px;
+  font-size: 0.9em;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* === Changelog card === */
+.changelog {
+  margin-top: 48px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+.changelog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.changelog-header h2 {
+  font-size: 1.2em;
+  color: #fff;
+}
+.changelog-version {
+  font-family: var(--font-heading);
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--apps-color);
+  padding: 4px 12px;
+  border: 1px solid var(--apps-color);
+  border-radius: 20px;
+}
+.changelog-list {
+  list-style: none;
+  padding: 0;
+}
+.changelog-list li {
+  font-size: 0.88em;
+  color: var(--text-muted);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(42, 42, 48, 0.5);
+  line-height: 1.5;
+}
+.changelog-list li:last-child { border-bottom: none; }
+.changelog-category {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  display: block;
+}
+.changelog-category:first-child { margin-top: 0; }
+
+/* === 404 mini game === */
+.mini-game {
+  margin-top: 24px;
+  text-align: center;
+}
+.mine-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--apps-color);
+  background: var(--surface);
+  color: #fff;
+  font-size: 2em;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mine-btn:active { transform: scale(0.9); }
+.mine-btn:hover { box-shadow: 0 0 16px rgba(34, 197, 94, 0.3); }
+.mine-score {
+  font-family: var(--font-heading);
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 12px;
+}
+.mine-label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .fade-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .scroll-progress { display: none; }
+}
+
 /* === Print === */
 @media print {
   header, footer, .skip-link, .scroll-progress, .share-buttons,

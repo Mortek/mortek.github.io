@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://mortek.github.io/</loc>
+    <loc>https://mortek.github.io/about.html</loc>
     <lastmod>2026-04-09</lastmod>
-    <priority>1.0</priority>
+    <priority>0.7</priority>
     <image:image>
-      <image:loc>https://mortek.github.io/og-home.png</image:loc>
-      <image:title>Mortek — Apps, Books &amp; Music by Maurice Moret</image:title>
+      <image:loc>https://mortek.github.io/books/profielfoto.jpeg</image:loc>
+      <image:title>Maurice Moret</image:title>
     </image:image>
   </url>
   <url>
@@ -16,32 +16,37 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/blog.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/books.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://mortek.github.io/books/book_covers/Stop_Overthinking.jpg</image:loc>
-      <image:title>Stop Overthinking by Maurice Moret</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://mortek.github.io/books/book_covers/The_Stoic_Mind.jpg</image:loc>
-      <image:title>The Stoic Mind by Maurice Moret</image:title>
-    </image:image>
-    <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/Dopamine_Detox.jpg</image:loc>
       <image:title>Dopamine Detox by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Read_People_Like_a_Book.jpg</image:loc>
+      <image:title>Read People Like a Book by Maurice Moret</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://mortek.github.io/books/book_covers/Stop_Overthinking.jpg</image:loc>
+      <image:title>Stop Overthinking by Maurice Moret</image:title>
     </image:image>
     <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/The_Discipline_Blueprint.jpg</image:loc>
       <image:title>The Discipline Blueprint by Maurice Moret</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://mortek.github.io/books/book_covers/Wealth_Without_Permission.jpg</image:loc>
-      <image:title>Wealth Without Permission by Maurice Moret</image:title>
+      <image:loc>https://mortek.github.io/books/book_covers/The_Stoic_Mind.jpg</image:loc>
+      <image:title>The Stoic Mind by Maurice Moret</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://mortek.github.io/books/book_covers/Read_People_Like_a_Book.jpg</image:loc>
-      <image:title>Read People Like a Book by Maurice Moret</image:title>
+      <image:loc>https://mortek.github.io/books/book_covers/Wealth_Without_Permission.jpg</image:loc>
+      <image:title>Wealth Without Permission by Maurice Moret</image:title>
     </image:image>
     <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/Whole.jpg</image:loc>
@@ -49,58 +54,14 @@
     </image:image>
   </url>
   <url>
+    <loc>https://mortek.github.io/</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/music.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/stop-overthinking.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/the-stoic-mind.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/dopamine-detox.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/the-discipline-blueprint.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/wealth-without-permission.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/read-people-like-a-book.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/blog/whole.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://mortek.github.io/about.html</loc>
-    <lastmod>2026-04-09</lastmod>
-    <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://mortek.github.io/books/profielfoto.jpeg</image:loc>
-      <image:title>Maurice Moret</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/music_visualizer.html</loc>
@@ -111,5 +72,40 @@
     <loc>https://mortek.github.io/privacy_policy.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/dopamine-detox.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/read-people-like-a-book.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/stop-overthinking.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/the-discipline-blueprint.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/the-stoic-mind.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/wealth-without-permission.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/whole.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
   </url>
 </urlset>
