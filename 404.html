@@ -30,14 +30,7 @@
   <div class="icon" aria-hidden="true">&#128269;</div>
   <h1>Page Not <span>Found</span></h1>
   <p class="message">The page you're looking for doesn't exist or has been moved.</p>
-  <p class="fun-fact" id="funFact"></p>
-  <div class="mini-game" style="margin-top:40px">
-    <p class="mine-label" style="margin-bottom:16px">While you're here... tap to mine!</p>
-    <button class="mine-btn" id="mineBtn" aria-label="Tap to mine">&#9935;&#65039;</button>
-    <div class="mine-score" id="mineScore">0</div>
-    <p class="mine-label">coins mined</p>
-  </div>
-  <div style="margin-top:32px">
+  <div style="margin-top:40px">
     <a class="btn" href="/">Back to Home</a>
   </div>
 </main>
@@ -53,7 +46,7 @@
 </footer>
 
 <script>
-var f=["Crypto Mining Tycoon supports 12 languages and has over 50 skins!","Maurice has published 7 self-help books on personal development.","The Music Visualizer has 20+ particle effects you can customize.","Mortek Music spans from epic anime gaming to chill lo-fi beats.","You can create and export music videos with the Visualizer!"];document.getElementById('funFact').textContent="Did you know? "+f[Math.floor(Math.random()*f.length)];if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');var coins=0,btn=document.getElementById('mineBtn'),sc=document.getElementById('mineScore');btn.addEventListener('click',()=>{coins+=Math.floor(Math.random()*5)+1;sc.textContent=coins;btn.style.transform='scale(0.9)';setTimeout(()=>btn.style.transform='',100)});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');
 </script>
 </body>
 </html>
