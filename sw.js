@@ -1,4 +1,4 @@
-const CACHE = 'mortek-v2';
+const CACHE = 'mortek-v3';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -7,20 +7,21 @@ const PRECACHE = [
   '/music.html',
   '/about.html',
   '/404.html',
-  '/style.min.css?v=7',
+  '/style.min.css?v=19',
   '/favicon.svg',
   '/manifest.json',
   '/apple-touch-icon.png',
   '/icon-192.png',
   '/icon-512.png',
+  '/books/profielfoto.webp',
   '/books/profielfoto.jpeg',
-  '/books/book_covers/Stop_Overthinking.jpg',
-  '/books/book_covers/The_Stoic_Mind.jpg',
-  '/books/book_covers/Dopamine_Detox.jpg',
-  '/books/book_covers/The_Discipline_Blueprint.jpg',
-  '/books/book_covers/Wealth_Without_Permission.jpg',
-  '/books/book_covers/Read_People_Like_a_Book.jpg',
-  '/books/book_covers/Whole.jpg'
+  '/books/book_covers/Stop_Overthinking.webp',
+  '/books/book_covers/The_Stoic_Mind.webp',
+  '/books/book_covers/Dopamine_Detox.webp',
+  '/books/book_covers/The_Discipline_Blueprint.webp',
+  '/books/book_covers/Wealth_Without_Permission.webp',
+  '/books/book_covers/Read_People_Like_a_Book.webp',
+  '/books/book_covers/Whole.webp'
 ];
 
 self.addEventListener('install', e => {
