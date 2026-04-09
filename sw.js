@@ -8,7 +8,7 @@ const PRECACHE = [
   '/about.html',
   '/blog.html',
   '/404.html',
-  '/style.min.css?v=27',
+  '/style.min.css?v=28',
   '/favicon.svg',
   '/manifest.json',
   '/apple-touch-icon.png',
