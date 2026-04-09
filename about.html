@@ -133,7 +133,7 @@
 </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');const co=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){const t=parseInt(i.target.dataset.target),d=Math.max(30,1500/t);let c=0;const iv=setInterval(()=>{c++;i.target.textContent=c>=t?t+'+':c;if(c>=t)clearInterval(iv)},d);co.unobserve(i.target)}})},{threshold:0.5});document.querySelectorAll('[data-target]').forEach(e=>co.observe(e))});
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');const co=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){const t=parseInt(i.target.dataset.target),d=Math.max(30,1500/t);let c=0;const iv=setInterval(()=>{c++;i.target.textContent=c>=t?t:c;if(c>=t)clearInterval(iv)},d);co.unobserve(i.target)}})},{threshold:0.5});document.querySelectorAll('[data-target]').forEach(e=>co.observe(e))});
 </script>
 </body>
 </html>
