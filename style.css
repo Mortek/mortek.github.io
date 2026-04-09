@@ -973,7 +973,7 @@ h1 span { color: var(--accent); }
 .book-card img {
   width: 100%;
   max-height: 280px;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.3s;
 }
