@@ -1081,7 +1081,7 @@ h1 span { color: var(--accent); }
   top: 8px;
   bottom: 8px;
   width: 2px;
-  background: linear-gradient(to bottom, var(--apps-color), var(--books-color), var(--music-color), #6c3fc5);
+  background: linear-gradient(to bottom, var(--apps-color), var(--books-color), var(--music-color), #FBBF24);
   border-radius: 1px;
 }
 .timeline-item {
