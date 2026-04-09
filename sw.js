@@ -1,4 +1,4 @@
-const CACHE = 'mortek-v11';
+const CACHE = 'mortek-v12';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -8,7 +8,7 @@ const PRECACHE = [
   '/about.html',
   '/blog.html',
   '/404.html',
-  '/style.min.css?v=33',
+  '/style.min.css?v=34',
   '/favicon.svg',
   '/manifest.json',
   '/apple-touch-icon.png',

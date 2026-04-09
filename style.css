@@ -389,8 +389,7 @@ h1 span { color: var(--accent); }
     radial-gradient(ellipse farthest-side at 50% 60%, rgba(245, 158, 11, 0.04) 0%, transparent 70%);
   pointer-events: none;
   z-index: -1;
-  mask-image: linear-gradient(to bottom, black 40%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
+  filter: blur(60px);
 }
 .home-main h1 { font-size: 2.4em; text-align: center; }
 .subtitle {
@@ -1264,8 +1263,7 @@ h1 span { color: var(--accent); }
   height: 600px;
   pointer-events: none;
   z-index: -1;
-  mask-image: linear-gradient(to bottom, black 40%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
+  filter: blur(60px);
 }
 .about-main.hero-glow::before {
   background:
