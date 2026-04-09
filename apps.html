@@ -56,7 +56,7 @@
 </header>
 
 <main id="main-content" class="apps-main">
-  <div class="app-icon" aria-hidden="true">&#9935;&#65039;</div>
+  <div class="app-icon"><picture><source srcset="apps/crypto%20mining%20tycoon/icon.webp" type="image/webp"><img src="apps/crypto%20mining%20tycoon/icon.png" alt="Crypto Mining Tycoon" width="240" height="240"></picture></div>
   <h1>Crypto Mining <span>Tycoon</span></h1>
   <p class="tagline">
     Tap to mine, buy upgrades, prestige for multipliers, and build the ultimate crypto empire.
@@ -66,9 +66,10 @@
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" loading="lazy">
   </a>
 
-  <div class="screenshot-slider fade-in">
+  <div class="screenshot-slider slider fade-in">
     <h2>Screenshots</h2>
-    <div class="screenshot-track">
+    <button class="slider-btn slider-btn--prev hidden" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="slider-track">
       <img src="apps/crypto%20mining%20tycoon/screenshots/1.webp" alt="Crypto Mining Tycoon — Main mining screen" width="360" height="804" loading="lazy">
       <img src="apps/crypto%20mining%20tycoon/screenshots/2.webp" alt="Crypto Mining Tycoon — Upgrades" width="360" height="804" loading="lazy">
       <img src="apps/crypto%20mining%20tycoon/screenshots/3.webp" alt="Crypto Mining Tycoon — Prestige" width="360" height="804" loading="lazy">
@@ -84,6 +85,7 @@
       <img src="apps/crypto%20mining%20tycoon/screenshots/13.webp" alt="Crypto Mining Tycoon — Achievements" width="360" height="804" loading="lazy">
       <img src="apps/crypto%20mining%20tycoon/screenshots/14.webp" alt="Crypto Mining Tycoon — More features" width="360" height="804" loading="lazy">
     </div>
+    <button class="slider-btn slider-btn--next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
 
   <div class="features">
@@ -174,7 +176,7 @@
 </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');document.querySelectorAll('.slider').forEach(s=>{const t=s.querySelector('.slider-track'),p=s.querySelector('.slider-btn--prev'),n=s.querySelector('.slider-btn--next');if(!t||!p||!n)return;const u=()=>{p.classList.toggle('hidden',t.scrollLeft<10);n.classList.toggle('hidden',t.scrollLeft>=t.scrollWidth-t.clientWidth-10)};p.addEventListener('click',()=>t.scrollBy({left:-t.clientWidth*.7,behavior:'smooth'}));n.addEventListener('click',()=>t.scrollBy({left:t.clientWidth*.7,behavior:'smooth'}));t.addEventListener('scroll',u,{passive:true});u()})});
 </script>
 </body>
 </html>

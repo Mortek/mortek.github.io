@@ -98,24 +98,38 @@
     </div>
   </div>
 
-  <section class="testimonials">
-    <h2 class="section-heading fade-in">What Readers Say</h2>
-    <div class="testimonial-grid">
-      <div class="testimonial fade-in">
-        <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"Clear, practical, and immediately useful. This book gave me the tools to finally quiet my racing mind."</p>
-        <span class="reviewer">— Reader on <em>Stop Overthinking</em></span>
+  <section class="testimonials fade-in">
+    <h2 class="section-heading">What Readers Say</h2>
+    <div class="testimonial-slider slider">
+      <button class="slider-btn slider-btn--prev hidden" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="slider-track">
+        <div class="testimonial">
+          <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Clear, practical, and immediately useful. This book gave me the tools to finally quiet my racing mind."</p>
+          <span class="reviewer">— Reader on <em>Stop Overthinking</em></span>
+        </div>
+        <div class="testimonial">
+          <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Grounded in real science, not fluff. A refreshing approach to understanding how our brains work against us."</p>
+          <span class="reviewer">— Reader on <em>Dopamine Detox</em></span>
+        </div>
+        <div class="testimonial">
+          <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Honest, direct, and full of steps I could actually follow. No gatekeeping, just real advice."</p>
+          <span class="reviewer">— Reader on <em>Wealth Without Permission</em></span>
+        </div>
+        <div class="testimonial">
+          <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Finally a book on Stoicism that doesn't just quote Marcus Aurelius — it shows you how to actually live it day by day."</p>
+          <span class="reviewer">— Reader on <em>The Stoic Mind</em></span>
+        </div>
+        <div class="testimonial">
+          <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Short, sharp, and packed with actionable steps. I built a morning routine in the first week that actually stuck."</p>
+          <span class="reviewer">— Reader on <em>The Discipline Blueprint</em></span>
+        </div>
       </div>
-      <div class="testimonial fade-in">
-        <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"Grounded in real science, not fluff. A refreshing approach to understanding how our brains work against us."</p>
-        <span class="reviewer">— Reader on <em>Dopamine Detox</em></span>
-      </div>
-      <div class="testimonial fade-in">
-        <div class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"Honest, direct, and full of steps I could actually follow. No gatekeeping, just real advice."</p>
-        <span class="reviewer">— Reader on <em>Wealth Without Permission</em></span>
-      </div>
+      <button class="slider-btn slider-btn--next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
     </div>
   </section>
 
@@ -234,7 +248,7 @@
 </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');document.querySelectorAll('.faq-question').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.parentElement;const open=item.classList.toggle('open');btn.setAttribute('aria-expanded',open)})})});
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');document.querySelectorAll('.faq-question').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.parentElement;const open=item.classList.toggle('open');btn.setAttribute('aria-expanded',open)})});document.querySelectorAll('.slider').forEach(s=>{const t=s.querySelector('.slider-track'),p=s.querySelector('.slider-btn--prev'),n=s.querySelector('.slider-btn--next');if(!t||!p||!n)return;const u=()=>{p.classList.toggle('hidden',t.scrollLeft<10);n.classList.toggle('hidden',t.scrollLeft>=t.scrollWidth-t.clientWidth-10)};p.addEventListener('click',()=>t.scrollBy({left:-t.clientWidth*.7,behavior:'smooth'}));n.addEventListener('click',()=>t.scrollBy({left:t.clientWidth*.7,behavior:'smooth'}));t.addEventListener('scroll',u,{passive:true});u()})});
 </script>
 </body>
 </html>
