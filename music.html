@@ -53,36 +53,28 @@
     <section class="playlist fade-in">
       <h2>Mortek Music — Complete Collection</h2>
       <div class="yt-embed">
-        <div class="yt-facade" data-src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vyiTYtG2XV_4A8SpYVQ1gW_P">
-          <button class="yt-play" aria-label="Load Complete Collection playlist"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-        </div>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vyiTYtG2XV_4A8SpYVQ1gW_P" title="Mortek Music — Complete Collection playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
       <a href="https://www.youtube.com/playlist?list=PLeP3KCnW1vyiTYtG2XV_4A8SpYVQ1gW_P" target="_blank" rel="noopener" class="playlist-link">&#x25B6; Open Full Playlist on YouTube</a>
     </section>
     <section class="playlist fade-in">
       <h2>Epic Anime Gaming Music</h2>
       <div class="yt-embed">
-        <div class="yt-facade" data-src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vyjTZAIb_Bc1vK6wdTlios6D">
-          <button class="yt-play" aria-label="Load Epic Anime Gaming playlist"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-        </div>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vyjTZAIb_Bc1vK6wdTlios6D" title="Epic Anime Gaming Music playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
       <a href="https://www.youtube.com/playlist?list=PLeP3KCnW1vyjTZAIb_Bc1vK6wdTlios6D" target="_blank" rel="noopener" class="playlist-link">&#x25B6; Open Full Playlist on YouTube</a>
     </section>
     <section class="playlist fade-in">
       <h2>Chill Anime Gaming Music</h2>
       <div class="yt-embed">
-        <div class="yt-facade" data-src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vygyuL47rxMaxSUzf37i-VUL">
-          <button class="yt-play" aria-label="Load Chill Anime Gaming playlist"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-        </div>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vygyuL47rxMaxSUzf37i-VUL" title="Chill Anime Gaming Music playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
       <a href="https://www.youtube.com/playlist?list=PLeP3KCnW1vygyuL47rxMaxSUzf37i-VUL" target="_blank" rel="noopener" class="playlist-link">&#x25B6; Open Full Playlist on YouTube</a>
     </section>
     <section class="playlist fade-in">
       <h2>Lo-Fi Beats</h2>
       <div class="yt-embed">
-        <div class="yt-facade" data-src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vygHn1YMhNqFlXHCqOJ2Thah">
-          <button class="yt-play" aria-label="Load Lo-Fi Beats playlist"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-        </div>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLeP3KCnW1vygHn1YMhNqFlXHCqOJ2Thah" title="Lo-Fi Beats playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
       <a href="https://www.youtube.com/playlist?list=PLeP3KCnW1vygHn1YMhNqFlXHCqOJ2Thah" target="_blank" rel="noopener" class="playlist-link">&#x25B6; Open Full Playlist on YouTube</a>
     </section>
@@ -104,7 +96,7 @@
 </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));document.querySelectorAll('.yt-facade').forEach(f=>{f.addEventListener('click',()=>{const e=f.parentElement,i=document.createElement('iframe');i.src=f.dataset.src+'&autoplay=1';i.allow='accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture';i.allowFullscreen=true;i.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%';f.remove();e.appendChild(i)})});if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
 </script>
 </body>
 </html>

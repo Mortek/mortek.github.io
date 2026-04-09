@@ -14,19 +14,11 @@
     <loc>https://mortek.github.io/apps.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://mortek.github.io/og-apps.png</image:loc>
-      <image:title>Apps &amp; Games — Mortek</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/books.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://mortek.github.io/og-books.png</image:loc>
-      <image:title>Books — Mortek</image:title>
-    </image:image>
     <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/Stop_Overthinking.jpg</image:loc>
       <image:title>Stop Overthinking by Maurice Moret</image:title>
@@ -60,15 +52,46 @@
     <loc>https://mortek.github.io/music.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://mortek.github.io/og-music.png</image:loc>
-      <image:title>Music — Mortek</image:title>
-    </image:image>
   </url>
   <url>
     <loc>https://mortek.github.io/blog.html</loc>
     <lastmod>2026-04-09</lastmod>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/stop-overthinking.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/the-stoic-mind.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/dopamine-detox.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/the-discipline-blueprint.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/wealth-without-permission.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/read-people-like-a-book.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/whole.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/about.html</loc>
