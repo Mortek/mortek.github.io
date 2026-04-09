@@ -215,10 +215,6 @@ footer { view-transition-name: site-footer; }
   0%, 100% { transform: translateY(0) scale(1.15); }
   50% { transform: translateY(-6px) scale(1.15); }
 }
-@keyframes heroGlow {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
 
 /* Scroll-triggered fade-in */
 .fade-in {
@@ -388,13 +384,13 @@ h1 span { color: var(--accent); }
   width: 100vw;
   height: 600px;
   background:
-    radial-gradient(ellipse 600px 450px at 20% 40%, rgba(247, 147, 26, 0.05) 0%, rgba(247, 147, 26, 0.02) 30%, transparent 100%),
-    radial-gradient(ellipse 500px 400px at 80% 30%, rgba(139, 92, 246, 0.04) 0%, rgba(139, 92, 246, 0.015) 30%, transparent 100%),
-    radial-gradient(ellipse 450px 350px at 50% 60%, rgba(245, 158, 11, 0.035) 0%, rgba(245, 158, 11, 0.01) 30%, transparent 100%);
+    radial-gradient(ellipse farthest-side at 20% 40%, rgba(247, 147, 26, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 80% 30%, rgba(139, 92, 246, 0.045) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 50% 60%, rgba(245, 158, 11, 0.04) 0%, transparent 70%);
   pointer-events: none;
   z-index: -1;
-  mask-image: linear-gradient(to bottom, black 60%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
+  mask-image: linear-gradient(to bottom, black 40%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
 }
 .home-main h1 { font-size: 2.4em; text-align: center; }
 .subtitle {
@@ -1256,7 +1252,7 @@ h1 span { color: var(--accent); }
   line-height: 1.6;
 }
 
-/* === Animated hero glow === */
+/* === Hero glow === */
 .hero-glow { position: relative; }
 .hero-glow::before {
   content: '';
@@ -1268,21 +1264,20 @@ h1 span { color: var(--accent); }
   height: 600px;
   pointer-events: none;
   z-index: -1;
-  animation: heroGlow 8s ease-in-out infinite;
-  mask-image: linear-gradient(to bottom, black 50%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent);
+  mask-image: linear-gradient(to bottom, black 40%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
 }
 .about-main.hero-glow::before {
   background:
-    radial-gradient(ellipse 600px 450px at 30% 40%, rgba(247, 147, 26, 0.05) 0%, rgba(247, 147, 26, 0.02) 30%, transparent 100%),
-    radial-gradient(ellipse 500px 400px at 70% 20%, rgba(217, 119, 6, 0.04) 0%, rgba(217, 119, 6, 0.015) 30%, transparent 100%),
-    radial-gradient(ellipse 450px 350px at 50% 60%, rgba(251, 191, 36, 0.035) 0%, rgba(251, 191, 36, 0.01) 30%, transparent 100%);
+    radial-gradient(ellipse farthest-side at 30% 40%, rgba(247, 147, 26, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 70% 20%, rgba(217, 119, 6, 0.045) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 50% 60%, rgba(251, 191, 36, 0.04) 0%, transparent 70%);
 }
 .songs-main.hero-glow::before {
   background:
-    radial-gradient(ellipse 600px 450px at 20% 30%, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0.02) 30%, transparent 100%),
-    radial-gradient(ellipse 500px 400px at 80% 50%, rgba(139, 92, 246, 0.035) 0%, rgba(139, 92, 246, 0.01) 30%, transparent 100%),
-    radial-gradient(ellipse 450px 350px at 50% 60%, rgba(247, 147, 26, 0.035) 0%, rgba(247, 147, 26, 0.01) 30%, transparent 100%);
+    radial-gradient(ellipse farthest-side at 20% 30%, rgba(245, 158, 11, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 80% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse farthest-side at 50% 60%, rgba(247, 147, 26, 0.04) 0%, transparent 70%);
 }
 
 /* === About page === */
