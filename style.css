@@ -1005,6 +1005,14 @@ h1 span { color: var(--accent); }
   background: #e5850f;
   transform: translateY(-1px);
 }
+.buy-btn--outline {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.buy-btn--outline:hover {
+  background: rgba(247, 147, 26, 0.1);
+}
 
 /* Book subtitle hover reveal (desktop only) */
 @media (hover: hover) and (min-width: 641px) {
@@ -1169,6 +1177,14 @@ h1 span { color: var(--accent); }
   background: rgba(245, 158, 11, 0.1);
   color: var(--music-color);
   border-color: rgba(245, 158, 11, 0.3);
+}
+.music-description {
+  max-width: 640px;
+  margin: 0 auto 32px;
+  color: var(--text-muted);
+  font-size: 0.9em;
+  line-height: 1.7;
+  text-align: center;
 }
 
 /* === Blog page === */
@@ -1751,11 +1767,9 @@ h1 span { color: var(--accent); }
   margin-left: 10px;
 }
 .changelog-list {
-  list-style: none;
   padding: 0;
   margin: 0;
 }
-.changelog-list li,
 .changelog-list dd {
   font-size: 0.88em;
   color: var(--text-muted);
@@ -1764,9 +1778,7 @@ h1 span { color: var(--accent); }
   line-height: 1.5;
   margin: 0;
 }
-.changelog-list li:last-child,
 .changelog-list dd:last-child { border-bottom: none; }
-.changelog-category,
 .changelog-list dt {
   font-weight: 600;
   color: var(--text);
@@ -1775,9 +1787,7 @@ h1 span { color: var(--accent); }
   letter-spacing: 0.04em;
   margin-top: 12px;
   margin-bottom: 4px;
-  display: block;
 }
-.changelog-category:first-child,
 .changelog-list dt:first-child { margin-top: 0; }
 
 /* === 404 mini game === */
