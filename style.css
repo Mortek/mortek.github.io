@@ -902,16 +902,13 @@ h1 span { color: var(--accent); }
   font-weight: 600;
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: background 0.2s, transform 0.15s;
   width: fit-content;
-}
-.featured-book-info .buy-btn {
-  margin-top: 6px;
+  margin-top: 10px;
 }
 .featured-book-info .buy-btn:hover {
   background: #e5850f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(247, 147, 26, 0.25);
 }
 
 /* Testimonials */
@@ -1168,19 +1165,21 @@ h1 span { color: var(--accent); }
 .playlist-link {
   display: inline-block;
   margin-top: 14px;
-  padding: 8px 20px;
+  padding: 10px 24px;
   font-size: 0.85em;
-  color: #c0c0cc;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: #fff;
+  background: var(--music-color);
+  border: none;
   border-radius: 8px;
   text-decoration: none;
   letter-spacing: 0.3px;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
 .playlist-link:hover {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--music-color);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: #d98b09;
+  transform: translateY(-2px);
 }
 .music-description {
   max-width: 640px;
