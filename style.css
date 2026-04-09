@@ -518,6 +518,7 @@ h1 span { color: var(--accent); }
 }
 .store-badge img {
   height: 60px;
+  width: auto;
   transition: transform 0.15s;
 }
 .store-badge:hover img { transform: scale(1.05); }
@@ -903,6 +904,9 @@ h1 span { color: var(--accent); }
   text-decoration: none;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
   width: fit-content;
+}
+.featured-book-info .buy-btn {
+  margin-top: 6px;
 }
 .featured-book-info .buy-btn:hover {
   background: #e5850f;
