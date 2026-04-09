@@ -912,6 +912,7 @@ h1 span { color: var(--accent); }
 
 /* Testimonials */
 .testimonials {
+  margin-top: 64px;
   margin-bottom: 48px;
 }
 .testimonial-grid {
@@ -925,6 +926,8 @@ h1 span { color: var(--accent); }
   border-radius: 12px;
   padding: 24px;
   transition: border-color 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 .testimonial:hover {
   border-color: var(--accent);
@@ -942,6 +945,7 @@ h1 span { color: var(--accent); }
   line-height: 1.6;
   font-style: italic;
   margin-bottom: 12px;
+  flex: 1;
 }
 .testimonial .reviewer {
   font-size: 0.8em;
