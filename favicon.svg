@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    @keyframes pulse { 0%, 100% { fill: #F7931A; } 50% { fill: #FFD700; } }
+    .m { animation: pulse 3s ease-in-out infinite; }
+  </style>
   <rect width="32" height="32" rx="6" fill="#141416"/>
-  <text x="16" y="23" font-family="system-ui, sans-serif" font-size="22" font-weight="700" fill="#F7931A" text-anchor="middle">M</text>
+  <text class="m" x="16" y="23" font-family="system-ui, sans-serif" font-size="22" font-weight="700" fill="#F7931A" text-anchor="middle">M</text>
 </svg>

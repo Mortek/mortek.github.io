@@ -5,17 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Books by Maurice Moret — Self-help books on clarity, discipline, and personal growth. Grounded in psychology, neuroscience, and practical lived experience.">
 <meta name="theme-color" content="#141416">
+<meta name="view-transition" content="same-origin">
 <meta property="og:title" content="Books — Mortek">
 <meta property="og:description" content="Self-help books by Maurice Moret on clarity, discipline, and personal growth.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mortek.github.io/books.html">
-<meta property="og:image" content="https://mortek.github.io/books/profielfoto.jpeg">
+<meta property="og:image" content="https://mortek.github.io/og-books.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Books — Mortek">
+<meta name="twitter:description" content="Self-help books by Maurice Moret on clarity, discipline, and personal growth.">
+<meta name="twitter:image" content="https://mortek.github.io/og-books.png">
 <link rel="canonical" href="https://mortek.github.io/books.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.min.css?v=6">
-<noscript><style>.fade-in{animation:none !important;opacity:1 !important;transform:none !important}</style></noscript>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.min.css?v=7">
+<noscript><style>.fade-in{opacity:1 !important;transform:none !important;transition:none !important}</style></noscript>
 <title>Books — Mortek</title>
 <script type="application/ld+json">
 [
@@ -113,16 +123,18 @@
 
   <h1>My <span>Books</span></h1>
 
-  <div class="books-grid">
-    <div class="book-card fade-in">
-      <img src="books/book_covers/Stop_Overthinking.jpg" alt="Stop Overthinking" loading="lazy">
-      <div class="info">
-        <h3>Stop Overthinking</h3>
-        <p>A Practical Guide to Quieting Your Mind</p>
-        <p class="isbn">ISBN 9798255084449</p>
-      </div>
+  <div class="featured-book fade-in">
+    <img src="books/book_covers/Stop_Overthinking.jpg" alt="Stop Overthinking" loading="lazy">
+    <div class="featured-book-info">
+      <span class="featured-label">Featured</span>
+      <h2>Stop Overthinking</h2>
+      <p class="featured-subtitle">A Practical Guide to Quieting Your Mind</p>
+      <p class="isbn">ISBN 9798255084449</p>
       <a href="https://www.amazon.com/dp/B0GHQQH4TY" target="_blank" rel="noopener" class="buy-btn">Buy on Amazon</a>
     </div>
+  </div>
+
+  <div class="books-grid">
     <div class="book-card fade-in">
       <img src="books/book_covers/The_Stoic_Mind.jpg" alt="The Stoic Mind" loading="lazy">
       <div class="info">
@@ -195,5 +207,8 @@
   <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener">BookBub</a>
 </footer>
 
+<script>
+document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js')});
+</script>
 </body>
 </html>
