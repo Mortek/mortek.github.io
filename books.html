@@ -6,7 +6,7 @@
 <meta name="description" content="Books by Maurice Moret — Self-help books on clarity, discipline, and personal growth. Grounded in psychology, neuroscience, and practical lived experience.">
 <meta name="theme-color" content="#141416">
 <meta name="view-transition" content="same-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https:; frame-src https://www.youtube.com; font-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https:; frame-src https://www.youtube.com; font-src 'self'">
 <meta property="og:title" content="Books — Self-Help Books by Maurice Moret">
 <meta property="og:description" content="Self-help books by Maurice Moret on clarity, discipline, and personal growth.">
 <meta property="og:type" content="website">
@@ -26,8 +26,8 @@
 <link rel="preload" href="fonts/space-grotesk-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}.slider{position:relative;width:100%}.slider-track{display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.slider-track::-webkit-scrollbar{display:none}.testimonial-slider .testimonial{min-width:300px;flex:0 0 calc(33.333% - 14px);scroll-snap-align:start}</style>
-<link rel="stylesheet" href="style.min.css?v=50" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="style.min.css?v=50"><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
+<link rel="stylesheet" href="style.min.css?v=51">
+<noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
 <title>Books — Self-Help Books on Clarity & Growth by Maurice Moret</title>
 <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
   <div class="featured-book fade-in">
     <picture>
       <source srcset="books/book_covers/Stop_Overthinking.webp" type="image/webp">
-      <img src="books/book_covers/Stop_Overthinking.jpg" alt="Stop Overthinking" width="400" height="600">
+      <img src="books/book_covers/Stop_Overthinking.jpg" alt="Stop Overthinking" width="400" height="600" fetchpriority="high">
     </picture>
     <div class="featured-book-info">
       <span class="featured-label">Featured</span>
@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <div class="books-slider slider">
+  <div class="books-slider slider" role="region" aria-roledescription="carousel" aria-label="Books">
     <button class="slider-btn slider-btn--prev hidden" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="slider-track books-grid">
     <div class="book-card fade-in">
@@ -190,7 +190,7 @@
 
   <section class="testimonials fade-in">
     <h2 class="section-heading">What Readers Say</h2>
-    <div class="testimonial-slider slider">
+    <div class="testimonial-slider slider" role="region" aria-roledescription="carousel" aria-label="Reader testimonials">
       <button class="slider-btn slider-btn--prev hidden" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="slider-track">
         <div class="testimonial">
@@ -262,8 +262,6 @@
   <p>&copy; 2026 Mortek &nbsp;&middot;&nbsp; <a href="privacy_policy.html">Privacy Policy</a></p>
 </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded',()=>{const o=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add('in-view');o.unobserve(i.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(e=>o.observe(e));if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js');document.querySelectorAll('.faq-question').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.parentElement;const open=item.classList.toggle('open');btn.setAttribute('aria-expanded',open)})});document.querySelectorAll('.slider').forEach(s=>{const t=s.querySelector('.slider-track'),p=s.querySelector('.slider-btn--prev'),n=s.querySelector('.slider-btn--next');if(!t||!p||!n)return;const u=()=>{p.classList.toggle('hidden',t.scrollLeft<10);n.classList.toggle('hidden',t.scrollLeft>=t.scrollWidth-t.clientWidth-10)};p.addEventListener('click',()=>t.scrollBy({left:-t.clientWidth*.7,behavior:'smooth'}));n.addEventListener('click',()=>t.scrollBy({left:t.clientWidth*.7,behavior:'smooth'}));t.addEventListener('scroll',u,{passive:true});window.addEventListener('load',u);u()});const bg=document.querySelector('.books-grid');if(bg){const bs=bg.closest('.books-slider'),bp=bs&&bs.querySelector('.slider-btn--prev'),bn=bs&&bs.querySelector('.slider-btn--next');const step=()=>bg.clientWidth;if(bp&&bn){bp.replaceWith(bp.cloneNode(true));bn.replaceWith(bn.cloneNode(true));const bp2=bs.querySelector('.slider-btn--prev'),bn2=bs.querySelector('.slider-btn--next');const ub=()=>{bp2.classList.toggle('hidden',bg.scrollLeft<10);bn2.classList.toggle('hidden',bg.scrollLeft>=bg.scrollWidth-bg.clientWidth-10)};bp2.addEventListener('click',()=>{bg.scrollBy({left:-step(),behavior:'smooth'});setTimeout(ub,350)});bn2.addEventListener('click',()=>{bg.scrollBy({left:step(),behavior:'smooth'});setTimeout(ub,350)});ub()}let sx,sy,sl,dir;bg.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;sl=bg.scrollLeft;dir=null},{passive:true});bg.addEventListener('touchmove',e=>{if(dir==='y')return;const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;if(!dir){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;dir=Math.abs(dx)>Math.abs(dy)?'x':'y';if(dir==='y')return}bg.scrollLeft=sl-dx},{passive:true});bg.addEventListener('touchend',()=>{if(dir==='x'){const cw=step();bg.scrollTo({left:Math.round(bg.scrollLeft/cw)*cw,behavior:'smooth'})}dir=null},{passive:true})}});
-</script>
+<script src="site.js"></script>
 </body>
 </html>
