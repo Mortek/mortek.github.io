@@ -954,6 +954,7 @@ h1 span { color: var(--accent); }
 .books-main h1 { text-align: center; margin-bottom: 32px; }
 
 /* Books grid */
+.books-slider .slider-btn { display: none; }
 .books-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1852,7 +1853,7 @@ h1 span { color: var(--accent); }
   .about-links { grid-template-columns: 1fr; }
   .featured-book { flex-direction: column; }
   .featured-book > picture { width: 100%; }
-  .featured-book picture img { max-height: 320px; }
+  .featured-book picture img { max-height: none; }
   .featured-book-info { padding: 24px; }
   .testimonial-grid { grid-template-columns: 1fr; }
   .testimonial-slider .testimonial { flex: 0 0 calc(50% - 10px); }
@@ -1872,22 +1873,18 @@ h1 span { color: var(--accent); }
   .slider-btn--prev { left: -18px; }
   .slider-btn--next { right: -18px; }
   .screenshot-slider .slider-track img { height: 320px; }
+  .books-slider .slider-btn { display: flex; }
   .books-grid {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
     gap: 16px;
-    padding-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
+    padding: 4px 0;
   }
-  .books-grid::-webkit-scrollbar { height: 4px; }
-  .books-grid::-webkit-scrollbar-track { background: transparent; }
-  .books-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   .book-card {
-    min-width: 200px;
-    flex-shrink: 0;
+    flex: 0 0 calc(50% - 8px);
+    min-width: 0;
     scroll-snap-align: start;
   }
+  .book-card img { max-height: none; }
 }
 @media (max-width: 480px) {
   .features { grid-template-columns: repeat(2, 1fr); }
@@ -1895,5 +1892,5 @@ h1 span { color: var(--accent); }
   header nav { order: 1; width: 100%; }
   .app-icon { margin-top: 16px; }
   .changelog-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .book-card img { max-height: none; object-fit: contain; }
+  .book-card { flex: 0 0 calc(100% - 16px); }
 }
