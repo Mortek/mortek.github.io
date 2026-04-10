@@ -1898,9 +1898,8 @@ h1 span { color: var(--accent); }
   header { flex-wrap: wrap; gap: 12px; }
   header nav { order: 1; width: 100%; }
   .app-icon { margin-top: 16px; }
-  .changelog-header { align-items: flex-end; }
-  .changelog-header > div { display: flex; flex-direction: column-reverse; align-items: flex-end; }
-  .changelog-date { margin-left: 0; font-size: 0.65em; margin-bottom: 4px; }
-  .changelog-list dt:first-child { margin-top: 12px; }
+  .changelog-header { align-items: flex-end; margin-bottom: 24px; }
+  .changelog-header > div { display: flex; flex-direction: column-reverse; align-items: flex-end; margin-bottom: 2px; }
+  .changelog-date { margin-left: 0; font-size: 0.65em; margin-bottom: 2px; }
   .book-card { flex: 0 0 calc(100% - 16px); }
 }
