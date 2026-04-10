@@ -1849,6 +1849,7 @@ h1 span { color: var(--accent); }
 /* === Responsive === */
 @media (max-width: 900px) {
   .books-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .book-card img { max-height: none; }
 }
 @media (max-width: 700px) {
   .bio { flex-direction: column; text-align: center; gap: 20px; }
