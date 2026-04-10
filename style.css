@@ -1881,15 +1881,14 @@ h1 span { color: var(--accent); }
     display: flex;
     gap: 16px;
     padding: 4px 0;
-    touch-action: pan-x;
   }
-  .books-grid img { touch-action: pan-x; }
+  .books-grid, .books-grid * { touch-action: pan-x; }
   .book-card {
     flex: 0 0 calc(50% - 8px);
     min-width: 0;
     scroll-snap-align: start;
   }
-  .book-card img { max-height: none; object-fit: contain; }
+  .book-card img { max-height: none; object-fit: cover; }
 }
 @media (max-width: 480px) {
   .features { grid-template-columns: repeat(2, 1fr); }
