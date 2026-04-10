@@ -1885,7 +1885,12 @@ h1 span { color: var(--accent); }
     display: flex;
     gap: 16px;
     padding: 4px 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .books-grid::-webkit-scrollbar { display: none; }
   .book-card {
     flex: 0 0 calc(50% - 8px);
     min-width: 0;
