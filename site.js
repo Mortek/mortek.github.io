@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* === Slider logic === */
   document.querySelectorAll('.slider').forEach(s => {
+    if (s.classList.contains('books-slider')) return;
     const t = s.querySelector('.slider-track');
     const p = s.querySelector('.slider-btn--prev');
     const n = s.querySelector('.slider-btn--next');
@@ -27,24 +28,21 @@ document.addEventListener('DOMContentLoaded', () => {
     u();
   });
 
-  /* === Books grid slider override === */
+  /* === Books grid slider === */
   const bg = document.querySelector('.books-grid');
   if (bg) {
     const bs = bg.closest('.books-slider');
     const bp = bs && bs.querySelector('.slider-btn--prev');
     const bn = bs && bs.querySelector('.slider-btn--next');
-    const step = () => bg.clientWidth;
     if (bp && bn) {
-      bp.replaceWith(bp.cloneNode(true));
-      bn.replaceWith(bn.cloneNode(true));
-      const bp2 = bs.querySelector('.slider-btn--prev');
-      const bn2 = bs.querySelector('.slider-btn--next');
       const ub = () => {
-        bp2.classList.toggle('hidden', bg.scrollLeft < 10);
-        bn2.classList.toggle('hidden', bg.scrollLeft >= bg.scrollWidth - bg.clientWidth - 10);
+        bp.classList.toggle('hidden', bg.scrollLeft < 10);
+        bn.classList.toggle('hidden', bg.scrollLeft >= bg.scrollWidth - bg.clientWidth - 10);
       };
-      bp2.addEventListener('click', () => { bg.scrollBy({ left: -step(), behavior: 'smooth' }); setTimeout(ub, 350); });
-      bn2.addEventListener('click', () => { bg.scrollBy({ left: step(), behavior: 'smooth' }); setTimeout(ub, 350); });
+      bp.addEventListener('click', () => bg.scrollBy({ left: -bg.clientWidth, behavior: 'smooth' }));
+      bn.addEventListener('click', () => bg.scrollBy({ left: bg.clientWidth, behavior: 'smooth' }));
+      bg.addEventListener('scroll', ub, { passive: true });
+      window.addEventListener('load', ub);
       ub();
     }
     let sx, sy, sl, dir;
@@ -55,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; if (dir === 'y') return; }
       bg.scrollLeft = sl - dx;
     }, { passive: true });
-    bg.addEventListener('touchend', () => { if (dir === 'x') { const cw = step(); bg.scrollTo({ left: Math.round(bg.scrollLeft / cw) * cw, behavior: 'smooth' }); } dir = null; }, { passive: true });
+    bg.addEventListener('touchend', () => { if (dir === 'x') { const cw = bg.clientWidth; bg.scrollTo({ left: Math.round(bg.scrollLeft / cw) * cw, behavior: 'smooth' }); } dir = null; }, { passive: true });
   }
 
   /* === FAQ accordion === */
@@ -98,9 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
   /* === Scroll progress bar === */
   const bar = document.getElementById('scrollProgress');
   if (bar) {
+    let barTick = false;
     window.addEventListener('scroll', () => {
-      const h = document.documentElement;
-      bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+      if (!barTick) {
+        requestAnimationFrame(() => {
+          const h = document.documentElement;
+          bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+          barTick = false;
+        });
+        barTick = true;
+      }
     }, { passive: true });
   }
 
@@ -156,9 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
   /* === Copy link button === */
   document.querySelectorAll('.share-btn[aria-label="Copy link"]').forEach(btn => {
     btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(window.location.href);
-      btn.classList.add('copied');
-      setTimeout(() => btn.classList.remove('copied'), 1500);
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1500);
+      }).catch(() => {});
     });
   });
 
@@ -185,8 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!a || a.target === '_blank' || a.getAttribute('href').startsWith('mailto:') || a.getAttribute('href').startsWith('#')) return;
     const href = a.getAttribute('href');
     if (href.startsWith('http') && !href.includes('mortek.github.io')) return;
+    const prev = document.querySelector('.nav-progress');
+    if (prev) prev.remove();
     const p = document.createElement('div');
     p.className = 'nav-progress';
+    p.addEventListener('animationend', () => p.remove());
     document.body.appendChild(p);
   });
 });
