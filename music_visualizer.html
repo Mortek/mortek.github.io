@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.6.2</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.0</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1383,24 +1383,13 @@ function elU(id,v,w){if(!w){w=1;let t=v;while(t>=256){w++;t=Math.floor(t/256);}}
 function elF(id,v){const b=new ArrayBuffer(8);new DataView(b).setFloat64(0,v);return el(id,new Uint8Array(b));}
 function elS(id,s){return el(id,new TextEncoder().encode(s));}
 
-function buildWebM(vChunks,aChunks,w,h,durMs,opusPriv){
+function buildWebMPreamble(w,h,durMs,opusPriv){
   const header=el(0x1A45DFA3,cat(elU(0x4286,1),elU(0x42F7,1),elU(0x42F2,4),elU(0x42F3,8),elS(0x4282,'webm'),elU(0x4287,4),elU(0x4285,2)));
   const info=el(0x1549A966,cat(elU(0x2AD7B1,1000000),elS(0x4D80,'Mortek'),elS(0x5741,'Mortek'),elF(0x4489,durMs)));
   const vTrack=el(0xAE,cat(elU(0xD7,1),elU(0x73C5,1,4),elU(0x9C,0),elU(0x83,1),elS(0x86,'V_VP8'),el(0xE0,cat(elU(0xB0,w,2),elU(0xBA,h,2)))));
   const aTrack=el(0xAE,cat(elU(0xD7,2),elU(0x73C5,2,4),elU(0x9C,0),elU(0x83,2),elS(0x86,'A_OPUS'),elU(0x56AA,6500000,4),elU(0x56BB,80000000,4),el(0x63A2,opusPriv),el(0xE1,cat(elF(0xB5,48000),elU(0x9F,2)))));
   const tracks=el(0x1654AE6B,cat(vTrack,aTrack));
-  const all=[];
-  for(const c of vChunks)all.push({trk:1,t:c.ts/1000,d:c.data,kf:c.kf});
-  for(const c of aChunks)all.push({trk:2,t:c.ts/1000,d:c.data,kf:true});
-  all.sort((a,b)=>a.t-b.t);
-  const clusters=[];let cStart=0,cBlocks=[];
-  for(const b of all){
-    if(b.t>=cStart+1000&&cBlocks.length){clusters.push(mkCluster(cStart,cBlocks));cStart=Math.floor(b.t/1000)*1000;cBlocks=[];}
-    cBlocks.push(b);
-  }
-  if(cBlocks.length)clusters.push(mkCluster(cStart,cBlocks));
-  const segData=cat(info,tracks,...clusters);
-  return cat(header,eid(0x18538067),u8(0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF),segData);
+  return cat(header,eid(0x18538067),u8(0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF),info,tracks);
 }
 function mkCluster(tc,blocks){
   const parts=blocks.map(b=>{
@@ -1413,7 +1402,7 @@ function mkCluster(tc,blocks){
   return el(0x1F43B675,cat(elU(0xE7,Math.round(tc)),...parts));
 }
 
-// ---- DOWNLOAD VIDEO (fast offline encode) ----
+// ---- DOWNLOAD VIDEO (streaming encode, low memory) ----
 document.getElementById('dlBtn').onclick=async function(){
   if(!window.audioBuffer)return;
   if(typeof VideoEncoder==='undefined'){setStatus('Fast encoding requires Chrome or Edge.');return;}
@@ -1422,11 +1411,17 @@ document.getElementById('dlBtn').onclick=async function(){
   document.getElementById('shortsDlBtn').disabled=true;
   const pBar=document.getElementById('progressBar'),pFill=document.getElementById('progressFill');
   pBar.style.display='block';pFill.style.width='0%';
+  // Stream to disk via File System Access API if available (near-zero memory)
+  let writable=null;
+  const dlName=(imgName||'mortek-music-video')+'.webm';
+  if(window.showSaveFilePicker){
+    try{const fh=await showSaveFilePicker({suggestedName:dlName,types:[{description:'WebM Video',accept:{'video/webm':['.webm']}}]});writable=await fh.createWritable();}
+    catch(e){if(e.name==='AbortError'){btn.disabled=false;document.getElementById('shortsDlBtn').disabled=!shortsAudioBuffer;pBar.style.display='none';if(!animId)loop();return;}writable=null;}
+  }
   if(source){try{source.stop();}catch(e){}}
   playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const savedW=W,savedH=H;
-  // Render at 1440p (2560x1440)
   const VW=2560,VH=1440;
   W=VW;H=VH;trailC.width=VW;trailC.height=VH;
   try{
@@ -1490,28 +1485,7 @@ document.getElementById('dlBtn').onclick=async function(){
       }
     }
 
-    // Step 4: Encode video
-    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);
-    setStatus('Encoding video...');
-    const offC=new OffscreenCanvas(W,H);
-    const savedCtx=ctx;
-    ctx=offC.getContext('2d');
-    const vOut=[];
-    const vEnc=new VideoEncoder({output:(chunk,meta)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
-    vEnc.configure({codec:'vp8',width:VW,height:VH,bitrate:20000000,framerate:fps});
-    for(let i=0;i<totalFrames;i++){
-      drawFrame(frames[i]);
-      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
-      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
-      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
-      if(i%30===0){pFill.style.width=(10+i/totalFrames*55)+'%';btn.textContent='Encoding video... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));}
-    }
-    ctx=savedCtx;
-    await vEnc.flush();vEnc.close();
-    pFill.style.width='70%';
-
-    // Step 5: Encode audio
+    // Step 4: Encode audio first (small footprint ~1MB/min, needed for progressive muxing)
     setStatus('Encoding audio...');btn.textContent='Encoding audio...';
     let opusPriv=null;const aOut=[];
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
@@ -1519,30 +1493,81 @@ document.getElementById('dlBtn').onclick=async function(){
     const totalAudioSamples=nF+fadeOut*sr;
     for(let o=0;o<totalAudioSamples;o+=960){
       const n=Math.min(960,totalAudioSamples-o),d=new Float32Array(2*n);
-      if(o<nF){
-        const end=Math.min(o+n,nF);
-        d.set(ch0.subarray(o,end),0);d.set(ch1.subarray(o,end),n);
-      }
+      if(o<nF){const end=Math.min(o+n,nF);d.set(ch0.subarray(o,end),0);d.set(ch1.subarray(o,end),n);}
       const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
     await aEnc.flush();aEnc.close();
-    pFill.style.width='85%';
+    pFill.style.width='15%';
 
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
-    // Step 6: Mux & download
-    setStatus('Building file...');btn.textContent='Building file...';
-    const webm=buildWebM(vOut,aOut,VW,VH,(dur+fadeOut)*1000,opusPriv);
-    pFill.style.width='100%';
-    const blob=new Blob([webm],{type:'video/webm'});
-    const dlName=(imgName||'mortek-music-video')+'.webm';
-    const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),5000);
-    setStatus('Done! Video saved.');
+    // Write WebM preamble (header + segment + info + tracks)
+    const preamble=buildWebMPreamble(VW,VH,(dur+fadeOut)*1000,opusPriv);
+    const blobParts=writable?null:[preamble];
+    if(writable)await writable.write(preamble);
+
+    // Step 5: Encode video with progressive cluster flushing (bounded memory)
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    barMin.fill(0.5);barMax.fill(0.5);
+    setStatus('Encoding video...');
+    const offC=new OffscreenCanvas(W,H);
+    const savedCtx=ctx;
+    ctx=offC.getContext('2d');
+    const vBuf=[];
+    let aIdx=0,cStart=0;
+    const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vBuf.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
+    vEnc.configure({codec:'vp8',width:VW,height:VH,bitrate:20000000,framerate:fps});
+    for(let i=0;i<totalFrames;i++){
+      drawFrame(frames[i]);
+      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
+      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
+      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      if(i%30===0){
+        // Flush completed 1-second clusters to free memory
+        while(vBuf.length&&vBuf[vBuf.length-1].ts/1000>=cStart+1000){
+          const cEnd=cStart+1000,cAll=[];
+          while(vBuf.length&&vBuf[0].ts/1000<cEnd){const v=vBuf.shift();cAll.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});}
+          while(aIdx<aOut.length&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+          cAll.sort((a,b)=>a.t-b.t);
+          const cl=mkCluster(cStart,cAll);
+          if(writable)await writable.write(cl);else blobParts.push(cl);
+          cStart+=1000;
+        }
+        pFill.style.width=(15+i/totalFrames*70)+'%';btn.textContent='Encoding video... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));
+      }
+    }
+    ctx=savedCtx;
+    await vEnc.flush();vEnc.close();
+    // Flush remaining video + audio into final clusters
+    {const rem=[];
+    for(const v of vBuf)rem.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});
+    while(aIdx<aOut.length){rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+    if(rem.length){
+      rem.sort((a,b)=>a.t-b.t);
+      let rBlocks=[];
+      for(const b of rem){
+        if(b.t>=cStart+1000&&rBlocks.length){const cl=mkCluster(cStart,rBlocks);if(writable)await writable.write(cl);else blobParts.push(cl);cStart=Math.floor(b.t/1000)*1000;rBlocks=[];}
+        rBlocks.push(b);
+      }
+      if(rBlocks.length){const cl=mkCluster(cStart,rBlocks);if(writable)await writable.write(cl);else blobParts.push(cl);}
+    }}
+    vBuf.length=0;aOut.length=0;
+    pFill.style.width='95%';
+
+    // Step 6: Finalize download
+    setStatus('Saving...');btn.textContent='Saving...';
+    if(writable){await writable.close();writable=null;pFill.style.width='100%';setStatus('Done! Video saved.');}
+    else{
+      const blob=new Blob(blobParts,{type:'video/webm'});
+      pFill.style.width='100%';
+      const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+      setStatus('Done! Video saved.');
+    }
     await initAudio(buf);
-  }catch(err){setStatus('Error: '+err.message);console.error(err);}
+  }catch(err){if(writable)try{await writable.abort();}catch(e){}writable=null;setStatus('Error: '+err.message);console.error(err);}
   finally{precomputedFX=null;W=savedW;H=savedH;trailC.width=W;trailC.height=H;ctx=C.getContext('2d');btn.disabled=false;btn.textContent='Download Video';document.getElementById('shortsDlBtn').disabled=!shortsAudioBuffer;pBar.style.display='none';if(!animId)loop();}
 };
 
@@ -1737,6 +1762,13 @@ document.getElementById('shortsDlBtn').onclick=async function(){
   document.getElementById('dlBtn').disabled=true;
   const pBar=document.getElementById('shortsProgressBar'),pFill=document.getElementById('shortsProgressFill');
   pBar.style.display='block';pFill.style.width='0%';
+  // Stream to disk via File System Access API if available
+  let writable=null;
+  const dlName=(portraitName||imgName||'mortek-short')+'.webm';
+  if(window.showSaveFilePicker){
+    try{const fh=await showSaveFilePicker({suggestedName:dlName,types:[{description:'WebM Video',accept:{'video/webm':['.webm']}}]});writable=await fh.createWritable();}
+    catch(e){if(e.name==='AbortError'){btn.disabled=false;document.getElementById('dlBtn').disabled=!window.audioBuffer;pBar.style.display='none';if(!animId)loop();return;}writable=null;}
+  }
   if(sSource){try{sSource.stop();}catch(e){}}
   sPlaying=false;
   if(source){try{source.stop();}catch(e){}}
@@ -1806,25 +1838,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const pS=(pOnset>0.05&&brStr>0)?Math.pow(pOnset,0.6)*1.5*brStr:0;
     precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pS,shakeX:sx,shakeY:sy});}}
 
-    // Step 4: Encode video at 1080x1920
-    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
-    setShortsStatus('Encoding video...');
-    const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
-    // Run warmup frames to prime particles and bass tracking (not encoded)
-    for(let i=0;i<warmupFrames;i++) drawFrame(frames[i]);
-    const vOut=[];
-    const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vOut.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
-    vEnc.configure({codec:'vp8',width:SW,height:SH,bitrate:12000000,framerate:fps});
-    for(let i=0;i<totalFrames;i++){
-      drawFrame(frames[warmupFrames+i]);
-      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
-      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
-      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
-      if(i%30===0){pFill.style.width=(10+i/totalFrames*55)+'%';btn.textContent='Encoding... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));}
-    }
-    ctx=savedCtx;await vEnc.flush();vEnc.close();pFill.style.width='70%';
-
-    // Step 5: Encode audio (clip portion + 1s fade)
+    // Step 4: Encode audio first (small footprint, needed for progressive muxing)
     setShortsStatus('Encoding audio...');btn.textContent='Encoding audio...';
     let opusPriv=null;const aOut=[];
     const aEnc=new AudioEncoder({output:(chunk,meta)=>{if(meta?.decoderConfig?.description)opusPriv=new Uint8Array(meta.decoderConfig.description);const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);aOut.push({data:d,ts:chunk.timestamp});},error:e=>{throw e;}});
@@ -1838,19 +1852,71 @@ document.getElementById('shortsDlBtn').onclick=async function(){
       const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
-    await aEnc.flush();aEnc.close();pFill.style.width='85%';
+    await aEnc.flush();aEnc.close();pFill.style.width='15%';
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
-    // Step 6: Mux & download
-    setShortsStatus('Building file...');btn.textContent='Building file...';
-    const webm=buildWebM(vOut,aOut,SW,SH,(actualDur+fadeOut)*1000,opusPriv);
-    pFill.style.width='100%';
-    const blob=new Blob([webm],{type:'video/webm'});
-    const dlName=(portraitName||imgName||'mortek-short')+'.webm';
-    const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),5000);
-    setShortsStatus('Done! Saved as '+dlName);
+    // Write WebM preamble
+    const preamble=buildWebMPreamble(SW,SH,(actualDur+fadeOut)*1000,opusPriv);
+    const blobParts=writable?null:[preamble];
+    if(writable)await writable.write(preamble);
+
+    // Step 5: Encode video with progressive cluster flushing
+    prevBass=0;prevBassParticle=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    setShortsStatus('Encoding video...');
+    const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
+    // Run warmup frames to prime particles and bass tracking (not encoded)
+    for(let i=0;i<warmupFrames;i++) drawFrame(frames[i]);
+    const vBuf=[];
+    let aIdx=0,cStart=0;
+    const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vBuf.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
+    vEnc.configure({codec:'vp8',width:SW,height:SH,bitrate:12000000,framerate:fps});
+    for(let i=0;i<totalFrames;i++){
+      drawFrame(frames[warmupFrames+i]);
+      const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
+      vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
+      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      if(i%30===0){
+        // Flush completed 1-second clusters to free memory
+        while(vBuf.length&&vBuf[vBuf.length-1].ts/1000>=cStart+1000){
+          const cEnd=cStart+1000,cAll=[];
+          while(vBuf.length&&vBuf[0].ts/1000<cEnd){const v=vBuf.shift();cAll.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});}
+          while(aIdx<aOut.length&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+          cAll.sort((a,b)=>a.t-b.t);
+          const cl=mkCluster(cStart,cAll);
+          if(writable)await writable.write(cl);else blobParts.push(cl);
+          cStart+=1000;
+        }
+        pFill.style.width=(15+i/totalFrames*70)+'%';btn.textContent='Encoding... '+Math.round(i/totalFrames*100)+'%';await new Promise(r=>setTimeout(r,0));
+      }
+    }
+    ctx=savedCtx;await vEnc.flush();vEnc.close();
+    // Flush remaining clusters
+    {const rem=[];
+    for(const v of vBuf)rem.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});
+    while(aIdx<aOut.length){rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+    if(rem.length){
+      rem.sort((a,b)=>a.t-b.t);
+      let rBlocks=[];
+      for(const b of rem){
+        if(b.t>=cStart+1000&&rBlocks.length){const cl=mkCluster(cStart,rBlocks);if(writable)await writable.write(cl);else blobParts.push(cl);cStart=Math.floor(b.t/1000)*1000;rBlocks=[];}
+        rBlocks.push(b);
+      }
+      if(rBlocks.length){const cl=mkCluster(cStart,rBlocks);if(writable)await writable.write(cl);else blobParts.push(cl);}
+    }}
+    vBuf.length=0;aOut.length=0;
+    pFill.style.width='95%';
+
+    // Step 6: Finalize download
+    setShortsStatus('Saving...');btn.textContent='Saving...';
+    if(writable){await writable.close();writable=null;pFill.style.width='100%';setShortsStatus('Done! Saved as '+dlName);}
+    else{
+      const blob=new Blob(blobParts,{type:'video/webm'});
+      pFill.style.width='100%';
+      const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=dlName;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+      setShortsStatus('Done! Saved as '+dlName);
+    }
     // Restore state based on active tab
     _savedImg=savedImg;_savedImgLoaded=savedImgLoaded;
     _savedLogo=savedLogo;_savedLogoLoaded=savedLogoLoaded;_savedLogoMask=savedLogoMask;
@@ -1866,7 +1932,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     }
     if(activeTab==='shorts'&&shortsAudioBuffer) await initShortsAudio(shortsAudioBuffer);
     else if(window.audioBuffer) await initAudio(window.audioBuffer);
-  }catch(err){setShortsStatus('Error: '+err.message);console.error(err);}
+  }catch(err){if(writable)try{await writable.abort();}catch(e){}writable=null;setShortsStatus('Error: '+err.message);console.error(err);}
   finally{
     _savedImg=savedImg;_savedImgLoaded=savedImgLoaded;
     _savedLogo=savedLogo;_savedLogoLoaded=savedLogoLoaded;_savedLogoMask=savedLogoMask;
