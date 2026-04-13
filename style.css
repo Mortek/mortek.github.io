@@ -1040,21 +1040,6 @@ h1 span { color: var(--accent); }
   transform: translateY(-1px);
 }
 
-/* Book subtitle hover reveal (desktop only) */
-@media (hover: hover) and (min-width: 641px) {
-  .book-card .info .book-subtitle {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    margin-top: 0;
-    transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
-  }
-  .book-card:hover .info .book-subtitle {
-    max-height: 80px;
-    opacity: 1;
-    margin-top: 4px;
-  }
-}
 
 /* === Songs/Music page === */
 .songs-main {
