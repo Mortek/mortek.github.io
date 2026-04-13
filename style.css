@@ -908,7 +908,8 @@ h1 span { color: var(--accent); }
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.2s, transform 0.15s;
-  width: fit-content;
+  width: 200px;
+  text-align: center;
   margin-top: 10px;
 }
 .featured-book-info .buy-btn:hover {
