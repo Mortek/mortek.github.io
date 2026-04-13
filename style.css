@@ -1017,12 +1017,14 @@ h1 span { color: var(--accent); }
   transform: translateY(-1px);
 }
 .book-card .buy-btn.buy-btn--outline {
-  background: #a35e08;
-  border: none;
-  color: #fff;
+  background: var(--surface);
+  color: #ccc;
+  border: 1px solid var(--border);
 }
 .book-card .buy-btn.buy-btn--outline:hover {
-  background: #8a4f07;
+  background: #2a2a3a;
+  border-color: var(--accent);
+  color: #fff;
   transform: translateY(-1px);
 }
 
