@@ -1016,12 +1016,12 @@ h1 span { color: var(--accent); }
   background: #e5850f;
   transform: translateY(-1px);
 }
-.buy-btn--outline {
+.book-card .buy-btn.buy-btn--outline {
   background: #a35e08;
   border: none;
   color: #fff;
 }
-.buy-btn--outline:hover {
+.book-card .buy-btn.buy-btn--outline:hover {
   background: #8a4f07;
   transform: translateY(-1px);
 }
