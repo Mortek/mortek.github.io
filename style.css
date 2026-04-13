@@ -915,6 +915,17 @@ h1 span { color: var(--accent); }
   background: #e5850f;
   transform: translateY(-2px);
 }
+.featured-book-info .buy-btn.buy-btn--outline {
+  background: var(--surface);
+  color: #ccc;
+  border: 1px solid var(--border);
+}
+.featured-book-info .buy-btn.buy-btn--outline:hover {
+  background: #2a2a3a;
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+}
 
 /* Testimonials */
 .testimonials {
