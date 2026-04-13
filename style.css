@@ -1480,6 +1480,7 @@ h1 span { color: var(--accent); }
 }
 .article-banner {
   margin-top: 24px;
+  margin-bottom: 32px;
   border-radius: 12px;
   overflow: hidden;
 }
