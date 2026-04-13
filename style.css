@@ -1017,12 +1017,13 @@ h1 span { color: var(--accent); }
   transform: translateY(-1px);
 }
 .buy-btn--outline {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
+  background: #d97d0a;
+  border: none;
+  color: #fff;
 }
 .buy-btn--outline:hover {
-  background: rgba(247, 147, 26, 0.1);
+  background: #c06f09;
+  transform: translateY(-1px);
 }
 
 /* Book subtitle hover reveal (desktop only) */
