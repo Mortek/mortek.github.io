@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.1</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.2</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -858,19 +858,19 @@ function manageParticles(energy,data){
 }
 
 // ---- VISUALIZERS ----
-function drawCircle(data,p,energy){
+function drawCircle(data,p,energy,dS){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
   const reactR=parseFloat(document.getElementById('reactRadius').value);
-  const bassPulse=reactR>0?data.slice(1,5).reduce((a,b)=>a+b,0)/4/255*reactR*50:0;
-  const cx=W/2,cy=H/2,base=baseR*0.9+8+energy*6;
+  const bassPulse=reactR>0?data.slice(1,5).reduce((a,b)=>a+b,0)/4/255*reactR*50*dS:0;
+  const cx=W/2,cy=H/2,base=(baseR*0.9+8+energy*6)*dS;
   const innerBase=base+bassPulse;
-  const barGlowVal=parseFloat(document.getElementById('barGlow').value);
-  const barCapsVal=parseFloat(document.getElementById('barCaps').value);
+  const barGlowVal=parseFloat(document.getElementById('barGlow').value)*dS;
+  const barCapsVal=parseFloat(document.getElementById('barCaps').value)*dS;
   // inner circle: logo or glow ring
   if(logoLoaded&&logoMaskSrc){
     ctx.save();
     ctx.beginPath();ctx.arc(cx,cy,innerBase*.9,0,Math.PI*2);ctx.clip();
-    const lSize=baseR*1.8;
+    const lSize=baseR*1.8*dS;
     const lRatio=logo.naturalWidth/logo.naturalHeight;
     let lw,lh;
     if(lRatio>=1){lw=lSize;lh=lSize/lRatio;}else{lh=lSize;lw=lSize*lRatio;}
@@ -887,7 +887,7 @@ function drawCircle(data,p,energy){
     lx.fillRect(0,0,lc.width,lc.height);
     ctx.globalAlpha=0.2+energy*0.25;
     ctx.shadowColor=logoCol;
-    ctx.shadowBlur=25+energy*30;
+    ctx.shadowBlur=(25+energy*30)*dS;
     ctx.drawImage(lc,cx-lw/2,cy-lh/2,lw,lh);
     ctx.shadowBlur=0;
     ctx.globalAlpha=0.95+energy*0.05;
@@ -906,7 +906,7 @@ function drawCircle(data,p,energy){
   const bSmooth=parseFloat(document.getElementById('barSmoothing').value);
   const bThresh=parseFloat(document.getElementById('barThreshold').value);
   const bInt=parseFloat(document.getElementById('barIntensity').value);
-  const bWidth=parseFloat(document.getElementById('barWidth').value);
+  const bWidth=parseFloat(document.getElementById('barWidth').value)*dS;
   const len=data.length;
   const minBin=4, maxBin=Math.floor(len*0.7);
   const half=[];
@@ -931,7 +931,7 @@ function drawCircle(data,p,energy){
   for(let i=0;i<bars;i++){
     const v=vals[i];
     const a=(i/bars)*Math.PI*2-Math.PI/2;
-    const r1=base, r2=base+v*H*bLen*bInt+4;
+    const r1=base, r2=base+v*H*bLen*bInt+4*dS;
     if(barGlowVal>0){ctx.shadowColor=p[i%p.length];ctx.shadowBlur=barGlowVal*(0.5+v);}
     ctx.beginPath();
     ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
@@ -955,6 +955,7 @@ function drawCircle(data,p,energy){
 let precomputedFX=null;
 function drawFrame(data){
   frameCount++;
+  const dS=Math.min(W,H)/720;
   // Color cycle
   const ccRate=parseFloat(document.getElementById('colorCycle').value);
   if(ccRate>0) colorCycleT+=ccRate; else colorCycleT=0;
@@ -1031,7 +1032,7 @@ function drawFrame(data){
   const vigTotal=Math.min(cs+bgVig,1);
   if(vigTotal>0){
     const vigColorOn=document.getElementById('vigColor').value==='1';
-    const vigRadius=Math.max(280-bgVig*80,0);
+    const vigRadius=Math.max((280-bgVig*80)*dS,0);
     const gr=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,vigRadius);
     if(vigColorOn){
       const vc=p[0];
@@ -1045,7 +1046,7 @@ function drawFrame(data){
     ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
   }
 
-  drawCircle(data,p,energy);
+  drawCircle(data,p,energy,dS);
   ctx.restore(); // camera shake + ken burns
 }
 
