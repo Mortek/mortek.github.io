@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.0</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.1</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1434,9 +1434,9 @@ document.getElementById('dlBtn').onclick=async function(){
     const audioCtx2=new OfflineAudioContext(2,numSamples,sr);
     const audioSrc=audioCtx2.createBufferSource();audioSrc.buffer=buf;
     audioSrc.connect(audioCtx2.destination);audioSrc.start(0);
-    const rendered=await audioCtx2.startRendering();
+    let rendered=await audioCtx2.startRendering();
     const nCh=rendered.numberOfChannels,nF=rendered.length;
-    const ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
+    let ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
 
     // Step 2: Compute per-frame frequency data via manual FFT
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
@@ -1498,6 +1498,7 @@ document.getElementById('dlBtn').onclick=async function(){
       aEnc.encode(ad);ad.close();
     }
     await aEnc.flush();aEnc.close();
+    rendered=null;ch0=null;ch1=null;
     pFill.style.width='15%';
 
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
@@ -1519,16 +1520,16 @@ document.getElementById('dlBtn').onclick=async function(){
     const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vBuf.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:VW,height:VH,bitrate:20000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
-      drawFrame(frames[i]);
+      drawFrame(frames[i]);frames[i]=null;
       const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
       vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
-      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      while(vEnc.encodeQueueSize>5)await new Promise(r=>setTimeout(r,10));
       if(i%30===0){
         // Flush completed 1-second clusters to free memory
         while(vBuf.length&&vBuf[vBuf.length-1].ts/1000>=cStart+1000){
           const cEnd=cStart+1000,cAll=[];
           while(vBuf.length&&vBuf[0].ts/1000<cEnd){const v=vBuf.shift();cAll.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});}
-          while(aIdx<aOut.length&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+          while(aIdx<aOut.length&&aOut[aIdx]&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aOut[aIdx]=null;aIdx++;}
           cAll.sort((a,b)=>a.t-b.t);
           const cl=mkCluster(cStart,cAll);
           if(writable)await writable.write(cl);else blobParts.push(cl);
@@ -1542,7 +1543,7 @@ document.getElementById('dlBtn').onclick=async function(){
     // Flush remaining video + audio into final clusters
     {const rem=[];
     for(const v of vBuf)rem.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});
-    while(aIdx<aOut.length){rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+    while(aIdx<aOut.length){if(aOut[aIdx])rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aOut[aIdx]=null;aIdx++;}
     if(rem.length){
       rem.sort((a,b)=>a.t-b.t);
       let rBlocks=[];
@@ -1798,9 +1799,9 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const numSamples=Math.ceil(buf.duration*sr);
     const offAC=new OfflineAudioContext(2,numSamples,sr);
     const offSrc=offAC.createBufferSource();offSrc.buffer=buf;offSrc.connect(offAC.destination);offSrc.start(0);
-    const rendered=await offAC.startRendering();
+    let rendered=await offAC.startRendering();
     const nCh=rendered.numberOfChannels,nF=rendered.length;
-    const ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
+    let ch0=rendered.getChannelData(0),ch1=nCh>1?rendered.getChannelData(1):ch0;
 
     // Step 2: FFT analysis with 2s warmup for bass tracking accuracy
     setShortsStatus('Analyzing audio...');btn.textContent='Analyzing...';
@@ -1852,7 +1853,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
       const ad=new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(o/sr*1000000),data:d.buffer});
       aEnc.encode(ad);ad.close();
     }
-    await aEnc.flush();aEnc.close();pFill.style.width='15%';
+    await aEnc.flush();aEnc.close();rendered=null;ch0=null;ch1=null;pFill.style.width='15%';
     if(!opusPriv){opusPriv=new Uint8Array(19);opusPriv.set(new TextEncoder().encode('OpusHead'));const dv=new DataView(opusPriv.buffer);dv.setUint8(8,1);dv.setUint8(9,2);dv.setUint16(10,312,true);dv.setUint32(12,48000,true);}
 
     // Write WebM preamble
@@ -1865,22 +1866,22 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
-    for(let i=0;i<warmupFrames;i++) drawFrame(frames[i]);
+    for(let i=0;i<warmupFrames;i++){drawFrame(frames[i]);frames[i]=null;}
     const vBuf=[];
     let aIdx=0,cStart=0;
     const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vBuf.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
     vEnc.configure({codec:'vp8',width:SW,height:SH,bitrate:12000000,framerate:fps});
     for(let i=0;i<totalFrames;i++){
-      drawFrame(frames[warmupFrames+i]);
+      drawFrame(frames[warmupFrames+i]);frames[warmupFrames+i]=null;
       const vf=new VideoFrame(offC,{timestamp:Math.round(i*1000000/fps)});
       vEnc.encode(vf,{keyFrame:i%150===0});vf.close();
-      if(vEnc.encodeQueueSize>10)await new Promise(r=>setTimeout(r,1));
+      while(vEnc.encodeQueueSize>5)await new Promise(r=>setTimeout(r,10));
       if(i%30===0){
         // Flush completed 1-second clusters to free memory
         while(vBuf.length&&vBuf[vBuf.length-1].ts/1000>=cStart+1000){
           const cEnd=cStart+1000,cAll=[];
           while(vBuf.length&&vBuf[0].ts/1000<cEnd){const v=vBuf.shift();cAll.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});}
-          while(aIdx<aOut.length&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+          while(aIdx<aOut.length&&aOut[aIdx]&&aOut[aIdx].ts/1000<cEnd){cAll.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aOut[aIdx]=null;aIdx++;}
           cAll.sort((a,b)=>a.t-b.t);
           const cl=mkCluster(cStart,cAll);
           if(writable)await writable.write(cl);else blobParts.push(cl);
@@ -1893,7 +1894,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     // Flush remaining clusters
     {const rem=[];
     for(const v of vBuf)rem.push({trk:1,t:v.ts/1000,d:v.data,kf:v.kf});
-    while(aIdx<aOut.length){rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aIdx++;}
+    while(aIdx<aOut.length){if(aOut[aIdx])rem.push({trk:2,t:aOut[aIdx].ts/1000,d:aOut[aIdx].data,kf:true});aOut[aIdx]=null;aIdx++;}
     if(rem.length){
       rem.sort((a,b)=>a.t-b.t);
       let rBlocks=[];
