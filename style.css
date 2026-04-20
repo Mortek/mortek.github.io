@@ -211,9 +211,9 @@ footer { view-transition-name: site-footer; }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes borderRotate {
-  0%, 100% { border-color: var(--apps-color); box-shadow: 0 0 12px rgba(217, 119, 6, 0.3); }
-  33%  { border-color: #FBBF24; box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
-  66%  { border-color: #B45309; box-shadow: 0 0 12px rgba(180, 83, 9, 0.3); }
+  0%, 100% { border-color: #FFFFFF; box-shadow: 0 0 16px rgba(255, 255, 255, 0.55), 0 0 32px rgba(185, 242, 255, 0.25); }
+  33%  { border-color: #E5E4E2; box-shadow: 0 0 18px rgba(229, 228, 226, 0.6), 0 0 36px rgba(192, 192, 192, 0.3); }
+  66%  { border-color: #B9F2FF; box-shadow: 0 0 18px rgba(185, 242, 255, 0.55), 0 0 36px rgba(255, 255, 255, 0.3); }
 }
 @keyframes borderRotateBooks {
   0%, 100% { border-color: var(--books-color); box-shadow: 0 0 16px rgba(247, 147, 26, 0.15); }
@@ -500,7 +500,7 @@ h1 span { color: var(--accent); }
   height: 120px;
   background: var(--surface);
   border-radius: 28px;
-  border: 2px solid var(--apps-color);
+  border: 2px solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
