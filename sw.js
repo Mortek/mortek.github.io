@@ -1,4 +1,4 @@
-const CACHE = 'mortek-v52';
+const CACHE = 'mortek-v53';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -8,7 +8,7 @@ const PRECACHE = [
   '/about.html',
   '/blog.html',
   '/404.html',
-  '/style.min.css?v=71',
+  '/style.min.css?v=72',
   '/site.min.js?v=1',
   '/favicon.svg',
   '/manifest.json',
