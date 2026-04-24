@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.17</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.18</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -513,29 +513,32 @@ function getBass(data){
   for(let i=0;i<BASS_WEIGHTS.length;i++) s+=data[i+2]*BASS_WEIGHTS[i];
   return s/BASS_WSUM/255;
 }
-// Broadband low-mid band (~47-517Hz) — catches drum bodies and percussive
-// transients that extend above pure bass, so "bass-like" hits trigger even
-// when pure sub-bass isn't dominant.
+// Drum-body band (~47-328Hz) — kick/snare fundamentals + bass-guitar range.
+// Narrower than full low-mid so vocals and sustained instruments don't drive
+// the detector.
 function getLowMid(data){
   let s=0;
-  for(let i=2;i<=22;i++) s+=data[i];
-  return s/21/255;
+  for(let i=2;i<=14;i++) s+=data[i];
+  return s/13/255;
 }
-// Detect bass-like pulses combining:
-//  - bass flux: frame-to-frame rising edge (fires every hit even during
-//    sustained loud passages, where ratio-vs-EMA detection saturates)
-//  - low-mid flux: catches percussive transients with mid content
-//  - sustained level: continuous response during loud bass passages
+// Transient-only bass trigger: fires on the rising edge of bass or drum-body
+// energy. No sustained/continuous component — steady loud bass does NOT trigger
+// by itself, only its onsets do. A short refractory window prevents the same
+// hit from firing repeatedly during its attack envelope.
 function computeBassHit(data,state){
   const bass=getBass(data),lm=getLowMid(data);
   const bf=Math.max(bass-state.lastBass,0);
   const lf=Math.max(lm-state.lastLm,0);
   state.lastBass=bass;state.lastLm=lm;
-  const sustained=Math.max(bass-0.2,0)*0.5;
-  const onset=Math.max(bf*2.2,lf*1.6)+sustained;
-  return {bass,onset};
+  if(state.cooldown>0){state.cooldown--;return {bass,onset:0};}
+  // Gate on absolute level so quiet-section fluctuations don't trigger.
+  if(bass<0.1&&lm<0.15) return {bass,onset:0};
+  const raw=Math.max(bf*2.0,lf*1.4);
+  if(raw<0.08) return {bass,onset:0};
+  state.cooldown=5; // ~83ms at 60fps — one hit per kick
+  return {bass,onset:raw};
 }
-const liveBassState={lastBass:0,lastLm:0};
+const liveBassState={lastBass:0,lastLm:0,cooldown:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -1498,7 +1501,7 @@ document.getElementById('dlBtn').onclick=async function(){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      const st={lastBass:0,lastLm:0};
+      const st={lastBass:0,lastLm:0,cooldown:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
@@ -1534,7 +1537,7 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.lastBass=0;liveBassState.lastLm=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    liveBassState.lastBass=0;liveBassState.lastLm=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
@@ -1856,7 +1859,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={lastBass:0,lastLm:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={lastBass:0,lastLm:0,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
     for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
@@ -1886,7 +1889,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.lastBass=0;liveBassState.lastLm=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.lastBass=0;liveBassState.lastLm=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
