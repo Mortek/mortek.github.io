@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.15</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.16</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -505,6 +505,17 @@ const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
+// Weighted bass extractor — emphasises kick/sub-bass (~45-190Hz) so the visualiser
+// reacts to kick drums specifically rather than averaging in midrange energy.
+// With fftSize=2048 @ 44.1-48kHz each bin ≈ 21-23Hz, so bins 2-8 cover ~45-190Hz.
+const BASS_WEIGHTS=[0.7,1.0,1.0,0.9,0.7,0.5,0.4];
+const BASS_WSUM=BASS_WEIGHTS.reduce((a,b)=>a+b,0);
+function getBass(data){
+  let s=0;
+  for(let i=0;i<BASS_WEIGHTS.length;i++) s+=data[i+2]*BASS_WEIGHTS[i];
+  return s/BASS_WSUM/255;
+}
+
 // ---- PREFERENCES (session cookie, per-tab) ----
 const prefIds=['partStyle','partIntensity','partAmount','partSpeed','partSize','partLife','bassReact','colorScheme','overlay','centerShadow','partGlow','partTrails','vigColor','colorCycle','barIntensity','barThreshold','barCount','barWidth','barSmoothing','barLength','innerRadius','barCaps','barGlow','reactRadius','bassZoom','brightPulse','vigPulse','hueShift','cameraShake'];
 const prefRangeIds=['logoTint','hueSat'];
@@ -821,10 +832,10 @@ function manageParticles(energy,data){
   } else {
     const bassStr=parseFloat(document.getElementById('bassReact').value);
     if(bassStr>0){
-      const bass=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
+      const bass=getBass(data);
       const onset=Math.max(bass-prevBassParticle,0);
-      prevBassParticle+=(bass-prevBassParticle)*0.3;
-      if(onset>0.05) strength=Math.pow(onset,0.6)*1.5*bassStr;
+      prevBassParticle+=(bass-prevBassParticle)*0.35;
+      if(onset>0.03) strength=Math.pow(onset,0.55)*1.8*bassStr;
     }
   }
   if(strength>0){
@@ -861,7 +872,7 @@ function manageParticles(energy,data){
 function drawCircle(data,p,energy,dS){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
   const reactR=parseFloat(document.getElementById('reactRadius').value);
-  const bassPulse=reactR>0?data.slice(1,5).reduce((a,b)=>a+b,0)/4/255*reactR*50*dS:0;
+  const bassPulse=reactR>0?getBass(data)*reactR*50*dS:0;
   const cx=W/2,cy=H/2,base=(baseR*0.9+8+energy*6)*dS;
   const innerBase=base+bassPulse;
   const barGlowVal=parseFloat(document.getElementById('barGlow').value)*dS;
@@ -969,15 +980,15 @@ function drawFrame(data){
     bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
     shakeX=fx.shakeX||0;shakeY=fx.shakeY||0;
   } else {
-    const bassFX=data.slice(1,5).reduce((a,b)=>a+b,0)/4/255;
+    const bassFX=getBass(data);
     const bassRatio=bassFX/Math.max(prevBass,0.01);
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
     const vigStr=parseFloat(document.getElementById('vigPulse').value);
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
-    if(bassRatio>1.4&&bassFX>0.15){
+    if(bassRatio>1.25&&bassFX>0.1){
       const strength=(bassRatio-1)*bassFX;
-      const scaledStr=Math.pow(strength,0.6)*1.5;
+      const scaledStr=Math.pow(strength,0.55)*1.9;
       bgZoom=Math.max(bgZoom,scaledStr*zoomStr*8);
       bgBright=Math.max(bgBright,scaledStr*brightStr*4);
       bgVig=Math.max(bgVig,scaledStr*vigStr*4);
@@ -986,7 +997,7 @@ function drawFrame(data){
         shakeY+=(Math.random()-0.5)*scaledStr*shakeStr*10;
       }
     }
-    prevBass+=(bassFX-prevBass)*0.15;
+    prevBass+=(bassFX-prevBass)*0.2;
     bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
     shakeX*=0.85; shakeY*=0.85;
   }
@@ -1091,7 +1102,7 @@ async function initAudio(buf){
   if(audioCtx.state==='suspended') await audioCtx.resume();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
-  analyser.fftSize=1024;analyser.smoothingTimeConstant=0.3;
+  analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
   gainNode=audioCtx.createGain();
   analyser.connect(gainNode);
   gainNode.connect(audioCtx.destination);
@@ -1133,7 +1144,7 @@ async function initShortsAudio(buf){
   if(sAudioCtx.state==='suspended') await sAudioCtx.resume();
   shortsAudioBuffer=buf;
   sAnalyser=sAudioCtx.createAnalyser();
-  sAnalyser.fftSize=1024;sAnalyser.smoothingTimeConstant=0.3;
+  sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
   sGainNode=sAudioCtx.createGain();
   sAnalyser.connect(sGainNode);
   sGainNode.connect(sAudioCtx.destination);
@@ -1441,7 +1452,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 2: Compute per-frame frequency data via manual FFT
     setStatus('Analyzing audio...');btn.textContent='Analyzing...';
-    const fftN=1024,binCount=fftN/2;
+    const fftN=2048,binCount=fftN/2;
     const bWin=new Float32Array(fftN);
     for(let i=0;i<fftN;i++){const a=2*Math.PI*i/fftN;bWin[i]=0.42-0.5*Math.cos(a)+0.08*Math.cos(2*a);}
     function fftCalc(re,im){for(let i=1,j=0;i<fftN;i++){let b=fftN>>1;while(j&b){j^=b;b>>=1;}j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}for(let len=2;len<=fftN;len*=2){const half=len>>1,ang=-2*Math.PI/len;for(let i=0;i<fftN;i+=len){let wr=1,wi=0;const wpr=Math.cos(ang),wpi=Math.sin(ang);for(let j=0;j<half;j++){const tr=wr*re[i+j+half]-wi*im[i+j+half],ti=wr*im[i+j+half]+wi*re[i+j+half];re[i+j+half]=re[i+j]-tr;im[i+j+half]=im[i+j]-ti;re[i+j]+=tr;im[i+j]+=ti;const nw=wr*wpr-wi*wpi;wi=wr*wpi+wi*wpr;wr=nw;}}}}
@@ -1474,14 +1485,14 @@ document.getElementById('dlBtn').onclick=async function(){
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
         const fd=frames[i];
-        const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;
+        const bass=getBass(fd);
         const ratio=bass/Math.max(pb,0.01);
-        if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
-        pb+=(bass-pb)*0.15;
+        if(ratio>1.25&&bass>0.1){const str=(ratio-1)*bass;const sc=Math.pow(str,0.55)*1.9;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
+        pb+=(bass-pb)*0.2;
         z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
         const pOnset=Math.max(bass-pbP,0);
-        pbP+=(bass-pbP)*0.15;
-        const pStr=(pOnset>0.05&&bassReactStr>0)?Math.pow(pOnset,0.6)*1.5*bassReactStr:0;
+        pbP+=(bass-pbP)*0.35;
+        const pStr=(pOnset>0.03&&bassReactStr>0)?Math.pow(pOnset,0.55)*1.8*bassReactStr:0;
         precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr,shakeX:sx,shakeY:sy});
       }
     }
@@ -1806,7 +1817,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
 
     // Step 2: FFT analysis with 2s warmup for bass tracking accuracy
     setShortsStatus('Analyzing audio...');btn.textContent='Analyzing...';
-    const fftN=1024,binCount=fftN/2;
+    const fftN=2048,binCount=fftN/2;
     const bWin=new Float32Array(fftN);
     for(let i=0;i<fftN;i++){const a=2*Math.PI*i/fftN;bWin[i]=0.42-0.5*Math.cos(a)+0.08*Math.cos(2*a);}
     function sFFT(re,im){for(let i=1,j=0;i<fftN;i++){let b=fftN>>1;while(j&b){j^=b;b>>=1;}j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}for(let len=2;len<=fftN;len*=2){const half=len>>1,ang=-2*Math.PI/len;for(let i=0;i<fftN;i+=len){let wr=1,wi=0;const wpr=Math.cos(ang),wpi=Math.sin(ang);for(let j=0;j<half;j++){const tr=wr*re[i+j+half]-wi*im[i+j+half],ti=wr*im[i+j+half]+wi*re[i+j+half];re[i+j+half]=re[i+j]-tr;im[i+j+half]=im[i+j]-ti;re[i+j]+=tr;im[i+j]+=ti;const nw=wr*wpr-wi*wpi;wi=wr*wpi+wi*wpr;wr=nw;}}}}
@@ -1833,11 +1844,11 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
     {let pb=0,pbP=0,z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
-    for(let i=0;i<frames.length;i++){const fd=frames[i];const bass=fd.slice(1,5).reduce((a,c)=>a+c,0)/4/255;const ratio=bass/Math.max(pb,0.01);
-    if(ratio>1.4&&bass>0.15){const str=(ratio-1)*bass;const sc=Math.pow(str,0.6)*1.5;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
-    pb+=(bass-pb)*0.15;z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
-    const pOnset=Math.max(bass-pbP,0);pbP+=(bass-pbP)*0.15;
-    const pS=(pOnset>0.05&&brStr>0)?Math.pow(pOnset,0.6)*1.5*brStr:0;
+    for(let i=0;i<frames.length;i++){const fd=frames[i];const bass=getBass(fd);const ratio=bass/Math.max(pb,0.01);
+    if(ratio>1.25&&bass>0.1){const str=(ratio-1)*bass;const sc=Math.pow(str,0.55)*1.9;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
+    pb+=(bass-pb)*0.2;z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
+    const pOnset=Math.max(bass-pbP,0);pbP+=(bass-pbP)*0.35;
+    const pS=(pOnset>0.03&&brStr>0)?Math.pow(pOnset,0.55)*1.8*brStr:0;
     precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pS,shakeX:sx,shakeY:sy});}}
 
     // Step 4: Encode audio first (small footprint, needed for progressive muxing)
