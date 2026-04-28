@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.28-diag</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.29</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -478,8 +478,6 @@ select:hover{border-color:#a07fff}
 </div>
 
 <script>
-window.addEventListener('error',e=>console.log('[MV] UNCAUGHT ERROR: '+e.message+' at '+e.filename+':'+e.lineno));
-window.addEventListener('unhandledrejection',e=>console.log('[MV] UNHANDLED PROMISE REJECTION: '+(e.reason?.message||e.reason)));
 const C = document.getElementById('c');
 let ctx = C.getContext('2d');
 let W = C.width, H = C.height;
@@ -1145,10 +1143,8 @@ function loop(){
 
 // ---- AUDIO SETUP ----
 async function initAudio(buf){
-  console.log('[MV] initAudio start');
   if(audioCtx) audioCtx.close();
   audioCtx=new AudioContext();
-  console.log('[MV] audioCtx created, state='+audioCtx.state);
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
@@ -1158,26 +1154,33 @@ async function initAudio(buf){
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
+  // Auto-play: resume context then start. If browser blocks auto-resume
+  // (strict autoplay policy), the catch leaves playing=false so the user
+  // can click the play button to start manually — that IS a user gesture.
+  try{await audioCtx.resume();}catch(e){}
   playPreview();
-  console.log('[MV] initAudio end, playing='+playing);
 }
 
 function playPreview(offset){
-  console.log('[MV] playPreview, audioBuffer='+!!audioBuffer+' audioCtx='+!!audioCtx+(audioCtx?' state='+audioCtx.state:''));
   if(!audioBuffer||!audioCtx) return;
-  if(audioCtx.state==='suspended') audioCtx.resume();
   if(source){source.onended=null;try{source.stop();}catch(e){}}
   offset=offset||0;
   playOffset=offset;
-  playStartTime=audioCtx.currentTime;
-  source=audioCtx.createBufferSource();
-  source.buffer=audioBuffer;
-  source.connect(analyser);
-  source.start(0,offset);
-  playing=true;
-  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-  source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
-  console.log('[MV] playPreview end, playing='+playing);
+  // start() must run AFTER the context is actually running, not before.
+  // If still suspended (e.g. called from a user-gesture click), await
+  // resume via .then() so the clock is ticking when start() fires.
+  const go=()=>{
+    playStartTime=audioCtx.currentTime;
+    source=audioCtx.createBufferSource();
+    source.buffer=audioBuffer;
+    source.connect(analyser);
+    source.start(0,offset);
+    playing=true;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  };
+  if(audioCtx.state==='suspended') audioCtx.resume().then(go).catch(go);
+  else go();
 }
 
 function getCurrentTime(){
@@ -1202,22 +1205,26 @@ async function initShortsAudio(buf){
   sGainNode.connect(sAudioCtx.destination);
   particles=[];
   if(!animId) loop();
+  try{await sAudioCtx.resume();}catch(e){}
   playShortsPreview();
 }
 function playShortsPreview(offset){
   if(!shortsAudioBuffer||!sAudioCtx)return;
-  if(sAudioCtx.state==='suspended') sAudioCtx.resume();
   if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
   offset=offset||0;
   sPlayOffset=offset;
-  sPlayStartTime=sAudioCtx.currentTime;
-  sSource=sAudioCtx.createBufferSource();
-  sSource.buffer=shortsAudioBuffer;
-  sSource.connect(sAnalyser);
-  sSource.start(0,offset);
-  sPlaying=true;
-  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-  sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  const go=()=>{
+    sPlayStartTime=sAudioCtx.currentTime;
+    sSource=sAudioCtx.createBufferSource();
+    sSource.buffer=shortsAudioBuffer;
+    sSource.connect(sAnalyser);
+    sSource.start(0,offset);
+    sPlaying=true;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  };
+  if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go).catch(go);
+  else go();
 }
 function getCurrentShortsTime(){
   if(!sAudioCtx||!sPlaying) return sPlayOffset;
@@ -1272,15 +1279,11 @@ document.getElementById('logoInput').onchange=e=>{
 
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
-  console.log('[MV] audio file selected: '+f.name);
   setStatus('Loading audio...');
   const reader=new FileReader();
   reader.onload=ev=>{
-    console.log('[MV] FileReader.onload fired, byteLength='+ev.target.result.byteLength);
     const tmp=new AudioContext();
-    console.log('[MV] tmp AudioContext state='+tmp.state);
     tmp.decodeAudioData(ev.target.result.slice(0), buf=>{
-      console.log('[MV] decodeAudioData success, duration='+buf.duration.toFixed(2)+'s');
       tmp.close();
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
@@ -1289,7 +1292,7 @@ document.getElementById('audioInput').onchange=e=>{
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
       initAudio(buf);
-    }, (err)=>{console.log('[MV] decodeAudioData error',err);setStatus('Error decoding audio');});
+    }, ()=>setStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
 };
