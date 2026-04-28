@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.29</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.30</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1142,9 +1142,12 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-async function initAudio(buf){
-  if(audioCtx) audioCtx.close();
-  audioCtx=new AudioContext();
+// ctx argument: pass in an already-running AudioContext when available
+// (created synchronously in a user gesture handler), otherwise a new
+// suspended one is created and resume() is attempted.
+async function initAudio(buf, ctx){
+  if(audioCtx&&audioCtx!==ctx) audioCtx.close();
+  audioCtx=ctx||new AudioContext();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
@@ -1154,9 +1157,9 @@ async function initAudio(buf){
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  // Auto-play: resume context then start. If browser blocks auto-resume
-  // (strict autoplay policy), the catch leaves playing=false so the user
-  // can click the play button to start manually — that IS a user gesture.
+  // If context is already running (passed in from user-gesture handler)
+  // this is instant. Otherwise wait for resume — if browser blocks it the
+  // catch falls through and the play button works as a manual fallback.
   try{await audioCtx.resume();}catch(e){}
   playPreview();
 }
@@ -1194,9 +1197,9 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
-async function initShortsAudio(buf){
-  if(sAudioCtx) sAudioCtx.close();
-  sAudioCtx=new AudioContext();
+async function initShortsAudio(buf, ctx){
+  if(sAudioCtx&&sAudioCtx!==ctx) sAudioCtx.close();
+  sAudioCtx=ctx||new AudioContext();
   shortsAudioBuffer=buf;
   sAnalyser=sAudioCtx.createAnalyser();
   sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
@@ -1280,18 +1283,21 @@ document.getElementById('logoInput').onchange=e=>{
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
+  // Create AudioContext NOW, synchronously in the user-gesture handler.
+  // This gives us a 'running' context immediately — no resume() needed.
+  if(audioCtx) audioCtx.close();
+  audioCtx=new AudioContext();
+  const gestureCtx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const tmp=new AudioContext();
-    tmp.decodeAudioData(ev.target.result.slice(0), buf=>{
-      tmp.close();
+    gestureCtx.decodeAudioData(ev.target.result.slice(0), buf=>{
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
-      initAudio(buf);
+      initAudio(buf, gestureCtx);
     }, ()=>setStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
@@ -1737,11 +1743,12 @@ document.getElementById('clearPortraitBtn').onclick=function(){
 document.getElementById('shortsAudioInput').onchange=function(e){
   const f=e.target.files[0];if(!f)return;
   setShortsStatus('Loading audio...');
+  if(sAudioCtx) sAudioCtx.close();
+  sAudioCtx=new AudioContext();
+  const gestureCtx=sAudioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const tmp=new AudioContext();
-    tmp.decodeAudioData(ev.target.result.slice(0),buf=>{
-      tmp.close();
+    gestureCtx.decodeAudioData(ev.target.result.slice(0),buf=>{
       shortsAudioBuffer=buf;
       document.getElementById('shortsAudioLabel').textContent='\u2713 '+f.name;
       document.getElementById('shortsAudioLabel').classList.add('loaded');
@@ -1749,7 +1756,7 @@ document.getElementById('shortsAudioInput').onchange=function(e){
       document.getElementById('shortsDlBtn').disabled=false;
       setShortsStatus('Audio loaded! Previewing...');
       updateShortsEnd();
-      if(activeTab==='shorts') initShortsAudio(buf);
+      if(activeTab==='shorts') initShortsAudio(buf, gestureCtx);
     },()=>setShortsStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
