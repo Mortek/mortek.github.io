@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.26</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.27</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1145,7 +1145,6 @@ function loop(){
 async function initAudio(buf){
   if(audioCtx) audioCtx.close();
   audioCtx=new AudioContext();
-  if(audioCtx.state==='suspended') await audioCtx.resume();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
@@ -1160,6 +1159,7 @@ async function initAudio(buf){
 
 function playPreview(offset){
   if(!audioBuffer||!audioCtx) return;
+  if(audioCtx.state==='suspended') audioCtx.resume();
   if(source){source.onended=null;try{source.stop();}catch(e){}}
   offset=offset||0;
   playOffset=offset;
@@ -1187,7 +1187,6 @@ function fmtTime(s){
 async function initShortsAudio(buf){
   if(sAudioCtx) sAudioCtx.close();
   sAudioCtx=new AudioContext();
-  if(sAudioCtx.state==='suspended') await sAudioCtx.resume();
   shortsAudioBuffer=buf;
   sAnalyser=sAudioCtx.createAnalyser();
   sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
@@ -1200,6 +1199,7 @@ async function initShortsAudio(buf){
 }
 function playShortsPreview(offset){
   if(!shortsAudioBuffer||!sAudioCtx)return;
+  if(sAudioCtx.state==='suspended') sAudioCtx.resume();
   if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
   offset=offset||0;
   sPlayOffset=offset;
