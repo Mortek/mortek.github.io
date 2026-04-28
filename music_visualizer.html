@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.19</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.20</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -173,6 +173,7 @@ select:hover{border-color:#a07fff}
         <option value="118">2 min</option>
         <option value="148">2:30 min</option>
         <option value="178" selected>3 min</option>
+        <option value="full">Full Length</option>
       </select>
     </div>
   </div>
@@ -1777,9 +1778,10 @@ document.getElementById('shortsSetZero').onclick=function(){
 document.getElementById('shortsDur').onchange=updateShortsEnd;
 function getShortsAudio(){return shortsAudioBuffer;}
 function updateShortsEnd(){
-  const dur=parseInt(document.getElementById('shortsDur').value);
+  const val=document.getElementById('shortsDur').value;
   const ab=getShortsAudio();
   const maxDur=ab?ab.duration:9999;
+  const dur=val==='full'?maxDur-shortsStart:parseInt(val);
   const end=Math.min(shortsStart+dur,maxDur);
   document.getElementById('shortsStartTime').textContent=fmtTime(shortsStart);
   document.getElementById('shortsEndTime').textContent=fmtTime(end);
@@ -1819,7 +1821,8 @@ document.getElementById('shortsDlBtn').onclick=async function(){
   try{
     const buf=shortsBuf,fps=30,sr=48000;
     const clipStart=shortsStart;
-    const clipDur=parseInt(document.getElementById('shortsDur').value);
+    const durVal=document.getElementById('shortsDur').value;
+    const clipDur=durVal==='full'?buf.duration-clipStart:parseInt(durVal);
     const clipEnd=Math.min(clipStart+clipDur,buf.duration);
     const actualDur=clipEnd-clipStart;
     if(actualDur<0.5){setShortsStatus('Clip too short. Load audio and set a valid start time.');return;}
