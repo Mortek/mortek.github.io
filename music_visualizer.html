@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.21</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.22</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -312,6 +312,8 @@ select:hover{border-color:#a07fff}
       <option value="0.01">Normal</option>
       <option value="0.003">Smooth</option>
       <option value="0.001" selected>Very Smooth</option>
+      <option value="0.0004">Ultra Smooth</option>
+      <option value="0.0002">Maximum</option>
     </select>
   </div>
   <div class="ctrl"><label>Inner Radius</label>
@@ -486,6 +488,7 @@ const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0;
 const barMin = new Float32Array(200).fill(0.5);
 const barMax = new Float32Array(200).fill(0.5);
+const smoothedBars = new Float32Array(200).fill(0);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let sAudioCtx, sAnalyser, sGainNode, sSource;
@@ -736,7 +739,7 @@ function mkParticle(data){
   return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
     ox:0, oy:0,
     age:0, life:(150+Math.random()*200)*lf, color, style:s, r:(1+Math.random()*3)*sz,
-    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
+    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)], trail:[]};
 }
 
 function drawP(p, energy){
@@ -745,6 +748,18 @@ function drawP(p, energy){
   const boost = 1 + energy*2.5*pInt;
   const r = p.r*boost;
   ctx.save();
+  if(p.trail.length>1){
+    const tlen=p.trail.length;
+    for(let ti=0;ti<tlen-1;ti++){
+      const tf=(ti+1)/tlen;
+      ctx.globalAlpha=t*0.55*tf;
+      ctx.fillStyle=p.color;
+      ctx.shadowBlur=0;
+      ctx.beginPath();
+      ctx.arc(p.trail[ti].x,p.trail[ti].y,Math.max(p.r*tf*0.55,0.5),0,Math.PI*2);
+      ctx.fill();
+    }
+  }
   ctx.globalAlpha = t * 0.8;
   ctx.fillStyle = p.color;
   ctx.strokeStyle = p.color;
@@ -847,6 +862,8 @@ function updateP(p){
   p.hx+=p.ox*0.04; p.hy+=p.oy*0.04;
   p.ox*=0.92; p.oy*=0.92;
   p.x=p.hx+p.ox; p.y=p.hy+p.oy;
+  p.trail.push({x:p.x,y:p.y});
+  if(p.trail.length>12) p.trail.shift();
 }
 
 function manageParticles(energy,data){
@@ -960,7 +977,9 @@ function drawCircle(data,p,energy,dS){
     const range=Math.max(barMax[i]-barMin[i],0.1);
     let v=Math.min((raw-barMin[i])/range,1);
     if(v<bThresh) v=0;
-    half.push(v);
+    const orate=v>smoothedBars[i]?Math.min(bSmooth*200,1.0):bSmooth*50;
+    smoothedBars[i]+=(v-smoothedBars[i])*orate;
+    half.push(smoothedBars[i]);
   }
   const vals=[...half,...half.slice().reverse()];
   const bars=vals.length;
@@ -1542,7 +1561,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
     liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);
+    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
@@ -1650,7 +1669,7 @@ function switchTab(tab){
     W=1280;H=720;trailC.width=1280;trailC.height=720;
   }
   ctx=C.getContext('2d');
-  particles=[];barMin.fill(0.5);barMax.fill(0.5);
+  particles=[];barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
   // Update seek bar and controls for new tab
   if(isShorts){
     if(shortsAudioBuffer){
