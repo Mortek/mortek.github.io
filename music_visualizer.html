@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.22</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.23</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -535,17 +535,21 @@ function getMidBass(data){
 //   sub/(sub+mid) ≥ 0.50 (sub-bass dominates over the kick/snare body range)
 // 416ms refractory so a single boom doesn't chain into its own attack envelope.
 function computeBassHit(data,state){
-  const sub=getSubBass(data),mid=getMidBass(data);
-  const sf=Math.max(sub-state.lastSub,0);
-  state.lastSub=sub;
-  if(state.cooldown>0){state.cooldown--;return {bass:getBass(data),onset:0};}
-  if(sf<0.10||sub<0.25) return {bass:getBass(data),onset:0};
-  const ratio=sub/(sub+mid+0.01);
-  if(ratio<0.5) return {bass:getBass(data),onset:0};
-  state.cooldown=25;
-  return {bass:getBass(data),onset:sf*2.5*ratio};
+  const bass=getBass(data);
+  if(state.cooldown>0){
+    state.cooldown--;
+    // Decay baseline during cooldown so a hit that lands inside the window
+    // still has a measurable flux rise when cooldown clears.
+    state.lastBass*=0.85;
+    return {bass:bass,onset:0};
+  }
+  const sf=Math.max(bass-state.lastBass,0);
+  state.lastBass=bass;
+  if(sf<0.08||bass<0.12) return {bass:bass,onset:0};
+  state.cooldown=20;
+  return {bass:bass,onset:sf*2.0};
 }
-const liveBassState={lastSub:0,cooldown:0};
+const liveBassState={lastBass:0,cooldown:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -1524,7 +1528,7 @@ document.getElementById('dlBtn').onclick=async function(){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      const st={lastSub:0,cooldown:0};
+      const st={lastBass:0,cooldown:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
@@ -1560,7 +1564,7 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    liveBassState.lastBass=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
@@ -1884,7 +1888,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={lastSub:0,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={lastBass:0,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
     for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
@@ -1914,7 +1918,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.lastBass=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
