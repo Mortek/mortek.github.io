@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.25</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.26</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -536,15 +536,16 @@ function getMidBass(data){
 // 416ms refractory so a single boom doesn't chain into its own attack envelope.
 function computeBassHit(data,state){
   const bass=getBass(data);
-  // fast: ~2-frame follower catches attack; slow: ~33-frame background level
+  // fast: ~2-frame follower catches attack; slow: ~50-frame background
   state.fast=state.fast*0.4+bass*0.6;
-  state.slow=state.slow*0.97+bass*0.03;
+  state.slow=state.slow*0.98+bass*0.02;
   if(state.cooldown>0){state.cooldown--;return {bass:bass,onset:0};}
-  // Fire when fast average spikes well above the background level
-  const threshold=Math.max(state.slow*1.5,0.15);
+  // Fire when fast spikes well above background AND has enough absolute energy.
+  // minT=0.38 prevents firing when slow collapsed after a quiet section.
+  const threshold=Math.max(state.slow*1.55,0.38);
   const excess=state.fast-threshold;
   if(excess<=0) return {bass:bass,onset:0};
-  state.cooldown=20;
+  state.cooldown=40;
   return {bass:bass,onset:Math.min(excess*3.5,1.0)};
 }
 const liveBassState={fast:0,slow:0.05,cooldown:0};
