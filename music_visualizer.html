@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.23</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.24</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -540,12 +540,12 @@ function computeBassHit(data,state){
     state.cooldown--;
     // Decay baseline during cooldown so a hit that lands inside the window
     // still has a measurable flux rise when cooldown clears.
-    state.lastBass*=0.85;
+    state.lastBass*=0.93;
     return {bass:bass,onset:0};
   }
   const sf=Math.max(bass-state.lastBass,0);
   state.lastBass=bass;
-  if(sf<0.08||bass<0.12) return {bass:bass,onset:0};
+  if(sf<0.13||bass<0.20) return {bass:bass,onset:0};
   state.cooldown=20;
   return {bass:bass,onset:sf*2.0};
 }
