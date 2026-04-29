@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.37</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.38</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1120,10 +1120,14 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-async function initAudio(buf){
+// NOTE: do not await resume() here — this runs inside a FileReader→decode
+// callback chain, well after the user gesture from the file picker has been
+// consumed by the file dialog. Firefox holds the resume() promise pending
+// indefinitely in that situation, which used to leave audioBuffer unset and
+// the Play button unresponsive. Resume happens in the Play button handler.
+function initAudio(buf){
   if(audioCtx) audioCtx.close();
   audioCtx=new AudioContext();
-  if(audioCtx.state==='suspended') await audioCtx.resume();
   audioBuffer=buf;
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
@@ -1133,7 +1137,8 @@ async function initAudio(buf){
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  playPreview();
+  if(audioCtx.state==='running') playPreview();
+  else setStatus('Audio loaded — click ▶ to play.');
 }
 
 function playPreview(offset){
@@ -1162,10 +1167,9 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
-async function initShortsAudio(buf){
+function initShortsAudio(buf){
   if(sAudioCtx) sAudioCtx.close();
   sAudioCtx=new AudioContext();
-  if(sAudioCtx.state==='suspended') await sAudioCtx.resume();
   shortsAudioBuffer=buf;
   sAnalyser=sAudioCtx.createAnalyser();
   sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
@@ -1174,7 +1178,8 @@ async function initShortsAudio(buf){
   sGainNode.connect(sAudioCtx.destination);
   particles=[];
   if(!animId) loop();
-  playShortsPreview();
+  if(sAudioCtx.state==='running') playShortsPreview();
+  else setShortsStatus('Audio loaded — click ▶ to play.');
 }
 function playShortsPreview(offset){
   if(!shortsAudioBuffer||!sAudioCtx)return;
@@ -1310,6 +1315,7 @@ document.getElementById('pauseBtn').onclick=function(){
       sPlaying=false;
       this.innerHTML='&#9654;';this.title='Resume';
     } else {
+      if(sAudioCtx.state==='suspended') sAudioCtx.resume();
       playShortsPreview(sPlayOffset);
     }
   } else {
@@ -1320,6 +1326,7 @@ document.getElementById('pauseBtn').onclick=function(){
       playing=false;
       this.innerHTML='&#9654;';this.title='Resume';
     } else {
+      if(audioCtx.state==='suspended') audioCtx.resume();
       playPreview(playOffset);
     }
   }
