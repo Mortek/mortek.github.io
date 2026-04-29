@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.32</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.33-diag</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1142,7 +1142,6 @@ function loop(){
 // (created synchronously in a user gesture handler), otherwise a new
 // suspended one is created and resume() is attempted.
 async function initAudio(buf, ctx, resumeP){
-  // Reuse existing context if none provided — don't close/reopen.
   if(ctx) audioCtx=ctx;
   else if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
   audioBuffer=buf;
@@ -1156,9 +1155,9 @@ async function initAudio(buf, ctx, resumeP){
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  // resumeP was initiated in the user-gesture handler (onchange), so it's
-  // allowed by Chrome's autoplay policy. Await it here before source.start().
-  if(resumeP) try{await resumeP;}catch(e){}
+  console.log('[MV] initAudio: before await resumeP, ctx state=',audioCtx.state);
+  if(resumeP) try{await resumeP;}catch(e){console.log('[MV] resumeP await threw',e);}
+  console.log('[MV] initAudio: after await resumeP, ctx state=',audioCtx.state);
   playPreview();
 }
 
@@ -1171,6 +1170,7 @@ function playPreview(offset){
   // If still suspended (e.g. called from a user-gesture click), await
   // resume via .then() so the clock is ticking when start() fires.
   const go=()=>{
+    console.log('[MV] go(): ctx state=',audioCtx.state,'currentTime=',audioCtx.currentTime);
     playStartTime=audioCtx.currentTime;
     source=audioCtx.createBufferSource();
     source.buffer=audioBuffer;
@@ -1180,6 +1180,7 @@ function playPreview(offset){
     document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
+  console.log('[MV] playPreview: ctx state=',audioCtx.state);
   if(audioCtx.state==='suspended') audioCtx.resume().then(go);
   else go();
 }
@@ -1283,15 +1284,16 @@ document.getElementById('logoInput').onchange=e=>{
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
-  // Reuse existing context to avoid close/reopen races; create only when gone.
-  // Call resume() here (user-gesture handler) — the returned promise is passed
-  // through to initAudio so source.start() never fires on a suspended context.
   if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
+  console.log('[MV] onchange: ctx state=',audioCtx.state);
   const resumeP=audioCtx.resume();
+  resumeP.then(()=>console.log('[MV] resumeP resolved, ctx state=',audioCtx.state)).catch(err=>console.log('[MV] resumeP rejected',err));
   const gestureCtx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
+    console.log('[MV] reader.onload, decoding...');
     gestureCtx.decodeAudioData(ev.target.result.slice(0), buf=>{
+      console.log('[MV] decoded ok, ctx state=',gestureCtx.state);
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
