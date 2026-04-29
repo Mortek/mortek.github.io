@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.42</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.43</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -529,22 +529,53 @@ function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
 }
-// Fire on frame-to-frame bass rise: delta > 0.12 AND bass > 0.25.
-// Delta-based detection works in sustained-bass sections where the slow/fast
-// ratio model fails (slow tracks up until threshold > 1.0, impossible to trigger).
-// 20-frame (~333ms) cooldown prevents re-trigger on the same attack envelope.
+// Multi-detector bass onset: fires on anything that "sounds like" bass.
+// Combines sub (23-70Hz), low (45-190Hz) and mid-bass (94-188Hz) bands, then
+// runs three parallel detectors so we cover the full bass-style spectrum:
+//   1. Transient   — sharp delta rise: kicks, 808 attacks, snare-on-bass
+//   2. Adaptive    — fast envelope above slow baseline by ratio: wobbles,
+//                    wubs, growls, reese movement, 8-bit square arpeggios
+//   3. Sustain     — periodic re-fire while bass is held high: sub sines,
+//                    reese drones, 808 tails, sustained growls
+// Cooldown is short enough to track ~4Hz wobbles but long enough to avoid
+// double-firing on a single attack.
 function computeBassHit(data,state){
-  const bass=getBass(data);
-  const delta=bass-state.prev;
-  state.prev=bass;
-  if(state.cooldown>0){state.cooldown--;return {bass:bass,onset:0};}
-  if(delta>0.12&&bass>0.25){
-    state.cooldown=20;
-    return {bass:bass,onset:Math.min(delta*4,1.0)};
+  const sub=getSubBass(data);
+  const low=getBass(data);
+  const mid=getMidBass(data);
+  // Take the strongest band so distorted/harmonic-heavy basses (growls,
+  // square waves) and pure sub sines are both detected.
+  const energy=Math.max(sub*1.05,low,mid*0.85);
+  state.envFast+=(energy-state.envFast)*0.4;   // ~40ms
+  state.envSlow+=(energy-state.envSlow)*0.015; // ~1s baseline
+  const delta=energy-state.prev;
+  state.prev=energy;
+  if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
+  // 1. Transient — sharp rise
+  if(delta>0.10&&energy>0.22){
+    state.cooldown=14; state.sustainTimer=0;
+    return {bass:low,onset:Math.min(delta*4,1.0)};
   }
-  return {bass:bass,onset:0};
+  // 2. Adaptive — fast envelope above slow baseline (wobble/wub/growl peaks)
+  const baseline=Math.max(state.envSlow,0.05);
+  const ratio=state.envFast/baseline;
+  if(ratio>1.30&&state.envFast>0.18&&delta>0.03){
+    state.cooldown=12; state.sustainTimer=0;
+    return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
+  }
+  // 3. Sustain — periodic fire on held drones (reese, sub sine, 808 tail)
+  if(state.envSlow>0.28&&state.envFast>0.22){
+    state.sustainTimer++;
+    if(state.sustainTimer>=30){ // ~500ms
+      state.sustainTimer=0; state.cooldown=12;
+      return {bass:low,onset:0.45};
+    }
+  } else {
+    state.sustainTimer=0;
+  }
+  return {bass:low,onset:0};
 }
-const liveBassState={prev:0,cooldown:0};
+const liveBassState={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -1579,7 +1610,7 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
@@ -1934,7 +1965,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
