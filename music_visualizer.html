@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.38</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.39-diag</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1120,24 +1120,29 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-// NOTE: do not await resume() here — this runs inside a FileReader→decode
-// callback chain, well after the user gesture from the file picker has been
-// consumed by the file dialog. Firefox holds the resume() promise pending
-// indefinitely in that situation, which used to leave audioBuffer unset and
-// the Play button unresponsive. Resume happens in the Play button handler.
+// Create the audio graph (AudioContext + analyser + gainNode) lazily inside a
+// user-gesture handler — never from this load chain. In current Firefox, an
+// AudioContext created outside a user gesture cannot be resumed even from a
+// later gesture click; the resume() promise stays pending indefinitely. So
+// initAudio just stores the buffer and triggers playback if a usable context
+// already exists from a previous Play click.
+function ensureAudioGraph(){
+  if(!audioCtx||audioCtx.state==='closed'){
+    audioCtx=new AudioContext();
+    console.log('[MV] ensureAudioGraph: created AudioContext, state=',audioCtx.state);
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
+    gainNode=audioCtx.createGain();
+    analyser.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  }
+}
 function initAudio(buf){
-  if(audioCtx) audioCtx.close();
-  audioCtx=new AudioContext();
   audioBuffer=buf;
-  analyser=audioCtx.createAnalyser();
-  analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
-  gainNode=audioCtx.createGain();
-  analyser.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  if(audioCtx.state==='running') playPreview();
+  if(audioCtx&&audioCtx.state==='running') playPreview();
   else setStatus('Audio loaded — click ▶ to play.');
 }
 
@@ -1167,18 +1172,22 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
+function ensureShortsAudioGraph(){
+  if(!sAudioCtx||sAudioCtx.state==='closed'){
+    sAudioCtx=new AudioContext();
+    console.log('[MV] ensureShortsAudioGraph: created AudioContext, state=',sAudioCtx.state);
+    sAnalyser=sAudioCtx.createAnalyser();
+    sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
+    sGainNode=sAudioCtx.createGain();
+    sAnalyser.connect(sGainNode);
+    sGainNode.connect(sAudioCtx.destination);
+  }
+}
 function initShortsAudio(buf){
-  if(sAudioCtx) sAudioCtx.close();
-  sAudioCtx=new AudioContext();
   shortsAudioBuffer=buf;
-  sAnalyser=sAudioCtx.createAnalyser();
-  sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
-  sGainNode=sAudioCtx.createGain();
-  sAnalyser.connect(sGainNode);
-  sGainNode.connect(sAudioCtx.destination);
   particles=[];
   if(!animId) loop();
-  if(sAudioCtx.state==='running') playShortsPreview();
+  if(sAudioCtx&&sAudioCtx.state==='running') playShortsPreview();
   else setShortsStatus('Audio loaded — click ▶ to play.');
 }
 function playShortsPreview(offset){
@@ -1308,25 +1317,33 @@ document.getElementById('muteBtn').onclick=function(){
 };
 document.getElementById('pauseBtn').onclick=function(){
   if(activeTab==='shorts'){
-    if(!sAudioCtx||!shortsAudioBuffer)return;
+    if(!shortsAudioBuffer)return;
+    ensureShortsAudioGraph();
     if(sPlaying){
       sPlayOffset=getCurrentShortsTime();
       if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
       sPlaying=false;
       this.innerHTML='&#9654;';this.title='Resume';
     } else {
-      if(sAudioCtx.state==='suspended') sAudioCtx.resume();
+      console.log('[MV] play click (shorts). state=',sAudioCtx.state);
+      if(sAudioCtx.state==='suspended') sAudioCtx.resume()
+        .then(()=>console.log('[MV] shorts resume resolved. state=',sAudioCtx.state))
+        .catch(err=>console.log('[MV] shorts resume rejected:',err));
       playShortsPreview(sPlayOffset);
     }
   } else {
-    if(!audioCtx||!audioBuffer)return;
+    if(!audioBuffer)return;
+    ensureAudioGraph();
     if(playing){
       playOffset=getCurrentTime();
       if(source){source.onended=null;try{source.stop();}catch(e){}}
       playing=false;
       this.innerHTML='&#9654;';this.title='Resume';
     } else {
-      if(audioCtx.state==='suspended') audioCtx.resume();
+      console.log('[MV] play click. state=',audioCtx.state);
+      if(audioCtx.state==='suspended') audioCtx.resume()
+        .then(()=>console.log('[MV] resume resolved. state=',audioCtx.state))
+        .catch(err=>console.log('[MV] resume rejected:',err));
       playPreview(playOffset);
     }
   }
