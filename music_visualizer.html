@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.31</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.32</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1141,10 +1141,13 @@ function loop(){
 // ctx argument: pass in an already-running AudioContext when available
 // (created synchronously in a user gesture handler), otherwise a new
 // suspended one is created and resume() is attempted.
-async function initAudio(buf, ctx){
-  if(audioCtx&&audioCtx!==ctx) audioCtx.close();
-  audioCtx=ctx||new AudioContext();
+async function initAudio(buf, ctx, resumeP){
+  // Reuse existing context if none provided — don't close/reopen.
+  if(ctx) audioCtx=ctx;
+  else if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
   audioBuffer=buf;
+  if(analyser) try{analyser.disconnect();}catch(e){}
+  if(gainNode) try{gainNode.disconnect();}catch(e){}
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
   gainNode=audioCtx.createGain();
@@ -1153,10 +1156,9 @@ async function initAudio(buf, ctx){
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  // If context is already running (passed in from user-gesture handler)
-  // this is instant. Otherwise wait for resume — if browser blocks it the
-  // catch falls through and the play button works as a manual fallback.
-  try{await audioCtx.resume();}catch(e){}
+  // resumeP was initiated in the user-gesture handler (onchange), so it's
+  // allowed by Chrome's autoplay policy. Await it here before source.start().
+  if(resumeP) try{await resumeP;}catch(e){}
   playPreview();
 }
 
@@ -1178,7 +1180,7 @@ function playPreview(offset){
     document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
-  if(audioCtx.state==='suspended') audioCtx.resume().then(go).catch(go);
+  if(audioCtx.state==='suspended') audioCtx.resume().then(go);
   else go();
 }
 
@@ -1193,10 +1195,12 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
-async function initShortsAudio(buf, ctx){
-  if(sAudioCtx&&sAudioCtx!==ctx) sAudioCtx.close();
-  sAudioCtx=ctx||new AudioContext();
+async function initShortsAudio(buf, ctx, resumeP){
+  if(ctx) sAudioCtx=ctx;
+  else if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
   shortsAudioBuffer=buf;
+  if(sAnalyser) try{sAnalyser.disconnect();}catch(e){}
+  if(sGainNode) try{sGainNode.disconnect();}catch(e){}
   sAnalyser=sAudioCtx.createAnalyser();
   sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
   sGainNode=sAudioCtx.createGain();
@@ -1204,7 +1208,7 @@ async function initShortsAudio(buf, ctx){
   sGainNode.connect(sAudioCtx.destination);
   particles=[];
   if(!animId) loop();
-  try{await sAudioCtx.resume();}catch(e){}
+  if(resumeP) try{await resumeP;}catch(e){}
   playShortsPreview();
 }
 function playShortsPreview(offset){
@@ -1222,7 +1226,7 @@ function playShortsPreview(offset){
     document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
-  if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go).catch(go);
+  if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go);
   else go();
 }
 function getCurrentShortsTime(){
@@ -1279,10 +1283,11 @@ document.getElementById('logoInput').onchange=e=>{
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
-  // Create AudioContext NOW, synchronously in the user-gesture handler.
-  // This gives us a 'running' context immediately — no resume() needed.
-  if(audioCtx) audioCtx.close();
-  audioCtx=new AudioContext();
+  // Reuse existing context to avoid close/reopen races; create only when gone.
+  // Call resume() here (user-gesture handler) — the returned promise is passed
+  // through to initAudio so source.start() never fires on a suspended context.
+  if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
+  const resumeP=audioCtx.resume();
   const gestureCtx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
@@ -1293,7 +1298,7 @@ document.getElementById('audioInput').onchange=e=>{
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
-      initAudio(buf, gestureCtx);
+      initAudio(buf, gestureCtx, resumeP);
     }, ()=>setStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
@@ -1739,8 +1744,8 @@ document.getElementById('clearPortraitBtn').onclick=function(){
 document.getElementById('shortsAudioInput').onchange=function(e){
   const f=e.target.files[0];if(!f)return;
   setShortsStatus('Loading audio...');
-  if(sAudioCtx) sAudioCtx.close();
-  sAudioCtx=new AudioContext();
+  if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
+  const resumeP=sAudioCtx.resume();
   const gestureCtx=sAudioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
@@ -1752,7 +1757,7 @@ document.getElementById('shortsAudioInput').onchange=function(e){
       document.getElementById('shortsDlBtn').disabled=false;
       setShortsStatus('Audio loaded! Previewing...');
       updateShortsEnd();
-      if(activeTab==='shorts') initShortsAudio(buf, gestureCtx);
+      if(activeTab==='shorts') initShortsAudio(buf, gestureCtx, resumeP);
     },()=>setShortsStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
