@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.36</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.37</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -312,8 +312,6 @@ select:hover{border-color:#a07fff}
       <option value="0.01">Normal</option>
       <option value="0.003">Smooth</option>
       <option value="0.001" selected>Very Smooth</option>
-      <option value="0.0004">Ultra Smooth</option>
-      <option value="0.0002">Maximum</option>
     </select>
   </div>
   <div class="ctrl"><label>Inner Radius</label>
@@ -488,7 +486,6 @@ const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0;
 const barMin = new Float32Array(200).fill(0.5);
 const barMax = new Float32Array(200).fill(0.5);
-const smoothedBars = new Float32Array(200).fill(0);
 let audioCtx, analyser, audioBuffer, gainNode, source;
 let playing = false, animId;
 let sAudioCtx, sAnalyser, sGainNode, sSource;
@@ -529,22 +526,23 @@ function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
 }
-// Fire on frame-to-frame bass rise: delta > 0.12 AND bass > 0.25.
-// Delta-based detection works in sustained-bass sections where the slow/fast
-// ratio model fails (slow tracks up until threshold > 1.0, impossible to trigger).
-// 20-frame (~333ms) cooldown prevents re-trigger on the same attack envelope.
+// Trigger only on big sub-bass-dominant transients:
+//   sub flux ≥ 0.10   (sharp rise in 23-70Hz band)
+//   sub level ≥ 0.25  (loud enough to be a "real" boom, not background)
+//   sub/(sub+mid) ≥ 0.50 (sub-bass dominates over the kick/snare body range)
+// 416ms refractory so a single boom doesn't chain into its own attack envelope.
 function computeBassHit(data,state){
-  const bass=getBass(data);
-  const delta=bass-state.prev;
-  state.prev=bass;
-  if(state.cooldown>0){state.cooldown--;return {bass:bass,onset:0};}
-  if(delta>0.12&&bass>0.25){
-    state.cooldown=20;
-    return {bass:bass,onset:Math.min(delta*4,1.0)};
-  }
-  return {bass:bass,onset:0};
+  const sub=getSubBass(data),mid=getMidBass(data);
+  const sf=Math.max(sub-state.lastSub,0);
+  state.lastSub=sub;
+  if(state.cooldown>0){state.cooldown--;return {bass:getBass(data),onset:0};}
+  if(sf<0.10||sub<0.25) return {bass:getBass(data),onset:0};
+  const ratio=sub/(sub+mid+0.01);
+  if(ratio<0.5) return {bass:getBass(data),onset:0};
+  state.cooldown=25;
+  return {bass:getBass(data),onset:sf*2.5*ratio};
 }
-const liveBassState={prev:0,cooldown:0};
+const liveBassState={lastSub:0,cooldown:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -738,7 +736,7 @@ function mkParticle(data){
   return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
     ox:0, oy:0,
     age:0, life:(150+Math.random()*200)*lf, color, style:s, r:(1+Math.random()*3)*sz,
-    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)], trail:[]};
+    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
 }
 
 function drawP(p, energy){
@@ -747,18 +745,6 @@ function drawP(p, energy){
   const boost = 1 + energy*2.5*pInt;
   const r = p.r*boost;
   ctx.save();
-  if(p.trail.length>1){
-    const tlen=p.trail.length;
-    for(let ti=0;ti<tlen-1;ti++){
-      const tf=(ti+1)/tlen;
-      ctx.globalAlpha=t*0.55*tf;
-      ctx.fillStyle=p.color;
-      ctx.shadowBlur=0;
-      ctx.beginPath();
-      ctx.arc(p.trail[ti].x,p.trail[ti].y,Math.max(p.r*tf*0.55,0.5),0,Math.PI*2);
-      ctx.fill();
-    }
-  }
   ctx.globalAlpha = t * 0.8;
   ctx.fillStyle = p.color;
   ctx.strokeStyle = p.color;
@@ -861,8 +847,6 @@ function updateP(p){
   p.hx+=p.ox*0.04; p.hy+=p.oy*0.04;
   p.ox*=0.92; p.oy*=0.92;
   p.x=p.hx+p.ox; p.y=p.hy+p.oy;
-  p.trail.push({x:p.x,y:p.y});
-  if(p.trail.length>12) p.trail.shift();
 }
 
 function manageParticles(energy,data){
@@ -976,9 +960,7 @@ function drawCircle(data,p,energy,dS){
     const range=Math.max(barMax[i]-barMin[i],0.1);
     let v=Math.min((raw-barMin[i])/range,1);
     if(v<bThresh) v=0;
-    const orate=v>smoothedBars[i]?Math.min(bSmooth*200,1.0):bSmooth*50;
-    smoothedBars[i]+=(v-smoothedBars[i])*orate;
-    half.push(smoothedBars[i]);
+    half.push(v);
   }
   const vals=[...half,...half.slice().reverse()];
   const bars=vals.length;
@@ -1138,16 +1120,11 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-// ctx argument: pass in an already-running AudioContext when available
-// (created synchronously in a user gesture handler), otherwise a new
-// suspended one is created and resume() is attempted.
-function initAudio(buf, ctx){
-  console.log('[MV] initAudio: buf=',!!buf,'ctx state=',ctx&&ctx.state);
-  if(ctx) audioCtx=ctx;
-  else if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
+async function initAudio(buf){
+  if(audioCtx) audioCtx.close();
+  audioCtx=new AudioContext();
+  if(audioCtx.state==='suspended') await audioCtx.resume();
   audioBuffer=buf;
-  if(analyser) try{analyser.disconnect();}catch(e){}
-  if(gainNode) try{gainNode.disconnect();}catch(e){}
   analyser=audioCtx.createAnalyser();
   analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
   gainNode=audioCtx.createGain();
@@ -1160,30 +1137,18 @@ function initAudio(buf, ctx){
 }
 
 function playPreview(offset){
-  console.log('[MV] playPreview: audioBuffer=',!!audioBuffer,'audioCtx state=',audioCtx&&audioCtx.state);
   if(!audioBuffer||!audioCtx) return;
   if(source){source.onended=null;try{source.stop();}catch(e){}}
   offset=offset||0;
   playOffset=offset;
-  const go=()=>{
-    console.log('[MV] go(): starting source. state=',audioCtx.state,'currentTime=',audioCtx.currentTime);
-    try{
-      playStartTime=audioCtx.currentTime;
-      source=audioCtx.createBufferSource();
-      source.buffer=audioBuffer;
-      source.connect(analyser);
-      source.start(0,offset);
-      playing=true;
-      document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-      source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
-      console.log('[MV] go(): source.start succeeded. playing=true');
-    }catch(e){console.log('[MV] go(): source.start threw:',e);}
-  };
-  if(audioCtx.state==='suspended'){
-    console.log('[MV] playPreview: state suspended, calling resume()');
-    audioCtx.resume().then(()=>{console.log('[MV] playPreview resume resolved');go();})
-                     .catch(err=>console.log('[MV] playPreview resume rejected:',err));
-  } else go();
+  playStartTime=audioCtx.currentTime;
+  source=audioCtx.createBufferSource();
+  source.buffer=audioBuffer;
+  source.connect(analyser);
+  source.start(0,offset);
+  playing=true;
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
 }
 
 function getCurrentTime(){
@@ -1197,12 +1162,11 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
-async function initShortsAudio(buf, ctx){
-  if(ctx) sAudioCtx=ctx;
-  else if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
+async function initShortsAudio(buf){
+  if(sAudioCtx) sAudioCtx.close();
+  sAudioCtx=new AudioContext();
+  if(sAudioCtx.state==='suspended') await sAudioCtx.resume();
   shortsAudioBuffer=buf;
-  if(sAnalyser) try{sAnalyser.disconnect();}catch(e){}
-  if(sGainNode) try{sGainNode.disconnect();}catch(e){}
   sAnalyser=sAudioCtx.createAnalyser();
   sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
   sGainNode=sAudioCtx.createGain();
@@ -1217,18 +1181,14 @@ function playShortsPreview(offset){
   if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
   offset=offset||0;
   sPlayOffset=offset;
-  const go=()=>{
-    sPlayStartTime=sAudioCtx.currentTime;
-    sSource=sAudioCtx.createBufferSource();
-    sSource.buffer=shortsAudioBuffer;
-    sSource.connect(sAnalyser);
-    sSource.start(0,offset);
-    sPlaying=true;
-    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-    sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
-  };
-  if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go);
-  else go();
+  sPlayStartTime=sAudioCtx.currentTime;
+  sSource=sAudioCtx.createBufferSource();
+  sSource.buffer=shortsAudioBuffer;
+  sSource.connect(sAnalyser);
+  sSource.start(0,offset);
+  sPlaying=true;
+  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+  sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
 }
 function getCurrentShortsTime(){
   if(!sAudioCtx||!sPlaying) return sPlayOffset;
@@ -1281,39 +1241,23 @@ document.getElementById('logoInput').onchange=e=>{
   if(saved) loadLogoFromSrc(saved,sessionStorage.getItem('mvLogoName'));
 })();
 
-// Unlock AudioContext on pointerdown — fires BEFORE the click that opens the
-// file dialog. In Firefox, the click activation is consumed by the file picker
-// before resume() can use it, leaving resume()'s promise pending forever.
-// pointerdown grabs the activation while it is still fresh.
-function unlockMainAudio(){
-  if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
-  if(audioCtx.state==='suspended') audioCtx.resume()
-    .then(()=>console.log('[MV] main audio unlocked. state=',audioCtx.state))
-    .catch(err=>console.log('[MV] main audio unlock rejected:',err));
-}
-document.getElementById('audioLabel').addEventListener('pointerdown',unlockMainAudio);
 document.getElementById('audioInput').onchange=e=>{
-  console.log('[MV] onchange fired. files=',e.target.files);
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
-  if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
-  console.log('[MV] onchange: audioCtx state=',audioCtx.state);
-  const ctx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    console.log('[MV] reader.onload — decoding,', ev.target.result.byteLength,'bytes');
-    ctx.decodeAudioData(ev.target.result.slice(0), buf=>{
-      console.log('[MV] decoded ok. duration=',buf.duration,'state=',ctx.state);
+    const tmp=new AudioContext();
+    tmp.decodeAudioData(ev.target.result.slice(0), buf=>{
+      tmp.close();
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
-      initAudio(buf, ctx);
-    }, err=>{console.log('[MV] decode error:',err);setStatus('Error decoding audio');});
+      initAudio(buf);
+    }, ()=>setStatus('Error decoding audio'));
   };
-  reader.onerror=err=>console.log('[MV] reader error:',err);
   reader.readAsArrayBuffer(f);
 };
 
@@ -1561,7 +1505,7 @@ document.getElementById('dlBtn').onclick=async function(){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      const st={fast:0,slow:0.05,cooldown:0};
+      const st={lastSub:0,cooldown:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
@@ -1597,8 +1541,8 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
+    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    barMin.fill(0.5);barMax.fill(0.5);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
@@ -1706,7 +1650,7 @@ function switchTab(tab){
     W=1280;H=720;trailC.width=1280;trailC.height=720;
   }
   ctx=C.getContext('2d');
-  particles=[];barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
+  particles=[];barMin.fill(0.5);barMax.fill(0.5);
   // Update seek bar and controls for new tab
   if(isShorts){
     if(shortsAudioBuffer){
@@ -1754,22 +1698,14 @@ document.getElementById('clearPortraitBtn').onclick=function(){
   document.getElementById('portraitWrap').classList.remove('has-file');
   if(activeTab==='shorts'){img=_savedImg;imgLoaded=_savedImgLoaded;if(imgLoaded&&img)applyImageColors(img);}
 };
-// pointerdown — see unlockMainAudio above for why click doesn't work in Firefox.
-function unlockShortsAudio(){
-  if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
-  if(sAudioCtx.state==='suspended') sAudioCtx.resume()
-    .then(()=>console.log('[MV] shorts audio unlocked. state=',sAudioCtx.state))
-    .catch(err=>console.log('[MV] shorts audio unlock rejected:',err));
-}
-document.getElementById('shortsAudioLabel').addEventListener('pointerdown',unlockShortsAudio);
 document.getElementById('shortsAudioInput').onchange=function(e){
   const f=e.target.files[0];if(!f)return;
   setShortsStatus('Loading audio...');
-  if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
-  const ctx=sAudioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    ctx.decodeAudioData(ev.target.result.slice(0),buf=>{
+    const tmp=new AudioContext();
+    tmp.decodeAudioData(ev.target.result.slice(0),buf=>{
+      tmp.close();
       shortsAudioBuffer=buf;
       document.getElementById('shortsAudioLabel').textContent='\u2713 '+f.name;
       document.getElementById('shortsAudioLabel').classList.add('loaded');
@@ -1777,7 +1713,7 @@ document.getElementById('shortsAudioInput').onchange=function(e){
       document.getElementById('shortsDlBtn').disabled=false;
       setShortsStatus('Audio loaded! Previewing...');
       updateShortsEnd();
-      if(activeTab==='shorts') initShortsAudio(buf, ctx);
+      if(activeTab==='shorts') initShortsAudio(buf);
     },()=>setShortsStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
@@ -1929,7 +1865,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={fast:0,slow:0.05,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={lastSub:0,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
     for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
@@ -1959,7 +1895,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
