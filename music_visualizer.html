@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.49</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.50</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -560,27 +560,29 @@ function computeBassHit(data,state){
   const delta=sub-state.prev;
   state.prev=sub;
   if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
-  // Sub-dominance check — distinguishes real bass (sub band concentrated,
-  // hi-mid suppressed) from broadband cinematic swells, orchestral risers,
-  // vocal-rich pads (energy spread across sub + hi-mid).
-  const subDom=sub>hmid*1.65;
-  // 1. Transient — sharp sub-band attack (kicks, 808 hits). Delta floor 0.20
-  // requires a real percussive attack — cinematic swells rise more gradually
-  // (delta ~0.05-0.15 across consecutive frames) and get gated here.
-  if(delta>0.20&&sub>0.70&&subDom){
+  // What "real bass" looks like spectrally (per user perception):
+  // it's the kick / 808 / synth bass IN THE FULL MIX — broadband, sub
+  // comparable to hi-mid (sub/hmid ≈ 1.0-1.5). What "not bass" looks like:
+  // either an orchestral pad/drone (sub-dominant, sub/hmid > 1.65) where
+  // only the low instruments are loud, or a section without real low
+  // content (sub/hmid < 0.85). The envSlow > 0.65 floor gates "first big
+  // sound after a quiet section" which is a cinematic-buildup pattern
+  // distinct from a kick happening within a song.
+  const ok=sub<=hmid*1.65&&sub>hmid*0.85;
+  // 1. Transient — sharp sub-band attack (kick / 808 in the mix)
+  if(delta>0.10&&sub>0.65&&ok&&state.envSlow>0.65){
     state.cooldown=14; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
-  // 2. Adaptive — wobble/wub/growl peaks. envSlow>0.40 floor gates the
-  // "first big sound after silence" pattern that cinematic intros use.
+  // 2. Adaptive — wobble/wub/growl peaks
   const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
-  if(ratio>1.45&&state.envFast>0.55&&delta>0.05&&subDom&&state.envSlow>0.40){
+  if(ratio>1.40&&state.envFast>0.55&&delta>0.05&&ok&&state.envSlow>0.65){
     state.cooldown=14; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
-  // 3. Sustain — periodic fire on held sub-bass (reese, sub sine, 808 tail)
-  if(state.envSlow>0.75&&state.envFast>0.75&&subDom){
+  // 3. Sustain — periodic fire on held sub-bass
+  if(state.envSlow>0.75&&state.envFast>0.75&&ok){
     state.sustainTimer++;
     if(state.sustainTimer>=45){ // ~750ms
       state.sustainTimer=0; state.cooldown=16;
