@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.40</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.41-diag</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1183,7 +1183,14 @@ function loop(){
 function setupAudioElIfNeeded(){
   if(audioEl) return;
   audioEl=new Audio();
+  window.audioEl=audioEl;
   const btn=document.getElementById('pauseBtn');
+  ['play','playing','pause','ended','loadstart','loadeddata','canplay','canplaythrough','waiting','stalled','suspend','error','timeupdate'].forEach(ev=>{
+    audioEl.addEventListener(ev,()=>{
+      if(ev==='timeupdate') return; // fires too often
+      console.log('[MV] audioEl event:',ev,'paused=',audioEl.paused,'t=',audioEl.currentTime.toFixed(2),'rs=',audioEl.readyState,'ns=',audioEl.networkState,'vol=',audioEl.volume,'muted=',audioEl.muted,'err=',audioEl.error);
+    });
+  });
   audioEl.addEventListener('play',()=>{playing=true;btn.innerHTML='&#9208;';btn.title='Pause';});
   audioEl.addEventListener('pause',()=>{playing=false;btn.innerHTML='&#9654;';btn.title='Play';});
   audioEl.addEventListener('ended',()=>{playing=false;btn.innerHTML='&#9654;';btn.title='Play';});
@@ -1202,10 +1209,10 @@ function initAudio(buf,file){
 function playPreview(offset){
   if(!audioBuffer||!audioEl) return;
   if(typeof offset==='number') audioEl.currentTime=offset;
-  audioEl.play().catch(err=>{
-    console.log('[MV] audioEl.play() rejected:',err);
-    setStatus('Playback blocked — interact with the page first.');
-  });
+  console.log('[MV] calling audioEl.play(). src=',audioEl.src.slice(0,40),'rs=',audioEl.readyState,'paused=',audioEl.paused);
+  const p=audioEl.play();
+  if(p&&p.then) p.then(()=>console.log('[MV] play() resolved. paused=',audioEl.paused,'t=',audioEl.currentTime))
+                 .catch(err=>{console.log('[MV] play() rejected:',err);setStatus('Playback blocked — interact with the page first.');});
 }
 
 function getCurrentTime(){
