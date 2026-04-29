@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.50</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.51</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -256,9 +256,9 @@ select:hover{border-color:#a07fff}
   <div class="ctrl"><label>Bass React</label>
     <select id="bassReact">
       <option value="0">Off</option>
-      <option value="15" selected>Subtle</option>
+      <option value="15">Subtle</option>
       <option value="35">Medium</option>
-      <option value="70">Strong</option>
+      <option value="70" selected>Strong</option>
       <option value="120">Extreme</option>
     </select>
   </div>
@@ -310,8 +310,8 @@ select:hover{border-color:#a07fff}
     <select id="barSmoothing">
       <option value="0.05">Snappy</option>
       <option value="0.01">Normal</option>
-      <option value="0.003">Smooth</option>
-      <option value="0.001" selected>Very Smooth</option>
+      <option value="0.003" selected>Smooth</option>
+      <option value="0.001">Very Smooth</option>
       <option value="0.0004">Ultra Smooth</option>
       <option value="0.0002">Maximum</option>
     </select>
@@ -453,7 +453,7 @@ select:hover{border-color:#a07fff}
       <option value="0.5">Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" style="vertical-align:middle;margin-right:3px">Enable Hue</label>
+  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" checked style="vertical-align:middle;margin-right:3px">Enable Hue</label>
     <select id="hueShift">
       <option value="0.1" selected>Very Slow</option>
       <option value="0.3">Slow</option>
@@ -462,7 +462,7 @@ select:hover{border-color:#a07fff}
       <option value="5">Very Fast</option>
     </select>
   </div>
-  <div class="ctrl"><label>Hue Intensity <span id="hueSatVal">50%</span></label>
+  <div class="ctrl"><label>Hue Intensity <span id="hueSatVal">100%</span></label>
     <input type="range" id="hueSat" min="0" max="100" value="100" style="width:90px">
   </div>
   <div class="ctrl"><label>Cam Shake <span class="new-badge">NEW</span></label>
