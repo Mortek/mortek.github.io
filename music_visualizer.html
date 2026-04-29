@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.43</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.44</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -529,42 +529,39 @@ function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
 }
-// Multi-detector bass onset: fires on anything that "sounds like" bass.
-// Combines sub (23-70Hz), low (45-190Hz) and mid-bass (94-188Hz) bands, then
-// runs three parallel detectors so we cover the full bass-style spectrum:
-//   1. Transient   — sharp delta rise: kicks, 808 attacks, snare-on-bass
-//   2. Adaptive    — fast envelope above slow baseline by ratio: wobbles,
-//                    wubs, growls, reese movement, 8-bit square arpeggios
-//   3. Sustain     — periodic re-fire while bass is held high: sub sines,
-//                    reese drones, 808 tails, sustained growls
-// Cooldown is short enough to track ~4Hz wobbles but long enough to avoid
-// double-firing on a single attack.
+// Multi-detector bass onset gated on the SUB band (~23-70Hz). Real bass —
+// kicks, 808s, sub sines, reese, wobbles, growls — has strong energy below
+// 80Hz. Vocals, orchestral pads and ambient layers sit higher and produce
+// a lot of mid-bass energy without true sub content, so they fall out of
+// the trigger when we ignore the low/mid bands here. (low/mid still drive
+// the breathing ring — see drawCircle.) Three detectors:
+//   1. Transient — sharp sub-band attack (kicks, 808 hits, snare-on-bass)
+//   2. Adaptive  — sub-band peak above its own slow baseline (wobble/wub,
+//                  growl peaks, reese movement, 8-bit square attacks)
+//   3. Sustain   — periodic fire while sub is held high (sub sines, reese
+//                  drones, 808 tails, sustained growls)
 function computeBassHit(data,state){
   const sub=getSubBass(data);
   const low=getBass(data);
-  const mid=getMidBass(data);
-  // Take the strongest band so distorted/harmonic-heavy basses (growls,
-  // square waves) and pure sub sines are both detected.
-  const energy=Math.max(sub*1.05,low,mid*0.85);
-  state.envFast+=(energy-state.envFast)*0.4;   // ~40ms
-  state.envSlow+=(energy-state.envSlow)*0.015; // ~1s baseline
-  const delta=energy-state.prev;
-  state.prev=energy;
+  state.envFast+=(sub-state.envFast)*0.4;
+  state.envSlow+=(sub-state.envSlow)*0.015;
+  const delta=sub-state.prev;
+  state.prev=sub;
   if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
-  // 1. Transient — sharp rise
-  if(delta>0.10&&energy>0.22){
+  // 1. Transient — sharp sub-band rise (kicks, 808 attacks)
+  if(delta>0.10&&sub>0.50){
     state.cooldown=14; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
-  // 2. Adaptive — fast envelope above slow baseline (wobble/wub/growl peaks)
-  const baseline=Math.max(state.envSlow,0.05);
+  // 2. Adaptive — wobble/wub/growl peaks (fast > slow baseline)
+  const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
-  if(ratio>1.30&&state.envFast>0.18&&delta>0.03){
+  if(ratio>1.35&&state.envFast>0.50&&delta>0.04){
     state.cooldown=12; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
-  // 3. Sustain — periodic fire on held drones (reese, sub sine, 808 tail)
-  if(state.envSlow>0.28&&state.envFast>0.22){
+  // 3. Sustain — periodic fire on held sub-bass (reese, sub sine, 808 tail)
+  if(state.envSlow>0.55&&state.envFast>0.55){
     state.sustainTimer++;
     if(state.sustainTimer>=30){ // ~500ms
       state.sustainTimer=0; state.cooldown=12;
