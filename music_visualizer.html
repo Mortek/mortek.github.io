@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.41-diag</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.31</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -312,6 +312,8 @@ select:hover{border-color:#a07fff}
       <option value="0.01">Normal</option>
       <option value="0.003">Smooth</option>
       <option value="0.001" selected>Very Smooth</option>
+      <option value="0.0004">Ultra Smooth</option>
+      <option value="0.0002">Maximum</option>
     </select>
   </div>
   <div class="ctrl"><label>Inner Radius</label>
@@ -486,8 +488,8 @@ const logoCanvas = document.createElement('canvas');
 let playStartTime=0, playOffset=0;
 const barMin = new Float32Array(200).fill(0.5);
 const barMax = new Float32Array(200).fill(0.5);
+const smoothedBars = new Float32Array(200).fill(0);
 let audioCtx, analyser, audioBuffer, gainNode, source;
-let audioEl = null;
 let playing = false, animId;
 let sAudioCtx, sAnalyser, sGainNode, sSource;
 let sPlaying=false, sPlayStartTime=0, sPlayOffset=0;
@@ -500,61 +502,6 @@ let bgHue = 0;
 let frameCount = 0;
 let shakeX = 0, shakeY = 0;
 let colorCycleT = 0;
-// ---- IN-JS FFT (decoupled from AudioContext) ----
-// Computes a 256-bin frequency magnitude array (0-255) from raw audioBuffer
-// samples at a given playback time. Used so visualization works regardless of
-// AudioContext state (some browsers' autoplay policies leave AudioContext
-// permanently suspended even after user-gesture resume() calls).
-const FFT_SIZE=2048;
-const fftRe=new Float32Array(FFT_SIZE);
-const fftIm=new Float32Array(FFT_SIZE);
-const hannWin=new Float32Array(FFT_SIZE);
-for(let i=0;i<FFT_SIZE;i++) hannWin[i]=0.5*(1-Math.cos(2*Math.PI*i/(FFT_SIZE-1)));
-const smoothedMag=new Float32Array(256);
-function fftCT(re,im){
-  const N=re.length;
-  let j=0;
-  for(let i=1;i<N;i++){
-    let bit=N>>1;
-    for(;j&bit;bit>>=1) j^=bit;
-    j^=bit;
-    if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}
-  }
-  for(let size=2;size<=N;size<<=1){
-    const half=size>>1;
-    const ang=-2*Math.PI/size;
-    for(let i=0;i<N;i+=size){
-      for(let k=0;k<half;k++){
-        const c=Math.cos(ang*k),s=Math.sin(ang*k);
-        const tre=re[i+k+half]*c-im[i+k+half]*s;
-        const tim=re[i+k+half]*s+im[i+k+half]*c;
-        re[i+k+half]=re[i+k]-tre;
-        im[i+k+half]=im[i+k]-tim;
-        re[i+k]+=tre;
-        im[i+k]+=tim;
-      }
-    }
-  }
-}
-function getFreqDataFromBuffer(buffer,currentSec,output){
-  if(!buffer){output.fill(0);return;}
-  const ch=buffer.getChannelData(0);
-  const start=Math.floor(currentSec*buffer.sampleRate);
-  for(let i=0;i<FFT_SIZE;i++){
-    fftRe[i]=(ch[start+i]||0)*hannWin[i];
-    fftIm[i]=0;
-  }
-  fftCT(fftRe,fftIm);
-  // Match AnalyserNode default: smoothingTimeConstant 0.2, minDb -100, maxDb -30
-  const SM=0.2;
-  for(let i=0;i<output.length;i++){
-    const mag=Math.sqrt(fftRe[i]*fftRe[i]+fftIm[i]*fftIm[i]);
-    smoothedMag[i]=SM*smoothedMag[i]+(1-SM)*mag;
-    const db=20*Math.log10(Math.max(smoothedMag[i],1e-10));
-    output[i]=Math.max(0,Math.min(255,((db+100)/70)*255));
-  }
-}
-
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
@@ -582,23 +529,22 @@ function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
 }
-// Trigger only on big sub-bass-dominant transients:
-//   sub flux ≥ 0.10   (sharp rise in 23-70Hz band)
-//   sub level ≥ 0.25  (loud enough to be a "real" boom, not background)
-//   sub/(sub+mid) ≥ 0.50 (sub-bass dominates over the kick/snare body range)
-// 416ms refractory so a single boom doesn't chain into its own attack envelope.
+// Fire on frame-to-frame bass rise: delta > 0.12 AND bass > 0.25.
+// Delta-based detection works in sustained-bass sections where the slow/fast
+// ratio model fails (slow tracks up until threshold > 1.0, impossible to trigger).
+// 20-frame (~333ms) cooldown prevents re-trigger on the same attack envelope.
 function computeBassHit(data,state){
-  const sub=getSubBass(data),mid=getMidBass(data);
-  const sf=Math.max(sub-state.lastSub,0);
-  state.lastSub=sub;
-  if(state.cooldown>0){state.cooldown--;return {bass:getBass(data),onset:0};}
-  if(sf<0.10||sub<0.25) return {bass:getBass(data),onset:0};
-  const ratio=sub/(sub+mid+0.01);
-  if(ratio<0.5) return {bass:getBass(data),onset:0};
-  state.cooldown=25;
-  return {bass:getBass(data),onset:sf*2.5*ratio};
+  const bass=getBass(data);
+  const delta=bass-state.prev;
+  state.prev=bass;
+  if(state.cooldown>0){state.cooldown--;return {bass:bass,onset:0};}
+  if(delta>0.12&&bass>0.25){
+    state.cooldown=20;
+    return {bass:bass,onset:Math.min(delta*4,1.0)};
+  }
+  return {bass:bass,onset:0};
 }
-const liveBassState={lastSub:0,cooldown:0};
+const liveBassState={prev:0,cooldown:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -792,7 +738,7 @@ function mkParticle(data){
   return {x, y, hx:x, hy:y, vx:(Math.random()-.5)*spd, vy:(Math.random()-.5)*spd,
     ox:0, oy:0,
     age:0, life:(150+Math.random()*200)*lf, color, style:s, r:(1+Math.random()*3)*sz,
-    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)]};
+    rot:Math.random()*360, char:matChars[Math.floor(Math.random()*matChars.length)], trail:[]};
 }
 
 function drawP(p, energy){
@@ -801,6 +747,18 @@ function drawP(p, energy){
   const boost = 1 + energy*2.5*pInt;
   const r = p.r*boost;
   ctx.save();
+  if(p.trail.length>1){
+    const tlen=p.trail.length;
+    for(let ti=0;ti<tlen-1;ti++){
+      const tf=(ti+1)/tlen;
+      ctx.globalAlpha=t*0.55*tf;
+      ctx.fillStyle=p.color;
+      ctx.shadowBlur=0;
+      ctx.beginPath();
+      ctx.arc(p.trail[ti].x,p.trail[ti].y,Math.max(p.r*tf*0.55,0.5),0,Math.PI*2);
+      ctx.fill();
+    }
+  }
   ctx.globalAlpha = t * 0.8;
   ctx.fillStyle = p.color;
   ctx.strokeStyle = p.color;
@@ -903,6 +861,8 @@ function updateP(p){
   p.hx+=p.ox*0.04; p.hy+=p.oy*0.04;
   p.ox*=0.92; p.oy*=0.92;
   p.x=p.hx+p.ox; p.y=p.hy+p.oy;
+  p.trail.push({x:p.x,y:p.y});
+  if(p.trail.length>12) p.trail.shift();
 }
 
 function manageParticles(energy,data){
@@ -1016,7 +976,9 @@ function drawCircle(data,p,energy,dS){
     const range=Math.max(barMax[i]-barMin[i],0.1);
     let v=Math.min((raw-barMin[i])/range,1);
     if(v<bThresh) v=0;
-    half.push(v);
+    const orate=v>smoothedBars[i]?Math.min(bSmooth*200,1.0):bSmooth*50;
+    smoothedBars[i]+=(v-smoothedBars[i])*orate;
+    half.push(smoothedBars[i]);
   }
   const vals=[...half,...half.slice().reverse()];
   const bars=vals.length;
@@ -1151,7 +1113,7 @@ function loop(){
   if(activeTab==='shorts'){
     if(sAnalyser&&sPlaying) sAnalyser.getByteFrequencyData(data);
   } else {
-    if(audioBuffer&&audioEl&&!audioEl.paused) getFreqDataFromBuffer(audioBuffer,audioEl.currentTime,data);
+    if(analyser&&playing) analyser.getByteFrequencyData(data);
   }
   drawFrame(data);
   if(!seeking){
@@ -1176,47 +1138,53 @@ function loop(){
 }
 
 // ---- AUDIO SETUP ----
-// Playback uses HTMLAudioElement (audioEl) — no AudioContext needed. Visualization
-// reads audioBuffer samples + JS FFT, also AudioContext-free. This sidesteps the
-// browser autoplay policy entirely: HTMLAudioElement.play() works in any user
-// gesture handler without resume() promise hangs.
-function setupAudioElIfNeeded(){
-  if(audioEl) return;
-  audioEl=new Audio();
-  window.audioEl=audioEl;
-  const btn=document.getElementById('pauseBtn');
-  ['play','playing','pause','ended','loadstart','loadeddata','canplay','canplaythrough','waiting','stalled','suspend','error','timeupdate'].forEach(ev=>{
-    audioEl.addEventListener(ev,()=>{
-      if(ev==='timeupdate') return; // fires too often
-      console.log('[MV] audioEl event:',ev,'paused=',audioEl.paused,'t=',audioEl.currentTime.toFixed(2),'rs=',audioEl.readyState,'ns=',audioEl.networkState,'vol=',audioEl.volume,'muted=',audioEl.muted,'err=',audioEl.error);
-    });
-  });
-  audioEl.addEventListener('play',()=>{playing=true;btn.innerHTML='&#9208;';btn.title='Pause';});
-  audioEl.addEventListener('pause',()=>{playing=false;btn.innerHTML='&#9654;';btn.title='Play';});
-  audioEl.addEventListener('ended',()=>{playing=false;btn.innerHTML='&#9654;';btn.title='Play';});
-}
-function initAudio(buf,file){
+// ctx argument: pass in an already-running AudioContext when available
+// (created synchronously in a user gesture handler), otherwise a new
+// suspended one is created and resume() is attempted.
+async function initAudio(buf, ctx){
+  if(audioCtx&&audioCtx!==ctx) audioCtx.close();
+  audioCtx=ctx||new AudioContext();
   audioBuffer=buf;
-  setupAudioElIfNeeded();
-  if(audioEl.src&&audioEl.src.startsWith('blob:')) URL.revokeObjectURL(audioEl.src);
-  audioEl.src=URL.createObjectURL(file);
+  analyser=audioCtx.createAnalyser();
+  analyser.fftSize=2048;analyser.smoothingTimeConstant=0.2;
+  gainNode=audioCtx.createGain();
+  analyser.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
   particles=[];
   if(animId) cancelAnimationFrame(animId);
   loop();
-  setStatus('Audio loaded — click ▶ to play.');
+  // If context is already running (passed in from user-gesture handler)
+  // this is instant. Otherwise wait for resume — if browser blocks it the
+  // catch falls through and the play button works as a manual fallback.
+  try{await audioCtx.resume();}catch(e){}
+  playPreview();
 }
 
 function playPreview(offset){
-  if(!audioBuffer||!audioEl) return;
-  if(typeof offset==='number') audioEl.currentTime=offset;
-  console.log('[MV] calling audioEl.play(). src=',audioEl.src.slice(0,40),'rs=',audioEl.readyState,'paused=',audioEl.paused);
-  const p=audioEl.play();
-  if(p&&p.then) p.then(()=>console.log('[MV] play() resolved. paused=',audioEl.paused,'t=',audioEl.currentTime))
-                 .catch(err=>{console.log('[MV] play() rejected:',err);setStatus('Playback blocked — interact with the page first.');});
+  if(!audioBuffer||!audioCtx) return;
+  if(source){source.onended=null;try{source.stop();}catch(e){}}
+  offset=offset||0;
+  playOffset=offset;
+  // start() must run AFTER the context is actually running, not before.
+  // If still suspended (e.g. called from a user-gesture click), await
+  // resume via .then() so the clock is ticking when start() fires.
+  const go=()=>{
+    playStartTime=audioCtx.currentTime;
+    source=audioCtx.createBufferSource();
+    source.buffer=audioBuffer;
+    source.connect(analyser);
+    source.start(0,offset);
+    playing=true;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  };
+  if(audioCtx.state==='suspended') audioCtx.resume().then(go).catch(go);
+  else go();
 }
 
 function getCurrentTime(){
-  return audioEl?audioEl.currentTime:0;
+  if(!audioCtx||!playing) return playOffset;
+  return playOffset+(audioCtx.currentTime-playStartTime);
 }
 
 function fmtTime(s){
@@ -1225,37 +1193,37 @@ function fmtTime(s){
 }
 
 // ---- SHORTS AUDIO ----
-function ensureShortsAudioGraph(){
-  if(!sAudioCtx||sAudioCtx.state==='closed'){
-    sAudioCtx=new AudioContext();
-    console.log('[MV] ensureShortsAudioGraph: created AudioContext, state=',sAudioCtx.state);
-    sAnalyser=sAudioCtx.createAnalyser();
-    sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
-    sGainNode=sAudioCtx.createGain();
-    sAnalyser.connect(sGainNode);
-    sGainNode.connect(sAudioCtx.destination);
-  }
-}
-function initShortsAudio(buf){
+async function initShortsAudio(buf, ctx){
+  if(sAudioCtx&&sAudioCtx!==ctx) sAudioCtx.close();
+  sAudioCtx=ctx||new AudioContext();
   shortsAudioBuffer=buf;
+  sAnalyser=sAudioCtx.createAnalyser();
+  sAnalyser.fftSize=2048;sAnalyser.smoothingTimeConstant=0.2;
+  sGainNode=sAudioCtx.createGain();
+  sAnalyser.connect(sGainNode);
+  sGainNode.connect(sAudioCtx.destination);
   particles=[];
   if(!animId) loop();
-  if(sAudioCtx&&sAudioCtx.state==='running') playShortsPreview();
-  else setShortsStatus('Audio loaded — click ▶ to play.');
+  try{await sAudioCtx.resume();}catch(e){}
+  playShortsPreview();
 }
 function playShortsPreview(offset){
   if(!shortsAudioBuffer||!sAudioCtx)return;
   if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
   offset=offset||0;
   sPlayOffset=offset;
-  sPlayStartTime=sAudioCtx.currentTime;
-  sSource=sAudioCtx.createBufferSource();
-  sSource.buffer=shortsAudioBuffer;
-  sSource.connect(sAnalyser);
-  sSource.start(0,offset);
-  sPlaying=true;
-  document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-  sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  const go=()=>{
+    sPlayStartTime=sAudioCtx.currentTime;
+    sSource=sAudioCtx.createBufferSource();
+    sSource.buffer=shortsAudioBuffer;
+    sSource.connect(sAnalyser);
+    sSource.start(0,offset);
+    sPlaying=true;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+  };
+  if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go).catch(go);
+  else go();
 }
 function getCurrentShortsTime(){
   if(!sAudioCtx||!sPlaying) return sPlayOffset;
@@ -1311,17 +1279,21 @@ document.getElementById('logoInput').onchange=e=>{
 document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
+  // Create AudioContext NOW, synchronously in the user-gesture handler.
+  // This gives us a 'running' context immediately — no resume() needed.
+  if(audioCtx) audioCtx.close();
+  audioCtx=new AudioContext();
+  const gestureCtx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const tmp=new AudioContext();
-    tmp.decodeAudioData(ev.target.result.slice(0), buf=>{
-      tmp.close();
+    gestureCtx.decodeAudioData(ev.target.result.slice(0), buf=>{
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
-      initAudio(buf,f);
+      setStatus('Audio loaded! Previewing — configure your look, then download.');
+      initAudio(buf, gestureCtx);
     }, ()=>setStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
@@ -1337,10 +1309,10 @@ seekBar.addEventListener('change',()=>{
     if(sAudioCtx.state==='suspended') sAudioCtx.resume();
     playShortsPreview(t);
   } else {
-    if(!audioBuffer||!audioEl)return;
+    if(!audioBuffer||!audioCtx)return;
     const t=seekBar.value/1000*audioBuffer.duration;
-    audioEl.currentTime=t;
-    if(audioEl.paused) audioEl.play().catch(()=>{});
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    playPreview(t);
   }
 });
 
@@ -1351,9 +1323,9 @@ document.getElementById('restartBtn').onclick=function(){
     if(sAudioCtx.state==='suspended') sAudioCtx.resume();
     playShortsPreview(0);
   } else {
-    if(!audioBuffer||!audioEl)return;
-    audioEl.currentTime=0;
-    audioEl.play().catch(()=>{});
+    if(!audioBuffer||!audioCtx)return;
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    playPreview(0);
   }
 };
 document.getElementById('muteBtn').onclick=function(){
@@ -1362,35 +1334,32 @@ document.getElementById('muteBtn').onclick=function(){
     if(sGainNode.gain.value>0){sGainNode.gain.value=0;this.innerHTML='&#128263;';this.title='Unmute';}
     else{sGainNode.gain.value=1;this.innerHTML='&#128264;';this.title='Mute';}
   } else {
-    if(!audioEl)return;
-    audioEl.muted=!audioEl.muted;
-    this.innerHTML=audioEl.muted?'&#128263;':'&#128264;';
-    this.title=audioEl.muted?'Unmute':'Mute';
+    if(!gainNode)return;
+    if(gainNode.gain.value>0){gainNode.gain.value=0;this.innerHTML='&#128263;';this.title='Unmute';}
+    else{gainNode.gain.value=1;this.innerHTML='&#128264;';this.title='Mute';}
   }
 };
 document.getElementById('pauseBtn').onclick=function(){
   if(activeTab==='shorts'){
-    if(!shortsAudioBuffer)return;
-    ensureShortsAudioGraph();
+    if(!sAudioCtx||!shortsAudioBuffer)return;
     if(sPlaying){
       sPlayOffset=getCurrentShortsTime();
       if(sSource){sSource.onended=null;try{sSource.stop();}catch(e){}}
       sPlaying=false;
       this.innerHTML='&#9654;';this.title='Resume';
     } else {
-      console.log('[MV] play click (shorts). state=',sAudioCtx.state);
-      if(sAudioCtx.state==='suspended') sAudioCtx.resume()
-        .then(()=>console.log('[MV] shorts resume resolved. state=',sAudioCtx.state))
-        .catch(err=>console.log('[MV] shorts resume rejected:',err));
       playShortsPreview(sPlayOffset);
     }
   } else {
-    if(!audioBuffer||!audioEl)return;
-    if(audioEl.paused) audioEl.play().catch(err=>{
-      console.log('[MV] audioEl.play() rejected:',err);
-      setStatus('Playback blocked — interact with the page first.');
-    });
-    else audioEl.pause();
+    if(!audioCtx||!audioBuffer)return;
+    if(playing){
+      playOffset=getCurrentTime();
+      if(source){source.onended=null;try{source.stop();}catch(e){}}
+      playing=false;
+      this.innerHTML='&#9654;';this.title='Resume';
+    } else {
+      playPreview(playOffset);
+    }
   }
 };
 document.getElementById('clearImgBtn').onclick=function(){
@@ -1407,10 +1376,9 @@ document.getElementById('clearImgBtn').onclick=function(){
   setStatus('Image cleared');
 };
 document.getElementById('clearAudioBtn').onclick=function(){
-  if(audioEl){audioEl.pause();if(audioEl.src&&audioEl.src.startsWith('blob:'))URL.revokeObjectURL(audioEl.src);audioEl.src='';audioEl.muted=false;}
-  audioBuffer=null;
+  if(source){try{source.stop();}catch(e){}}
   playing=false;
-  smoothedMag.fill(0);
+  if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
   window.audioBuffer=null;
   document.getElementById('audioInput').value='';
   document.getElementById('audioLabel').textContent='+ Load Audio';
@@ -1419,7 +1387,7 @@ document.getElementById('clearAudioBtn').onclick=function(){
   document.getElementById('dlBtn').disabled=true;
   document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';
   document.getElementById('muteBtn').innerHTML='&#128264;';document.getElementById('muteBtn').title='Mute';
-  seekBar.value=0;seekTime.textContent='0:00 / 0:00';
+  seekBar.value=0;seekTime.textContent='0:00 / 0:00';playOffset=0;
   setStatus('Audio cleared');
 };
 document.getElementById('clearLogoBtn').onclick=function(){
@@ -1432,10 +1400,9 @@ document.getElementById('clearLogoBtn').onclick=function(){
   setStatus('Logo cleared');
 };
 document.getElementById('clearBtn').onclick=function(){
-  if(audioEl){audioEl.pause();if(audioEl.src&&audioEl.src.startsWith('blob:'))URL.revokeObjectURL(audioEl.src);audioEl.src='';audioEl.muted=false;}
-  audioBuffer=null;
+  if(source){try{source.stop();}catch(e){}}
   playing=false;
-  smoothedMag.fill(0);
+  if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;gainNode=null;}
   if(sSource){try{sSource.stop();}catch(e){}}
   sPlaying=false;
   if(sAudioCtx){sAudioCtx.close();sAudioCtx=null;sAnalyser=null;sGainNode=null;}
@@ -1525,7 +1492,8 @@ document.getElementById('dlBtn').onclick=async function(){
     try{const fh=await showSaveFilePicker({suggestedName:dlName,types:[{description:'WebM Video',accept:{'video/webm':['.webm']}}]});writable=await fh.createWritable();}
     catch(e){if(e.name==='AbortError'){btn.disabled=false;document.getElementById('shortsDlBtn').disabled=!shortsAudioBuffer;pBar.style.display='none';if(!animId)loop();return;}writable=null;}
   }
-  if(audioEl&&!audioEl.paused) audioEl.pause();
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const savedW=W,savedH=H;
   const VW=2560,VH=1440;
@@ -1575,7 +1543,7 @@ document.getElementById('dlBtn').onclick=async function(){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      const st={lastSub:0,cooldown:0};
+      const st={fast:0,slow:0.05,cooldown:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
@@ -1611,8 +1579,8 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
@@ -1682,8 +1650,10 @@ let _savedImg=null,_savedImgLoaded=false,_savedLogo=null,_savedLogoLoaded=false,
 function switchTab(tab){
   if(tab===activeTab)return;
   // Pause outgoing audio
-  if(activeTab==='landscape'&&audioEl&&!audioEl.paused){
-    audioEl.pause();
+  if(activeTab==='landscape'&&playing){
+    playOffset=getCurrentTime();
+    if(source){source.onended=null;try{source.stop();}catch(e){}}
+    playing=false;
   }
   if(activeTab==='shorts'&&sPlaying){
     sPlayOffset=getCurrentShortsTime();
@@ -1718,7 +1688,7 @@ function switchTab(tab){
     W=1280;H=720;trailC.width=1280;trailC.height=720;
   }
   ctx=C.getContext('2d');
-  particles=[];barMin.fill(0.5);barMax.fill(0.5);
+  particles=[];barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
   // Update seek bar and controls for new tab
   if(isShorts){
     if(shortsAudioBuffer){
@@ -1769,11 +1739,12 @@ document.getElementById('clearPortraitBtn').onclick=function(){
 document.getElementById('shortsAudioInput').onchange=function(e){
   const f=e.target.files[0];if(!f)return;
   setShortsStatus('Loading audio...');
+  if(sAudioCtx) sAudioCtx.close();
+  sAudioCtx=new AudioContext();
+  const gestureCtx=sAudioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const tmp=new AudioContext();
-    tmp.decodeAudioData(ev.target.result.slice(0),buf=>{
-      tmp.close();
+    gestureCtx.decodeAudioData(ev.target.result.slice(0),buf=>{
       shortsAudioBuffer=buf;
       document.getElementById('shortsAudioLabel').textContent='\u2713 '+f.name;
       document.getElementById('shortsAudioLabel').classList.add('loaded');
@@ -1781,7 +1752,7 @@ document.getElementById('shortsAudioInput').onchange=function(e){
       document.getElementById('shortsDlBtn').disabled=false;
       setShortsStatus('Audio loaded! Previewing...');
       updateShortsEnd();
-      if(activeTab==='shorts') initShortsAudio(buf);
+      if(activeTab==='shorts') initShortsAudio(buf, gestureCtx);
     },()=>setShortsStatus('Error decoding audio'));
   };
   reader.readAsArrayBuffer(f);
@@ -1873,7 +1844,8 @@ document.getElementById('shortsDlBtn').onclick=async function(){
   }
   if(sSource){try{sSource.stop();}catch(e){}}
   sPlaying=false;
-  if(audioEl&&!audioEl.paused) audioEl.pause();
+  if(source){try{source.stop();}catch(e){}}
+  playing=false;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const savedW=W,savedH=H;
   const savedImg=activeTab==='shorts'?_savedImg:img;
@@ -1932,7 +1904,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={lastSub:0,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={fast:0,slow:0.05,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
     for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
@@ -1962,7 +1934,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.lastSub=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
