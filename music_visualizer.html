@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.47</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.48</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -524,10 +524,18 @@ function getBass(data){
 function getSubBass(data){
   return (data[1]*0.7+data[2]*1.0+data[3]*0.8)/2.5/255;
 }
-// Mid-bass band for the sub-dominance ratio (~94-188Hz).
+// Mid-bass band (~94-188Hz). Used for the breathing visual.
 function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
+}
+// High-mid band (~540-2150Hz). Real bass instruments concentrate energy in
+// the sub band and have suppressed high-mid content; cinematic risers,
+// orchestral swells and broadband impacts spread energy across all bands so
+// sub ≈ hmid. Comparing sub vs hmid lets us reject "kinda bassy" non-bass.
+function getHighMid(data){
+  let s=0;for(let i=50;i<200;i++) s+=data[i];
+  return s/150/255;
 }
 // Multi-detector bass onset gated on the SUB band (~23-70Hz). Real bass —
 // kicks, 808s, sub sines, reese, wobbles, growls — has strong energy below
@@ -543,26 +551,34 @@ function getMidBass(data){
 function computeBassHit(data,state){
   const sub=getSubBass(data);
   const low=getBass(data);
+  const hmid=getHighMid(data);
   state.envFast+=(sub-state.envFast)*0.4;
   state.envSlow+=(sub-state.envSlow)*0.015;
   const delta=sub-state.prev;
   state.prev=sub;
   if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
-  // 1. Transient — sharp sub-band rise (kicks, 808 attacks). Short cooldown
-  // (~100ms) so fast patterns (16ths, drum rolls, 808 trap rolls) all fire.
-  if(delta>0.11&&sub>0.65){
-    state.cooldown=6; state.sustainTimer=0;
+  // Sub-dominance check — distinguishes real bass (sub band concentrated)
+  // from broadband cinematic swells / orchestral risers / vocal-rich pads
+  // (energy spread across sub + hi-mid). Strict ratio for new attacks,
+  // looser for held content (sustain envelope alone is already evidence).
+  const subDomStrict=sub>hmid*1.65;
+  const subDomLoose =sub>hmid*1.20;
+  // 1. Transient — sharp sub-band rise (kicks, 808 attacks). Cooldown ~233ms
+  // is short enough for fast patterns (16ths at 150 BPM = 200ms) but long
+  // enough to gate continuation re-fires on a single swell or sustained note.
+  if(delta>0.11&&sub>0.70&&subDomStrict){
+    state.cooldown=14; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
   // 2. Adaptive — wobble/wub/growl peaks (fast > slow baseline)
   const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
-  if(ratio>1.45&&state.envFast>0.55&&delta>0.05){
-    state.cooldown=6; state.sustainTimer=0;
+  if(ratio>1.45&&state.envFast>0.55&&delta>0.05&&subDomStrict){
+    state.cooldown=14; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
   // 3. Sustain — periodic fire on held sub-bass (reese, sub sine, 808 tail)
-  if(state.envSlow>0.70&&state.envFast>0.70){
+  if(state.envSlow>0.70&&state.envFast>0.70&&subDomLoose){
     state.sustainTimer++;
     if(state.sustainTimer>=45){ // ~750ms
       state.sustainTimer=0; state.cooldown=16;
