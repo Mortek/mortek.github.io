@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.30</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.31</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -529,26 +529,22 @@ function getMidBass(data){
   let s=0;for(let i=4;i<=8;i++) s+=data[i];
   return s/5/255;
 }
-// Trigger only on big sub-bass-dominant transients:
-//   sub flux ≥ 0.10   (sharp rise in 23-70Hz band)
-//   sub level ≥ 0.25  (loud enough to be a "real" boom, not background)
-//   sub/(sub+mid) ≥ 0.50 (sub-bass dominates over the kick/snare body range)
-// 416ms refractory so a single boom doesn't chain into its own attack envelope.
+// Fire on frame-to-frame bass rise: delta > 0.12 AND bass > 0.25.
+// Delta-based detection works in sustained-bass sections where the slow/fast
+// ratio model fails (slow tracks up until threshold > 1.0, impossible to trigger).
+// 20-frame (~333ms) cooldown prevents re-trigger on the same attack envelope.
 function computeBassHit(data,state){
   const bass=getBass(data);
-  // fast: ~2-frame follower catches attack; slow: ~50-frame background
-  state.fast=state.fast*0.4+bass*0.6;
-  state.slow=state.slow*0.98+bass*0.02;
+  const delta=bass-state.prev;
+  state.prev=bass;
   if(state.cooldown>0){state.cooldown--;return {bass:bass,onset:0};}
-  // Fire when fast spikes well above background AND has enough absolute energy.
-  // minT=0.38 prevents firing when slow collapsed after a quiet section.
-  const threshold=Math.max(state.slow*1.55,0.38);
-  const excess=state.fast-threshold;
-  if(excess<=0) return {bass:bass,onset:0};
-  state.cooldown=40;
-  return {bass:bass,onset:Math.min(excess*3.5,1.0)};
+  if(delta>0.12&&bass>0.25){
+    state.cooldown=20;
+    return {bass:bass,onset:Math.min(delta*4,1.0)};
+  }
+  return {bass:bass,onset:0};
 }
-const liveBassState={fast:0,slow:0.05,cooldown:0};
+const liveBassState={prev:0,cooldown:0};
 let currentBass=0,currentBassOnset=0;
 
 // ---- PREFERENCES (session cookie, per-tab) ----
@@ -1583,7 +1579,7 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.fast=0;liveBassState.slow=0.05;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);
     setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
@@ -1938,7 +1934,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.fast=0;liveBassState.slow=0.05;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
+    liveBassState.prev=0;liveBassState.cooldown=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);
     setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
