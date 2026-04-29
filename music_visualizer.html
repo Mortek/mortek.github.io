@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.34</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.35-diag</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1142,6 +1142,7 @@ function loop(){
 // (created synchronously in a user gesture handler), otherwise a new
 // suspended one is created and resume() is attempted.
 function initAudio(buf, ctx){
+  console.log('[MV] initAudio: buf=',!!buf,'ctx state=',ctx&&ctx.state);
   if(ctx) audioCtx=ctx;
   else if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
   audioBuffer=buf;
@@ -1159,25 +1160,30 @@ function initAudio(buf, ctx){
 }
 
 function playPreview(offset){
+  console.log('[MV] playPreview: audioBuffer=',!!audioBuffer,'audioCtx state=',audioCtx&&audioCtx.state);
   if(!audioBuffer||!audioCtx) return;
   if(source){source.onended=null;try{source.stop();}catch(e){}}
   offset=offset||0;
   playOffset=offset;
-  // start() must run AFTER the context is actually running, not before.
-  // If still suspended (e.g. called from a user-gesture click), await
-  // resume via .then() so the clock is ticking when start() fires.
   const go=()=>{
-    playStartTime=audioCtx.currentTime;
-    source=audioCtx.createBufferSource();
-    source.buffer=audioBuffer;
-    source.connect(analyser);
-    source.start(0,offset);
-    playing=true;
-    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
-    source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+    console.log('[MV] go(): starting source. state=',audioCtx.state,'currentTime=',audioCtx.currentTime);
+    try{
+      playStartTime=audioCtx.currentTime;
+      source=audioCtx.createBufferSource();
+      source.buffer=audioBuffer;
+      source.connect(analyser);
+      source.start(0,offset);
+      playing=true;
+      document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+      source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
+      console.log('[MV] go(): source.start succeeded. playing=true');
+    }catch(e){console.log('[MV] go(): source.start threw:',e);}
   };
-  if(audioCtx.state==='suspended') audioCtx.resume().then(go);
-  else go();
+  if(audioCtx.state==='suspended'){
+    console.log('[MV] playPreview: state suspended, calling resume()');
+    audioCtx.resume().then(()=>{console.log('[MV] playPreview resume resolved');go();})
+                     .catch(err=>console.log('[MV] playPreview resume rejected:',err));
+  } else go();
 }
 
 function getCurrentTime(){
@@ -1279,20 +1285,24 @@ document.getElementById('logoInput').onchange=e=>{
 // The file dialog opens after this, so by the time onchange fires the context
 // is already running and no further resume() is needed.
 document.getElementById('audioLabel').addEventListener('click',()=>{
+  console.log('[MV] label click. audioCtx=',audioCtx,'state=',audioCtx&&audioCtx.state);
   if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
-  audioCtx.resume();
+  console.log('[MV] label click after create. state=',audioCtx.state);
+  audioCtx.resume().then(()=>console.log('[MV] label-click resume resolved. state=',audioCtx.state))
+                   .catch(err=>console.log('[MV] label-click resume rejected:',err));
 });
 document.getElementById('audioInput').onchange=e=>{
+  console.log('[MV] onchange fired. files=',e.target.files);
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
-  // audioCtx was created and resumed by the label click above.
-  // Fallback: if somehow missing, create now (user won't get autoplay but
-  // the play button click will unlock it).
   if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
+  console.log('[MV] onchange: audioCtx state=',audioCtx.state);
   const ctx=audioCtx;
   const reader=new FileReader();
   reader.onload=ev=>{
+    console.log('[MV] reader.onload — decoding,', ev.target.result.byteLength,'bytes');
     ctx.decodeAudioData(ev.target.result.slice(0), buf=>{
+      console.log('[MV] decoded ok. duration=',buf.duration,'state=',ctx.state);
       window.audioBuffer=buf;
       document.getElementById('audioLabel').textContent='✓ '+f.name;
       document.getElementById('audioLabel').classList.add('loaded');
@@ -1300,8 +1310,9 @@ document.getElementById('audioInput').onchange=e=>{
       document.getElementById('dlBtn').disabled=false;
       setStatus('Audio loaded! Previewing — configure your look, then download.');
       initAudio(buf, ctx);
-    }, ()=>setStatus('Error decoding audio'));
+    }, err=>{console.log('[MV] decode error:',err);setStatus('Error decoding audio');});
   };
+  reader.onerror=err=>console.log('[MV] reader error:',err);
   reader.readAsArrayBuffer(f);
 };
 
