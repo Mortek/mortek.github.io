@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.45</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.46</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -549,22 +549,22 @@ function computeBassHit(data,state){
   state.prev=sub;
   if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
   // 1. Transient — sharp sub-band rise (kicks, 808 attacks)
-  if(delta>0.11&&sub>0.52){
-    state.cooldown=16; state.sustainTimer=0;
+  if(delta>0.11&&sub>0.65){
+    state.cooldown=18; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
   // 2. Adaptive — wobble/wub/growl peaks (fast > slow baseline)
   const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
-  if(ratio>1.40&&state.envFast>0.52&&delta>0.05){
-    state.cooldown=14; state.sustainTimer=0;
+  if(ratio>1.45&&state.envFast>0.55&&delta>0.05){
+    state.cooldown=16; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
   // 3. Sustain — periodic fire on held sub-bass (reese, sub sine, 808 tail)
-  if(state.envSlow>0.58&&state.envFast>0.58){
+  if(state.envSlow>0.70&&state.envFast>0.70){
     state.sustainTimer++;
-    if(state.sustainTimer>=40){ // ~667ms
-      state.sustainTimer=0; state.cooldown=14;
+    if(state.sustainTimer>=45){ // ~750ms
+      state.sustainTimer=0; state.cooldown=16;
       return {bass:low,onset:0.45};
     }
   } else {
