@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.35-diag</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.36</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1281,16 +1281,17 @@ document.getElementById('logoInput').onchange=e=>{
   if(saved) loadLogoFromSrc(saved,sessionStorage.getItem('mvLogoName'));
 })();
 
-// Unlock AudioContext on label click — this IS a real in-page click (user gesture).
-// The file dialog opens after this, so by the time onchange fires the context
-// is already running and no further resume() is needed.
-document.getElementById('audioLabel').addEventListener('click',()=>{
-  console.log('[MV] label click. audioCtx=',audioCtx,'state=',audioCtx&&audioCtx.state);
+// Unlock AudioContext on pointerdown — fires BEFORE the click that opens the
+// file dialog. In Firefox, the click activation is consumed by the file picker
+// before resume() can use it, leaving resume()'s promise pending forever.
+// pointerdown grabs the activation while it is still fresh.
+function unlockMainAudio(){
   if(!audioCtx||audioCtx.state==='closed') audioCtx=new AudioContext();
-  console.log('[MV] label click after create. state=',audioCtx.state);
-  audioCtx.resume().then(()=>console.log('[MV] label-click resume resolved. state=',audioCtx.state))
-                   .catch(err=>console.log('[MV] label-click resume rejected:',err));
-});
+  if(audioCtx.state==='suspended') audioCtx.resume()
+    .then(()=>console.log('[MV] main audio unlocked. state=',audioCtx.state))
+    .catch(err=>console.log('[MV] main audio unlock rejected:',err));
+}
+document.getElementById('audioLabel').addEventListener('pointerdown',unlockMainAudio);
 document.getElementById('audioInput').onchange=e=>{
   console.log('[MV] onchange fired. files=',e.target.files);
   const f=e.target.files[0]; if(!f) return;
@@ -1753,10 +1754,14 @@ document.getElementById('clearPortraitBtn').onclick=function(){
   document.getElementById('portraitWrap').classList.remove('has-file');
   if(activeTab==='shorts'){img=_savedImg;imgLoaded=_savedImgLoaded;if(imgLoaded&&img)applyImageColors(img);}
 };
-document.getElementById('shortsAudioLabel').addEventListener('click',()=>{
+// pointerdown — see unlockMainAudio above for why click doesn't work in Firefox.
+function unlockShortsAudio(){
   if(!sAudioCtx||sAudioCtx.state==='closed') sAudioCtx=new AudioContext();
-  sAudioCtx.resume();
-});
+  if(sAudioCtx.state==='suspended') sAudioCtx.resume()
+    .then(()=>console.log('[MV] shorts audio unlocked. state=',sAudioCtx.state))
+    .catch(err=>console.log('[MV] shorts audio unlock rejected:',err));
+}
+document.getElementById('shortsAudioLabel').addEventListener('pointerdown',unlockShortsAudio);
 document.getElementById('shortsAudioInput').onchange=function(e){
   const f=e.target.files[0];if(!f)return;
   setShortsStatus('Loading audio...');
