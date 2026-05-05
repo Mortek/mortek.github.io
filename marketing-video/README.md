@@ -29,10 +29,16 @@ npm run build:whole     # render Whole shorts (1080x1920) to out/whole-short.mp4
 
 ## Regenerating voice lines
 
+Voices are generated locally with Kokoro TTS (`af_bella` voice — warm American female):
+
 ```bash
-PIPER=.tools/piper
-LD_LIBRARY_PATH=$PIPER echo "Your line." | $PIPER/piper -m .tools/voices/amy.onnx -f public/audio/voice/<book>/<scene>.wav
+PY=.tools/kokoro-env/bin/python
+$PY .tools/gen_voice.py af_bella public/audio/voice/<book>/<scene>.wav "Your line."
 ```
+
+Available Kokoro voices: `af_bella`, `af_nicole`, `af_sarah`, `af_sky`, `am_adam`, `am_michael`, `bf_emma`, `bf_isabella`, `bm_george`, `bm_lewis`.
+
+The Kokoro model files (`kokoro-v1.0.onnx`, `kokoro-voices-v1.0.bin`) and the venv (`.tools/kokoro-env/`) are gitignored.
 
 ## Verifying the install
 

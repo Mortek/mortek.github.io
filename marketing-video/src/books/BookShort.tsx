@@ -19,7 +19,7 @@ export const BOOK_SHORT_DURATION = HOOK_DUR + COVER_DUR + CTA_DUR;
 
 const MUSIC_BASE = 0.22;
 const MUSIC_DUCKED = 0.10;
-const VOICE_GAIN = 1.0;
+const VOICE_GAIN = 1.6;
 const MUSIC_START_FRAME = 60 * 30;
 
 const VOICE_WINDOWS: Array<[number, number]> = [
