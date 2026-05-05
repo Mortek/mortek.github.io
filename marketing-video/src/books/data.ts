@@ -11,6 +11,12 @@ export const whole: BookData = {
   cover: staticFile("books/whole/cover.png"),
   banner: staticFile("books/whole/banner.png"),
   hook: "Are you really living a whole life?",
+  voice: {
+    hook: staticFile("audio/voice/whole/hook.wav"),
+    cover: staticFile("audio/voice/whole/cover.wav"),
+    pillars: staticFile("audio/voice/whole/pillars.wav"),
+    cta: staticFile("audio/voice/whole/cta.wav"),
+  },
   bullets: [
     "Physical",
     "Mental",

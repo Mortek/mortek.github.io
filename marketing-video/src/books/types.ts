@@ -8,6 +8,12 @@ export type BookData = {
   banner: string;
   bullets: string[];
   hook: string;
+  voice: {
+    hook: string;
+    cover: string;
+    pillars: string;
+    cta: string;
+  };
   palette: {
     bg: string;
     bgAccent: string;
