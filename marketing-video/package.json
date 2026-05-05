@@ -8,6 +8,7 @@
     "studio": "remotion studio src/index.ts",
     "build:whole": "remotion render src/index.ts WholeShort out/whole-short.mp4",
     "build:dopamine-detox": "remotion render src/index.ts DopamineDetoxShort out/dopamine-detox-short.mp4",
+    "build:stoic-mind": "remotion render src/index.ts StoicMindShort out/stoic-mind-short.mp4",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {

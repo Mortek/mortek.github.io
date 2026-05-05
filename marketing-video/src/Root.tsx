@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { BookShort, BOOK_SHORT_DURATION } from "./books/BookShort";
-import { whole, dopamineDetox } from "./books/data";
+import { whole, dopamineDetox, stoicMind } from "./books/data";
 
 export const RemotionRoot = () => {
   return (
@@ -22,6 +22,15 @@ export const RemotionRoot = () => {
         width={1080}
         height={1920}
         defaultProps={{ book: dopamineDetox }}
+      />
+      <Composition
+        id="StoicMindShort"
+        component={BookShort}
+        durationInFrames={BOOK_SHORT_DURATION}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{ book: stoicMind }}
       />
     </>
   );
