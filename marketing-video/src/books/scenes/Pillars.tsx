@@ -17,8 +17,6 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
     extrapolateRight: "clamp",
     easing: easeOut,
   });
-  const headerSpread = interpolate(frame, [0, 60], [14, 4]);
-
   const dividerScale = interpolate(frame, [12, 36], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -55,7 +53,8 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
             fontWeight: 800,
             fontSize: 64,
             textAlign: "center",
-            letterSpacing: headerSpread,
+            letterSpacing: 4,
+            whiteSpace: "nowrap",
             textShadow: `0 4px 24px rgba(0,0,0,0.5), 0 0 40px ${book.palette.accent}33`,
           }}
         >
@@ -76,7 +75,7 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
             gap: "44px 60px",
             marginTop: 100,
             width: "100%",
@@ -119,8 +118,9 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
                     fontFamily:
                       "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
                     fontWeight: 700,
-                    fontSize: 60,
+                    fontSize: 56,
                     letterSpacing: 0.5,
+                    whiteSpace: "nowrap",
                     textShadow: "0 2px 12px rgba(0,0,0,0.5)",
                   }}
                 >
