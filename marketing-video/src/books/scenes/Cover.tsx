@@ -32,7 +32,11 @@ export const Cover: React.FC<{ book: BookData; durationInFrames: number }> = ({
     extrapolateRight: "clamp",
     easing: easeOut,
   });
-  const titleSpread = interpolate(frame, [24, 90], [16, 6]);
+  const titleLen = book.title.length;
+  const titleFontSize =
+    titleLen <= 6 ? 180 : titleLen <= 10 ? 150 : titleLen <= 14 ? 120 : 96;
+  const titleBaseSpread = titleLen <= 8 ? 6 : 2;
+  const titleSpread = interpolate(frame, [24, 90], [titleBaseSpread + 10, titleBaseSpread]);
 
   const subtitleOpacity = interpolate(frame, [44, 64], [0, 1], {
     extrapolateRight: "clamp",
@@ -113,11 +117,12 @@ export const Cover: React.FC<{ book: BookData; durationInFrames: number }> = ({
             fontFamily:
               "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
             fontWeight: 900,
-            fontSize: 180,
+            fontSize: titleFontSize,
             letterSpacing: titleSpread,
             textAlign: "center",
             textShadow: `0 8px 40px rgba(0,0,0,0.6), 0 0 60px ${book.palette.accent}55`,
-            lineHeight: 1,
+            lineHeight: 1.05,
+            maxWidth: 980,
           }}
         >
           {book.title}

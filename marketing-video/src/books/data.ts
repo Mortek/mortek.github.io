@@ -14,21 +14,35 @@ export const whole: BookData = {
   voice: {
     hook: staticFile("audio/voice/whole/hook.wav"),
     cover: staticFile("audio/voice/whole/cover.wav"),
-    pillars: staticFile("audio/voice/whole/pillars.wav"),
     cta: staticFile("audio/voice/whole/cta.wav"),
   },
-  bullets: [
-    "Physical",
-    "Mental",
-    "Emotional",
-    "Social",
-    "Spiritual",
-    "Environmental",
-  ],
   palette: {
     bg: "#0e2a26",
     bgAccent: "#1d5a4a",
     text: "#f5f3ec",
     accent: "#f6a55c",
+  },
+};
+
+export const dopamineDetox: BookData = {
+  id: "dopamine-detox",
+  title: "DOPAMINE DETOX",
+  subtitle:
+    "Reclaim Your Brain, Focus, and Energy in a World Designed to Distract You",
+  author: "Maurice Moret",
+  asin: "B0D8XJPTY9",
+  cover: staticFile("books/dopamine-detox/cover.png"),
+  banner: staticFile("books/dopamine-detox/banner.png"),
+  hook: "Trapped in the dopamine loop?",
+  voice: {
+    hook: staticFile("audio/voice/dopamine-detox/hook.wav"),
+    cover: staticFile("audio/voice/dopamine-detox/cover.wav"),
+    cta: staticFile("audio/voice/dopamine-detox/cta.wav"),
+  },
+  palette: {
+    bg: "#0a1428",
+    bgAccent: "#1a2c5a",
+    text: "#eef3ff",
+    accent: "#00d4ff",
   },
 };

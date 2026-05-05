@@ -11,11 +11,13 @@ voice, out_path, text = sys.argv[1], sys.argv[2], sys.argv[3]
 
 # Phoneme overrides for words Kokoro mispronounces.
 # Maps a word to a phoneme string that replaces the auto-phonemized version.
-PHONEME_OVERRIDES = {
-    "Amazon": "ˈæməzˌɑːn",
-    "Amazon!": "ˈæməzˌɑːn!",
-    "Amazon.": "ˈæməzˌɑːn.",
-}
+# Direct phoneme-string overrides. Maps Kokoro's auto-phonemized output
+# to a corrected version. Replacement is plain str.replace(), so order
+# matters (longer/more-specific keys first).
+PHONEME_OVERRIDES = [
+    ("ˈæmɐzˌɑːn", "ˈæməzˌɑːn"),  # Amazon: ɐ -> ə
+    ("dˈɑːpɐmˌiːn", "dˈoʊpəmˌiːn"),  # dopamine: DAH -> DOH, ɐ -> ə
+]
 
 k = Kokoro(
     "/home/maurice/Projects/mortek.github.io/marketing-video/.tools/kokoro-v1.0.onnx",
@@ -25,14 +27,8 @@ k = Kokoro(
 tok = Tokenizer()
 phonemes = tok.phonemize(text, lang="en-us")
 
-# Per-word phoneme replacement: tokenize source, swap matching words, recombine.
-src_words = text.split()
-ph_words = phonemes.split()
-if len(src_words) == len(ph_words):
-    for i, w in enumerate(src_words):
-        if w in PHONEME_OVERRIDES:
-            ph_words[i] = PHONEME_OVERRIDES[w]
-    phonemes = " ".join(ph_words)
+for src, dst in PHONEME_OVERRIDES:
+    phonemes = phonemes.replace(src, dst)
 
 samples, sr = k.create(phonemes, voice=voice, is_phonemes=True)
 sf.write(out_path, samples, sr)
