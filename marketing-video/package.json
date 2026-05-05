@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "studio": "remotion studio src/index.ts",
-    "build": "remotion render src/index.ts MarketingVideo out/marketing-video.mp4",
-    "build:shorts": "remotion render src/index.ts MarketingVideoShorts out/marketing-video-shorts.mp4",
+    "build:whole": "remotion render src/index.ts WholeShort out/whole-short.mp4",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
