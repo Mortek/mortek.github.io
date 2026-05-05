@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.51</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.52</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1592,7 +1592,7 @@ document.getElementById('dlBtn').onclick=async function(){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
-      const st={fast:0,slow:0.05,cooldown:0};
+      const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
       for(let i=0;i<totalFrames;i++){
@@ -1953,7 +1953,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={fast:0,slow:0.05,cooldown:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
     for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
