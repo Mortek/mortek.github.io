@@ -1,4 +1,4 @@
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import type { BookData } from "../types";
 import { easeOut } from "../easing";
 
@@ -7,19 +7,27 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
   durationInFrames,
 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
 
-  const headerOpacity = interpolate(frame, [0, 16], [0, 1], {
+  const headerOpacity = interpolate(frame, [0, 18], [0, 1], {
     extrapolateRight: "clamp",
     easing: easeOut,
   });
-  const headerY = interpolate(frame, [0, 18], [24, 0], {
+  const headerY = interpolate(frame, [0, 22], [40, 0], {
+    extrapolateRight: "clamp",
+    easing: easeOut,
+  });
+  const headerSpread = interpolate(frame, [0, 60], [14, 4]);
+
+  const dividerScale = interpolate(frame, [12, 36], [0, 1], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: easeOut,
   });
 
   const exitOpacity = interpolate(
     frame,
-    [durationInFrames - 8, durationInFrames],
+    [durationInFrames - 10, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp" }
   );
@@ -27,13 +35,13 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
   return (
     <AbsoluteFill
       style={{
-        background: `linear-gradient(165deg, ${book.palette.bg} 0%, ${book.palette.bgAccent} 100%)`,
+        background: `linear-gradient(165deg, #000 0%, ${book.palette.bg} 30%, ${book.palette.bgAccent} 100%)`,
         opacity: exitOpacity,
       }}
     >
       <AbsoluteFill
         style={{
-          padding: "260px 100px 0",
+          padding: "240px 80px 0",
           alignItems: "center",
         }}
       >
@@ -42,23 +50,26 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
             opacity: headerOpacity,
             transform: `translateY(${headerY}px)`,
             color: book.palette.text,
-            fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-            fontWeight: 700,
-            fontSize: 56,
+            fontFamily:
+              "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+            fontWeight: 800,
+            fontSize: 64,
             textAlign: "center",
-            letterSpacing: 1,
+            letterSpacing: headerSpread,
+            textShadow: `0 4px 24px rgba(0,0,0,0.5), 0 0 40px ${book.palette.accent}33`,
           }}
         >
           Six pillars of a whole life
         </div>
         <div
           style={{
-            width: 140,
+            width: 220,
             height: 4,
-            backgroundColor: book.palette.accent,
-            marginTop: 28,
-            opacity: headerOpacity,
+            background: `linear-gradient(90deg, transparent 0%, ${book.palette.accent} 50%, transparent 100%)`,
+            marginTop: 32,
+            transform: `scaleX(${dividerScale})`,
             borderRadius: 4,
+            boxShadow: `0 0 20px ${book.palette.accent}aa`,
           }}
         />
 
@@ -66,52 +77,51 @@ export const Pillars: React.FC<{ book: BookData; durationInFrames: number }> = (
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "40px 56px",
-            marginTop: 90,
+            gap: "44px 60px",
+            marginTop: 100,
             width: "100%",
           }}
         >
           {book.bullets.map((b, i) => {
-            const start = 22 + i * 8;
-            const op = interpolate(frame, [start, start + 14], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-              easing: easeOut,
+            const start = 26 + i * 7;
+            const sp = spring({
+              frame: Math.max(0, frame - start),
+              fps,
+              config: { damping: 14, stiffness: 120 },
             });
-            const dx = interpolate(frame, [start, start + 18], [40, 0], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-              easing: easeOut,
-            });
+            const op = interpolate(sp, [0, 1], [0, 1]);
+            const dx = interpolate(sp, [0, 1], [60, 0]);
+            const sc = interpolate(sp, [0, 1], [0.85, 1]);
             return (
               <div
                 key={b}
                 style={{
                   opacity: op,
-                  transform: `translateX(${dx}px)`,
+                  transform: `translateX(${dx}px) scale(${sc})`,
                   display: "flex",
                   alignItems: "center",
-                  gap: 22,
+                  gap: 24,
                 }}
               >
                 <div
                   style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 18,
+                    width: 22,
+                    height: 22,
+                    borderRadius: 22,
                     backgroundColor: book.palette.accent,
                     flexShrink: 0,
-                    boxShadow: `0 0 24px ${book.palette.accent}aa`,
+                    boxShadow: `0 0 32px ${book.palette.accent}, 0 0 8px ${book.palette.accent}`,
                   }}
                 />
                 <div
                   style={{
                     color: book.palette.text,
                     fontFamily:
-                      "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-                    fontWeight: 600,
-                    fontSize: 54,
+                      "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 60,
                     letterSpacing: 0.5,
+                    textShadow: "0 2px 12px rgba(0,0,0,0.5)",
                   }}
                 >
                   {b}

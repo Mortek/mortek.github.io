@@ -4,6 +4,9 @@ import { Hook } from "./scenes/Hook";
 import { Cover } from "./scenes/Cover";
 import { Pillars } from "./scenes/Pillars";
 import { CTA } from "./scenes/CTA";
+import { Particles } from "./effects/Particles";
+import { Vignette } from "./effects/Vignette";
+import { LightSweep } from "./effects/LightSweep";
 
 const HOOK_DUR = 75;
 const COVER_DUR = 150;
@@ -17,15 +20,16 @@ const CTA_START = HOOK_DUR + COVER_DUR + PILLARS_DUR;
 
 export const BOOK_SHORT_DURATION = HOOK_DUR + COVER_DUR + PILLARS_DUR + CTA_DUR;
 
-const MUSIC_BASE = 0.18;
-const MUSIC_DUCKED = 0.09;
+const MUSIC_BASE = 0.22;
+const MUSIC_DUCKED = 0.10;
 const VOICE_GAIN = 1.0;
+const MUSIC_START_FRAME = 60 * 30;
 
 const VOICE_WINDOWS: Array<[number, number]> = [
-  [HOOK_START + 4, HOOK_START + HOOK_DUR],
-  [COVER_START + 6, COVER_START + COVER_DUR],
-  [PILLARS_START + 6, PILLARS_START + PILLARS_DUR],
-  [CTA_START + 6, CTA_START + CTA_DUR],
+  [HOOK_START + 6, HOOK_START + HOOK_DUR],
+  [COVER_START + 8, COVER_START + COVER_DUR],
+  [PILLARS_START + 8, PILLARS_START + PILLARS_DUR],
+  [CTA_START + 8, CTA_START + CTA_DUR],
 ];
 
 const isInVoiceWindow = (frame: number) =>
@@ -35,10 +39,10 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
   const { durationInFrames } = useVideoConfig();
 
   const musicVolume = (f: number) => {
-    const fadeIn = interpolate(f, [0, 24], [0, 1], { extrapolateRight: "clamp" });
+    const fadeIn = interpolate(f, [0, 30], [0, 1], { extrapolateRight: "clamp" });
     const fadeOut = interpolate(
       f,
-      [durationInFrames - 36, durationInFrames - 4],
+      [durationInFrames - 40, durationInFrames - 4],
       [1, 0],
       { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
     );
@@ -47,19 +51,23 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
   };
 
   return (
-    <AbsoluteFill style={{ backgroundColor: book.palette.bg }}>
-      <Audio src={staticFile("audio/music-bed.mp3")} volume={musicVolume} />
+    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      <Audio
+        src={staticFile("audio/music-bed.mp3")}
+        volume={musicVolume}
+        startFrom={MUSIC_START_FRAME}
+      />
 
-      <Sequence from={HOOK_START + 4}>
+      <Sequence from={HOOK_START + 6}>
         <Audio src={book.voice.hook} volume={VOICE_GAIN} />
       </Sequence>
-      <Sequence from={COVER_START + 6}>
+      <Sequence from={COVER_START + 8}>
         <Audio src={book.voice.cover} volume={VOICE_GAIN} />
       </Sequence>
-      <Sequence from={PILLARS_START + 6}>
+      <Sequence from={PILLARS_START + 8}>
         <Audio src={book.voice.pillars} volume={VOICE_GAIN} />
       </Sequence>
-      <Sequence from={CTA_START + 6}>
+      <Sequence from={CTA_START + 8}>
         <Audio src={book.voice.cta} volume={VOICE_GAIN} />
       </Sequence>
 
@@ -75,6 +83,19 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
       <Sequence from={CTA_START} durationInFrames={CTA_DUR}>
         <CTA book={book} durationInFrames={CTA_DUR} />
       </Sequence>
+
+      <AbsoluteFill style={{ pointerEvents: "none" }}>
+        <Particles color={book.palette.text} intensity={0.6} />
+      </AbsoluteFill>
+
+      <Sequence from={COVER_START + 10} durationInFrames={70}>
+        <LightSweep duration={70} color="rgba(255,255,255,0.16)" />
+      </Sequence>
+      <Sequence from={CTA_START + 10} durationInFrames={70}>
+        <LightSweep duration={70} color={`${book.palette.accent}33`} />
+      </Sequence>
+
+      <Vignette strength={0.7} />
     </AbsoluteFill>
   );
 };
