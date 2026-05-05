@@ -23,7 +23,7 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
       [1, 0],
       { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
     );
-    return Math.min(fadeIn, fadeOut) * 0.55;
+    return Math.min(fadeIn, fadeOut);
   };
 
   return (
