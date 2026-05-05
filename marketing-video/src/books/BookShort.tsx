@@ -2,23 +2,20 @@ import { AbsoluteFill, Audio, Sequence, interpolate, staticFile, useVideoConfig 
 import type { BookData } from "./types";
 import { Hook } from "./scenes/Hook";
 import { Cover } from "./scenes/Cover";
-import { Pillars } from "./scenes/Pillars";
 import { CTA } from "./scenes/CTA";
 import { Particles } from "./effects/Particles";
 import { Vignette } from "./effects/Vignette";
 import { LightSweep } from "./effects/LightSweep";
 
-const HOOK_DUR = 75;
-const COVER_DUR = 150;
-const PILLARS_DUR = 165;
+const HOOK_DUR = 90;
+const COVER_DUR = 210;
 const CTA_DUR = 150;
 
 const HOOK_START = 0;
 const COVER_START = HOOK_DUR;
-const PILLARS_START = HOOK_DUR + COVER_DUR;
-const CTA_START = HOOK_DUR + COVER_DUR + PILLARS_DUR;
+const CTA_START = HOOK_DUR + COVER_DUR;
 
-export const BOOK_SHORT_DURATION = HOOK_DUR + COVER_DUR + PILLARS_DUR + CTA_DUR;
+export const BOOK_SHORT_DURATION = HOOK_DUR + COVER_DUR + CTA_DUR;
 
 const MUSIC_BASE = 0.22;
 const MUSIC_DUCKED = 0.10;
@@ -27,8 +24,7 @@ const MUSIC_START_FRAME = 60 * 30;
 
 const VOICE_WINDOWS: Array<[number, number]> = [
   [HOOK_START + 6, HOOK_START + HOOK_DUR],
-  [COVER_START + 8, COVER_START + COVER_DUR],
-  [PILLARS_START + 8, PILLARS_START + PILLARS_DUR],
+  [COVER_START + 10, COVER_START + COVER_DUR],
   [CTA_START + 8, CTA_START + CTA_DUR],
 ];
 
@@ -61,11 +57,8 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
       <Sequence from={HOOK_START + 6}>
         <Audio src={book.voice.hook} volume={VOICE_GAIN} />
       </Sequence>
-      <Sequence from={COVER_START + 8}>
+      <Sequence from={COVER_START + 10}>
         <Audio src={book.voice.cover} volume={VOICE_GAIN} />
-      </Sequence>
-      <Sequence from={PILLARS_START + 8}>
-        <Audio src={book.voice.pillars} volume={VOICE_GAIN} />
       </Sequence>
       <Sequence from={CTA_START + 8}>
         <Audio src={book.voice.cta} volume={VOICE_GAIN} />
@@ -77,9 +70,6 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
       <Sequence from={COVER_START} durationInFrames={COVER_DUR}>
         <Cover book={book} durationInFrames={COVER_DUR} />
       </Sequence>
-      <Sequence from={PILLARS_START} durationInFrames={PILLARS_DUR}>
-        <Pillars book={book} durationInFrames={PILLARS_DUR} />
-      </Sequence>
       <Sequence from={CTA_START} durationInFrames={CTA_DUR}>
         <CTA book={book} durationInFrames={CTA_DUR} />
       </Sequence>
@@ -88,8 +78,8 @@ export const BookShort: React.FC<{ book: BookData }> = ({ book }) => {
         <Particles color={book.palette.text} intensity={0.6} />
       </AbsoluteFill>
 
-      <Sequence from={COVER_START + 10} durationInFrames={70}>
-        <LightSweep duration={70} color="rgba(255,255,255,0.16)" />
+      <Sequence from={COVER_START + 12} durationInFrames={80}>
+        <LightSweep duration={80} color="rgba(255,255,255,0.16)" />
       </Sequence>
       <Sequence from={CTA_START + 10} durationInFrames={70}>
         <LightSweep duration={70} color={`${book.palette.accent}33`} />
