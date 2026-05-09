@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.54</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.55</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -574,7 +574,11 @@ function computeBassHit(data,state,fps=60){
   const ok=sub<=hmid*1.65&&sub>hmid*0.85;
   const cd=Math.round(14*fps/30); // ~467ms at any fps
   // 1. Transient — sharp sub-band attack (kick / 808 in the mix)
-  if(delta>0.10&&sub>0.65&&ok&&state.envSlow>0.65){
+  // sub>envSlow*1.12: sub must spike ≥12% above its own running average.
+  // Rejects orchestral passages where sub is consistently elevated but not
+  // spiking (sub/envSlow ≈ 1.0–1.1); passes kicks/808s that spike clearly
+  // above the recent baseline (sub/envSlow ≥ 1.15+).
+  if(delta>0.10&&sub>0.65&&sub>state.envSlow*1.12&&ok&&state.envSlow>0.65){
     state.cooldown=cd; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
