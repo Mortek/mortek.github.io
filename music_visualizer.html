@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.53</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.54</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -552,7 +552,9 @@ function getHighMid(data){
 //                  growl peaks, reese movement, 8-bit square attacks)
 //   3. Sustain   — periodic fire while sub is held high (sub sines, reese
 //                  drones, 808 tails, sustained growls)
-function computeBassHit(data,state){
+// fps param normalises all frame-count timers so render (30fps) and
+// live preview (~60fps) trigger at the same wall-clock intervals.
+function computeBassHit(data,state,fps=60){
   const sub=getSubBass(data);
   const low=getBass(data);
   const hmid=getHighMid(data);
@@ -570,23 +572,24 @@ function computeBassHit(data,state){
   // sound after a quiet section" which is a cinematic-buildup pattern
   // distinct from a kick happening within a song.
   const ok=sub<=hmid*1.65&&sub>hmid*0.85;
+  const cd=Math.round(14*fps/30); // ~467ms at any fps
   // 1. Transient — sharp sub-band attack (kick / 808 in the mix)
   if(delta>0.10&&sub>0.65&&ok&&state.envSlow>0.65){
-    state.cooldown=14; state.sustainTimer=0;
+    state.cooldown=cd; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
   // 2. Adaptive — wobble/wub/growl peaks
   const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
   if(ratio>1.40&&state.envFast>0.55&&delta>0.05&&ok&&state.envSlow>0.65){
-    state.cooldown=14; state.sustainTimer=0;
+    state.cooldown=cd; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
-  // 3. Sustain — periodic fire on held sub-bass
+  // 3. Sustain — periodic fire on held sub-bass (~1500ms at any fps)
   if(state.envSlow>0.75&&state.envFast>0.75&&ok){
     state.sustainTimer++;
-    if(state.sustainTimer>=45){ // ~750ms
-      state.sustainTimer=0; state.cooldown=16;
+    if(state.sustainTimer>=Math.round(45*fps/30)){
+      state.sustainTimer=0; state.cooldown=Math.round(16*fps/30);
       return {bass:low,onset:0.45};
     }
   } else {
@@ -1058,7 +1061,7 @@ function drawCircle(data,p,energy,dS){
 }
 // ---- MAIN DRAW ----
 let precomputedFX=null;
-function drawFrame(data){
+function drawFrame(data,dt=33.3){
   frameCount++;
   const dS=Math.min(W,H)/720;
   // Color cycle
@@ -1074,7 +1077,7 @@ function drawFrame(data){
     bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
     shakeX=fx.shakeX||0;shakeY=fx.shakeY||0;
   } else {
-    const hit=computeBassHit(data,liveBassState);
+    const hit=computeBassHit(data,liveBassState,1000/dt);
     currentBass=hit.bass;currentBassOnset=hit.onset;
     const zoomStr=parseFloat(document.getElementById('bassZoom').value);
     const brightStr=parseFloat(document.getElementById('brightPulse').value);
@@ -1090,8 +1093,10 @@ function drawFrame(data){
         shakeY+=(Math.random()-0.5)*scaledStr*shakeStr*10;
       }
     }
-    bgZoom*=0.88; bgBright*=0.85; bgVig*=0.9;
-    shakeX*=0.85; shakeY*=0.85;
+    // time-based decay keeps pulse duration consistent regardless of display fps
+    const d=dt/33.3;
+    bgZoom*=Math.pow(0.88,d);bgBright*=Math.pow(0.85,d);bgVig*=Math.pow(0.9,d);
+    shakeX*=Math.pow(0.85,d);shakeY*=Math.pow(0.85,d);
   }
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
@@ -1157,15 +1162,19 @@ function drawFrame(data){
 const seekBar=document.getElementById('seekBar');
 const seekTime=document.getElementById('seekTime');
 let seeking=false;
+let _lastFrameT=0;
 function loop(){
   animId=requestAnimationFrame(loop);
+  const _now=performance.now();
+  const _dt=_lastFrameT>0?Math.min(_now-_lastFrameT,100):33.3;
+  _lastFrameT=_now;
   const data=new Uint8Array(256);
   if(activeTab==='shorts'){
     if(sAnalyser&&sPlaying) sAnalyser.getByteFrequencyData(data);
   } else {
     if(analyser&&playing) analyser.getByteFrequencyData(data);
   }
-  drawFrame(data);
+  drawFrame(data,_dt);
   if(!seeking){
     if(activeTab==='shorts'){
       if(shortsAudioBuffer){
@@ -1596,8 +1605,11 @@ document.getElementById('dlBtn').onclick=async function(){
       const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};
       let z=0,b=0,v=0,sx=0,sy=0;
       precomputedFX=[];
+      const smBins=new Float32Array(binCount);
       for(let i=0;i<totalFrames;i++){
-        const hit=computeBassHit(frames[i],st);
+        // smooth in-place (smoothingTimeConstant=0.2) to match Web Audio analyser
+        const fr=frames[i];if(fr){for(let j=0;j<fr.length;j++){smBins[j]=smBins[j]*0.2+fr[j]*0.8;fr[j]=smBins[j]+0.5|0;}}
+        const hit=computeBassHit(frames[i],st,30);
         if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
         z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
         const pStr=(hit.onset>0.03&&bassReactStr>0)?Math.pow(hit.onset,0.55)*2.0*bassReactStr:0;
@@ -1955,7 +1967,9 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
     {const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
-    for(let i=0;i<frames.length;i++){const hit=computeBassHit(frames[i],st);
+    const smBins=new Float32Array(binCount);
+    for(let i=0;i<frames.length;i++){const fr=frames[i];if(fr){for(let j=0;j<fr.length;j++){smBins[j]=smBins[j]*0.2+fr[j]*0.8;fr[j]=smBins[j]+0.5|0;}}
+    const hit=computeBassHit(frames[i],st,30);
     if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
     z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
     const pS=(hit.onset>0.03&&brStr>0)?Math.pow(hit.onset,0.55)*2.0*brStr:0;
