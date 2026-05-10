@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.56</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.57</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -505,7 +505,6 @@ let shakeX = 0, shakeY = 0;
 let circleIntroT = 0;      // ms elapsed since playback started
 let circleIntroAnimT = -1; // ms into spring animation, -1 = not yet fired
 let circleIntroDone = false;
-let circleIntroFlash = 0;  // brightness flash for the pop, decays each frame
 let colorCycleT = 0;
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
@@ -1112,11 +1111,9 @@ function drawFrame(data,dt=33.3){
   if(!circleIntroDone){
     const _cip=precomputedFX?true:(activeTab==='shorts'?sPlaying:playing);
     if(_cip) circleIntroT+=dt;
-    if(circleIntroAnimT<0&&circleIntroT>=1500){circleIntroAnimT=0;circleIntroFlash=0.3;}
-    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=600)circleIntroDone=true;}
+    if(circleIntroAnimT<0&&circleIntroT>=1500){circleIntroAnimT=0;}
+    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=1000)circleIntroDone=true;}
   }
-  circleIntroFlash*=Math.pow(0.85,dt/33.3);
-  if(circleIntroFlash>0.005) bgBright=Math.max(bgBright,circleIntroFlash);
 
   ctx.clearRect(0,0,W,H);
   // Camera shake + Ken Burns: applied to entire frame
@@ -1175,9 +1172,8 @@ function drawFrame(data,dt=33.3){
   if(!circleIntroDone&&circleIntroAnimT<0){
     // hidden before pop-in
   } else if(!circleIntroDone&&circleIntroAnimT>=0){
-    const t=Math.min(circleIntroAnimT/600,1);
-    const c4=(2*Math.PI)/3;
-    const s=Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c4)+1;
+    const t=Math.min(circleIntroAnimT/1000,1);
+    const s=1-Math.pow(1-t,3);
     ctx.save();ctx.translate(W/2,H/2);ctx.scale(s,s);ctx.translate(-W/2,-H/2);
     drawCircle(data,p,energy,dS);
     ctx.restore();
@@ -1263,8 +1259,7 @@ function playPreview(offset){
     source.connect(analyser);
     source.start(0,offset);
     playing=true;
-    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;circleIntroFlash=0;
-    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
   if(audioCtx.state==='suspended') audioCtx.resume().then(go).catch(go);
@@ -1308,8 +1303,7 @@ function playShortsPreview(offset){
     sSource.connect(sAnalyser);
     sSource.start(0,offset);
     sPlaying=true;
-    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;circleIntroFlash=0;
-    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
   if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go).catch(go);
@@ -1673,8 +1667,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
     liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroFlash=0;
-    setStatus('Encoding video...');
+    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;    setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
     ctx=offC.getContext('2d');
@@ -2029,8 +2022,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroFlash=0;
-    setShortsStatus('Encoding video...');
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;    setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
     for(let i=0;i<warmupFrames;i++){drawFrame(frames[i]);frames[i]=null;}
