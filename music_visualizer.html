@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.58</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.59</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -505,7 +505,8 @@ let shakeX = 0, shakeY = 0;
 let circleIntroT = 0;
 let circleIntroAnimT = -1;
 let circleIntroDone = false;
-let circleIntroRings = []; // shockwave rings: [{t, maxT}]
+let circleIntroRings = [];
+let circlePostPulseT = -1; // ms into post-settle bass pulse, -1 = idle
 let colorCycleT = 0;
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
@@ -1116,8 +1117,9 @@ function drawFrame(data,dt=33.3){
       circleIntroAnimT=0;
       circleIntroRings=[{t:0,maxT:700},{t:-150,maxT:700},{t:-300,maxT:700}];
     }
-    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=1200)circleIntroDone=true;}
+    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=1200){circleIntroDone=true;circlePostPulseT=0;}}
   }
+  if(circlePostPulseT>=0){circlePostPulseT+=dt;if(circlePostPulseT>=600)circlePostPulseT=-1;}
   circleIntroRings=circleIntroRings.filter(r=>{r.t+=dt;return r.t<r.maxT;});
 
   ctx.clearRect(0,0,W,H);
@@ -1197,6 +1199,12 @@ function drawFrame(data,dt=33.3){
     const t=Math.min(circleIntroAnimT/1200,1);
     const c1=2.5,c3=c1+1;
     const s=1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);
+    ctx.save();ctx.translate(W/2,H/2);ctx.scale(s,s);ctx.translate(-W/2,-H/2);
+    drawCircle(data,p,energy,dS);
+    ctx.restore();
+  } else if(circlePostPulseT>=0){
+    const t=circlePostPulseT/600;
+    const s=1+0.12*Math.sin(t*Math.PI);
     ctx.save();ctx.translate(W/2,H/2);ctx.scale(s,s);ctx.translate(-W/2,-H/2);
     drawCircle(data,p,energy,dS);
     ctx.restore();
@@ -1282,7 +1290,8 @@ function playPreview(offset){
     source.connect(analyser);
     source.start(0,offset);
     playing=true;
-    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;circleIntroRings=[];circlePostPulseT=-1;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     source.onended=()=>{playing=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
   if(audioCtx.state==='suspended') audioCtx.resume().then(go).catch(go);
@@ -1326,7 +1335,8 @@ function playShortsPreview(offset){
     sSource.connect(sAnalyser);
     sSource.start(0,offset);
     sPlaying=true;
-    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
+    circleIntroT=offset*1000;circleIntroDone=circleIntroT>=1500;circleIntroAnimT=-1;circleIntroRings=[];circlePostPulseT=-1;
+    document.getElementById('pauseBtn').innerHTML='&#9208;';document.getElementById('pauseBtn').title='Pause';
     sSource.onended=()=>{sPlaying=false;document.getElementById('pauseBtn').innerHTML='&#9654;';document.getElementById('pauseBtn').title='Play';};
   };
   if(sAudioCtx.state==='suspended') sAudioCtx.resume().then(go).catch(go);
@@ -1690,7 +1700,7 @@ document.getElementById('dlBtn').onclick=async function(){
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
     liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
-    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];    setStatus('Encoding video...');
+    barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;    setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
     ctx=offC.getContext('2d');
@@ -2045,11 +2055,11 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];    setShortsStatus('Encoding video...');
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;    setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
     for(let i=0;i<warmupFrames;i++){drawFrame(frames[i]);frames[i]=null;}
-    circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];frameCount=0;
+    circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;frameCount=0;
     const vBuf=[];
     let aIdx=0,cStart=0;
     const vEnc=new VideoEncoder({output:(chunk)=>{const d=new Uint8Array(chunk.byteLength);chunk.copyTo(d);vBuf.push({data:d,ts:chunk.timestamp,kf:chunk.type==='key'});},error:e=>{throw e;}});
