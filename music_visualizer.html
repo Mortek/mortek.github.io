@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.59</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.60</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -454,7 +454,7 @@ select:hover{border-color:#a07fff}
       <option value="0.5">Extreme</option>
     </select>
   </div>
-  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" checked style="vertical-align:middle;margin-right:3px">Enable Hue</label>
+  <div class="ctrl"><label><input type="checkbox" id="hueShiftOn" style="vertical-align:middle;margin-right:3px">Enable Hue</label>
     <select id="hueShift">
       <option value="0.1" selected>Very Slow</option>
       <option value="0.3">Slow</option>
@@ -648,7 +648,10 @@ function loadPrefs(){
 }
 loadPrefs();
 if(!landscapeSettings) landscapeSettings=captureSettings();
-if(!shortsSettings) shortsSettings={...landscapeSettings};
+if(!shortsSettings) {
+  shortsSettings={...landscapeSettings};
+  shortsSettings.barIntensity='1.5';
+}
 const logoTintEl=document.getElementById('logoTint'),logoTintVal=document.getElementById('logoTintVal');
 logoTintVal.textContent=logoTintEl.value+'%';
 logoTintEl.oninput=function(){logoTintVal.textContent=this.value+'%';};

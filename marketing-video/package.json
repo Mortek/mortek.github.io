@@ -7,6 +7,8 @@
     "dev": "remotion studio src/index.ts",
     "studio": "remotion studio src/index.ts",
     "build:whole": "remotion render src/index.ts WholeShort out/whole-short.mp4",
+    "build:whole-premium-9x16": "remotion render src/index.ts WholePremiumVertical out/whole-premium-9x16.mp4",
+    "build:wealth-without-permission-premium": "remotion render src/index.ts WealthWithoutPermissionPremium out/wealth-without-permission-premium-9x16.mp4",
     "build:dopamine-detox": "remotion render src/index.ts DopamineDetoxShort out/dopamine-detox-short.mp4",
     "build:stoic-mind": "remotion render src/index.ts StoicMindShort out/stoic-mind-short.mp4",
     "upgrade": "remotion upgrade"
@@ -14,6 +16,7 @@
   "dependencies": {
     "@remotion/bundler": "^4.0.457",
     "@remotion/cli": "^4.0.457",
+    "@remotion/google-fonts": "^4.0.457",
     "@remotion/renderer": "^4.0.457",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

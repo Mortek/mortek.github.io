@@ -15,8 +15,9 @@ voice, out_path, text = sys.argv[1], sys.argv[2], sys.argv[3]
 # to a corrected version. Replacement is plain str.replace(), so order
 # matters (longer/more-specific keys first).
 PHONEME_OVERRIDES = [
-    ("ˈæmɐzˌɑːn", "ˈæməzˌɑːn"),  # Amazon: ɐ -> ə
+    ("ˈæmɐzˌɑːn", "ˈæməzɒn"),  # Amazon: AM-uh-zon — fix both vowels (short ɒ ending)
     ("dˈɑːpɐmˌiːn", "dˈoʊpəmˌiːn"),  # dopamine: DAH -> DOH, ɐ -> ə
+    ("mˈɔːɹt", "mˈɔːɹɛt"),  # Moret: collapsed to "MORT" — restore two-syllable "MOR-et"
 ]
 
 k = Kokoro(
