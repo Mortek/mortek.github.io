@@ -78,20 +78,50 @@
     100%{transform:translate(0,0) rotate(0)}
   }
 
-  /* owl perched above envelope while carrying */
+  /* snowy owl carrying envelope in its beak */
   .carrier-owl{
     position:absolute;
     left:50%;
-    top:-78px;
-    width: clamp(100px, 22%, 150px);
+    bottom:100%;
+    margin-bottom:-10px; /* slight overlap so beak grips the envelope edge */
+    width: clamp(110px, 24%, 160px);
     transform: translateX(-50%);
     z-index:8;
-    transform-origin: 50% 80%;
+    transform-origin: 50% 95%;
   }
-  .carrier-owl svg{display:block;width:100%;height:auto;filter: drop-shadow(0 6px 8px rgba(0,0,0,.5))}
-  .carrier-owl .wings{transform-origin:50% 55%; animation: wingFlap .28s ease-in-out infinite}
-  @keyframes wingFlap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.55) translateY(-2px)}}
-  .carrier-owl .string{stroke:#2a1c08;stroke-width:1.4;opacity:.55;fill:none}
+  .carrier-owl svg{display:block;width:100%;height:auto;filter: drop-shadow(0 6px 10px rgba(0,0,0,.55))}
+  .carrier-owl .wings{transform-origin:50% 50%; animation: wingFlap .3s ease-in-out infinite}
+  @keyframes wingFlap{
+    0%,100%{transform:scaleY(1)}
+    50%{transform:scaleY(.5) translateY(-3px)}
+  }
+
+  /* a single feather dropped when the owl flies away */
+  .feather{
+    position:absolute;
+    left:50%;
+    bottom:100%;
+    margin-bottom:30px;
+    width:22px;
+    transform: translateX(-50%) rotate(-8deg);
+    opacity:0;
+    z-index:7;
+    pointer-events:none;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  }
+  .feather svg{display:block;width:100%;height:auto}
+  .feather.fall{
+    animation: featherFall 4.6s cubic-bezier(.3,.2,.6,.9) forwards;
+  }
+  @keyframes featherFall{
+    0%  {opacity:0; transform: translateX(-50%) translate(0,0)        rotate(-8deg)}
+    8%  {opacity:1}
+    25% {              transform: translateX(-50%) translate(-28px,90px)  rotate(40deg)}
+    50% {              transform: translateX(-50%) translate(22px,190px)  rotate(-30deg)}
+    75% {              transform: translateX(-50%) translate(-18px,290px) rotate(55deg)}
+    95% {opacity:.85}
+    100%{opacity:0; transform: translateX(-50%) translate(12px,400px) rotate(-15deg)}
+  }
 
   /* once delivered, owl flies up & off */
   .carrier-owl.away{
@@ -335,7 +365,7 @@
 
   @media (max-width: 480px){
     .parchment{max-height:90vh}
-    .carrier-owl{top:-62px}
+    .carrier-owl{margin-bottom:-8px}
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:.01ms !important; transition-duration:.15s !important}
@@ -349,46 +379,75 @@
 <main class="stage">
  <div class="delivery" id="delivery">
 
-  <!-- Owl carrying the envelope -->
+  <!-- Snowy owl (Hedwig) carrying the envelope in its beak -->
   <div class="carrier-owl" id="carrierOwl" aria-hidden="true">
-    <svg viewBox="0 0 140 130">
-      <!-- strings from talons to envelope corners -->
-      <line class="string" x1="58" y1="112" x2="40" y2="128"/>
-      <line class="string" x1="82" y1="112" x2="100" y2="128"/>
+    <svg viewBox="0 0 140 140">
+      <!-- tail tuft at the top -->
+      <path d="M58 14 L70 4 L82 14 L78 24 L70 18 L62 24 Z" fill="#e8e3d3"/>
       <!-- wings (animated) -->
       <g class="wings">
-        <path d="M14 60 Q40 30 56 70 Q40 80 14 60 Z" fill="#2a1c08"/>
-        <path d="M126 60 Q100 30 84 70 Q100 80 126 60 Z" fill="#2a1c08"/>
-        <path d="M22 58 Q44 38 54 66" fill="none" stroke="#5a4324" stroke-width="1.5"/>
-        <path d="M118 58 Q96 38 86 66" fill="none" stroke="#5a4324" stroke-width="1.5"/>
+        <path d="M10 56 Q38 24 60 68 Q40 82 10 56 Z"   fill="#fafaf6" stroke="#bdb6a4" stroke-width=".6"/>
+        <path d="M130 56 Q102 24 80 68 Q100 82 130 56 Z" fill="#fafaf6" stroke="#bdb6a4" stroke-width=".6"/>
+        <!-- wing speckles -->
+        <circle cx="26" cy="54" r="1.4" fill="#3a2710" opacity=".45"/>
+        <circle cx="38" cy="62" r="1.2" fill="#3a2710" opacity=".45"/>
+        <circle cx="48" cy="58" r="1.1" fill="#3a2710" opacity=".4"/>
+        <circle cx="114" cy="54" r="1.4" fill="#3a2710" opacity=".45"/>
+        <circle cx="102" cy="62" r="1.2" fill="#3a2710" opacity=".45"/>
+        <circle cx="92" cy="58" r="1.1" fill="#3a2710" opacity=".4"/>
+        <!-- wing edge feathers -->
+        <path d="M22 56 Q44 36 56 64" fill="none" stroke="#d6d0bf" stroke-width=".9"/>
+        <path d="M118 56 Q96 36 84 64" fill="none" stroke="#d6d0bf" stroke-width=".9"/>
       </g>
-      <!-- body -->
-      <ellipse cx="70" cy="78" rx="26" ry="30" fill="#3a2710"/>
-      <ellipse cx="70" cy="78" rx="18" ry="22" fill="#5a4324" opacity=".6"/>
-      <!-- feather tufts -->
-      <path d="M55 56 Q60 50 64 56" stroke="#1a0f04" stroke-width="2" fill="none"/>
-      <path d="M76 56 Q80 50 85 56" stroke="#1a0f04" stroke-width="2" fill="none"/>
-      <!-- head -->
-      <circle cx="70" cy="50" r="22" fill="#4a341a"/>
-      <!-- ear tufts -->
-      <polygon points="53,34 50,22 59,32" fill="#3a2710"/>
-      <polygon points="87,34 90,22 81,32" fill="#3a2710"/>
-      <!-- eyes -->
-      <circle cx="60" cy="50" r="8" fill="#fff"/>
-      <circle cx="80" cy="50" r="8" fill="#fff"/>
-      <circle cx="60" cy="51" r="4.5" fill="#1a0f04"/>
-      <circle cx="80" cy="51" r="4.5" fill="#1a0f04"/>
-      <circle cx="61.5" cy="49" r="1.4" fill="#fff"/>
-      <circle cx="81.5" cy="49" r="1.4" fill="#fff"/>
-      <!-- beak -->
-      <polygon points="70,56 66,64 74,64" fill="#c9a14a"/>
-      <!-- belly speckles -->
-      <circle cx="64" cy="80" r="1.5" fill="#1a0f04" opacity=".5"/>
-      <circle cx="76" cy="84" r="1.5" fill="#1a0f04" opacity=".5"/>
-      <circle cx="68" cy="92" r="1.5" fill="#1a0f04" opacity=".5"/>
-      <!-- talons -->
-      <path d="M58 108 L58 116 M62 108 L62 116" stroke="#c9a14a" stroke-width="2"/>
-      <path d="M78 108 L78 116 M82 108 L82 116" stroke="#c9a14a" stroke-width="2"/>
+      <!-- body (oriented head-down) -->
+      <ellipse cx="70" cy="56" rx="28" ry="30" fill="#fafaf6" stroke="#bdb6a4" stroke-width=".5"/>
+      <!-- chest speckles -->
+      <circle cx="60" cy="50" r="1.3" fill="#3a2710" opacity=".4"/>
+      <circle cx="78" cy="54" r="1.2" fill="#3a2710" opacity=".4"/>
+      <circle cx="68" cy="64" r="1.4" fill="#3a2710" opacity=".4"/>
+      <circle cx="80" cy="70" r="1.2" fill="#3a2710" opacity=".4"/>
+      <circle cx="58" cy="72" r="1.1" fill="#3a2710" opacity=".4"/>
+      <circle cx="72" cy="78" r="1.3" fill="#3a2710" opacity=".4"/>
+      <!-- head (below body, gripping the envelope) -->
+      <circle cx="70" cy="98" r="22" fill="#fefefb" stroke="#bdb6a4" stroke-width=".5"/>
+      <!-- heart-shaped facial disc -->
+      <path d="M52 94 Q60 86 70 86 Q80 86 88 94" fill="none" stroke="#d6d0bf" stroke-width=".8"/>
+      <!-- subtle face speckles -->
+      <circle cx="56" cy="90" r=".8" fill="#3a2710" opacity=".3"/>
+      <circle cx="84" cy="90" r=".8" fill="#3a2710" opacity=".3"/>
+      <!-- amber eyes -->
+      <circle cx="60" cy="98" r="6.5" fill="#fff" stroke="#3a2710" stroke-width=".5"/>
+      <circle cx="80" cy="98" r="6.5" fill="#fff" stroke="#3a2710" stroke-width=".5"/>
+      <circle cx="60" cy="98" r="5.2" fill="#e9b836"/>
+      <circle cx="80" cy="98" r="5.2" fill="#e9b836"/>
+      <circle cx="60" cy="99" r="3"   fill="#1a0f04"/>
+      <circle cx="80" cy="99" r="3"   fill="#1a0f04"/>
+      <circle cx="61" cy="97.5" r="1" fill="#fff"/>
+      <circle cx="81" cy="97.5" r="1" fill="#fff"/>
+      <!-- beak gripping the envelope top (at SVG bottom) -->
+      <path d="M66 112 Q70 110 74 112 L72 122 Q70 124 68 122 Z" fill="#1a0f04"/>
+      <path d="M67.5 120 L70 126 L72.5 120 Z" fill="#0a0501"/>
+    </svg>
+  </div>
+
+  <!-- feather dropped when the owl flies away -->
+  <div class="feather" id="feather" aria-hidden="true">
+    <svg viewBox="0 0 24 38">
+      <path d="M12 1 Q3 14 7 28 L12 37 L17 28 Q21 14 12 1 Z"
+            fill="#f8f6ef" stroke="#bdb6a4" stroke-width=".6"/>
+      <path d="M12 5 L12 33" stroke="#bdb6a4" stroke-width=".5"/>
+      <g stroke="#d6d0bf" stroke-width=".35" opacity=".85" fill="none">
+        <path d="M12 8  Q7 7 5 8"/>
+        <path d="M12 12 Q6 11 4 13"/>
+        <path d="M12 16 Q6 16 4 19"/>
+        <path d="M12 20 Q6 21 5 25"/>
+        <path d="M12 24 Q7 25 6 29"/>
+        <path d="M12 8  Q17 7 19 8"/>
+        <path d="M12 12 Q18 11 20 13"/>
+        <path d="M12 16 Q18 16 20 19"/>
+        <path d="M12 20 Q18 21 19 25"/>
+        <path d="M12 24 Q17 25 18 29"/>
+      </g>
     </svg>
   </div>
 
@@ -495,7 +554,7 @@
 
         <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten.</p>
 
-        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Verschijning in tovenaarsgewaad is verplicht — Zwerkbalmonteur, Dooddoener, Patronus, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Wie in Dreuzelkleding aankomt, wordt vriendelijk doch beslist door de Sorteerhoed teruggestuurd. Vergeet uw toverstok niet.</p>
+        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Verschijning in tovenaarsgewaad is verplicht — Huiself, Dooddoener, Kobold, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Wie in Dreuzelkleding aankomt, wordt vriendelijk doch beslist door de Sorteerhoed teruggestuurd. Vergeet uw toverstok niet.</p>
 
         <div class="details">
           <h3>· Het Programma ·</h3>
@@ -504,11 +563,11 @@
               <div class="when">11 Juli</div>
               <div class="what">Datum van het feest (op een dag dat de sterren goed staan)</div>
             </div>
-            <div class="row">
+            <div class="row" id="rowKids" data-part="kind">
               <div class="when">12:00 – 15:00</div>
               <div class="what">Het Jonge Tovenaarsfeest — voor leerlingen van alle huizen</div>
             </div>
-            <div class="row">
+            <div class="row" id="rowAdults" data-part="volwassen">
               <div class="when">15:00 – laat</div>
               <div class="what">Het Grote Tovenaarsbal — voor heksen &amp; tovenaars van leeftijd</div>
             </div>
@@ -547,6 +606,18 @@
     ? 'Zweinstein Uitnodiging'
     : `Zweinstein Uitnodiging · ${naam}`;
 
+  // ?feest=kind  → show only the 12:00–15:00 row
+  // ?feest=volwassen → show only the 15:00–laat row
+  // (omitted / any other value) → show both
+  const feestRaw = (params.get('feest') || params.get('part') || '').toLowerCase().trim();
+  const feestAliases = {
+    'kind':'kind','kinderen':'kind','kids':'kind','child':'kind','jong':'kind',
+    'volwassen':'volwassen','volwassenen':'volwassen','adult':'volwassen','adults':'volwassen','groot':'volwassen'
+  };
+  const feest = feestAliases[feestRaw] || '';
+  if(feest === 'kind') document.getElementById('rowAdults').style.display = 'none';
+  if(feest === 'volwassen') document.getElementById('rowKids').style.display = 'none';
+
   // floating motes
   const motes = document.getElementById('motes');
   for(let i=0;i<28;i++){
@@ -564,6 +635,7 @@
   const letter = document.getElementById('letter');
   const delivery = document.getElementById('delivery');
   const carrierOwl = document.getElementById('carrierOwl');
+  const feather = document.getElementById('feather');
   const reopenBtn = document.getElementById('reopenBtn');
 
   // Timeline (ms from page load):
@@ -582,6 +654,8 @@
     }, 2900);
     setTimeout(()=>{
       carrierOwl.classList.add('away');
+      // one feather floats down where the owl was perched
+      setTimeout(()=> feather.classList.add('fall'), 320);
     }, 3200);
     setTimeout(()=>{
       env.classList.add('open');
@@ -610,7 +684,10 @@
   document.getElementById('closeBtn').addEventListener('click', closeLetter);
   reopenBtn.addEventListener('click', reopen);
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
-    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n12:00–15:00 — kinderfeest\n15:00–laat — feest voor groot tovenaarsvolk\n\nLet op: verkleedfeest — kom in tovenaarsgewaad!\n\n${location.href}`;
+    const lines = [];
+    if(feest !== 'volwassen') lines.push('12:00–15:00 — kinderfeest');
+    if(feest !== 'kind')      lines.push('15:00–laat — feest voor groot tovenaarsvolk');
+    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n${lines.join('\n')}\n\nLet op: verkleedfeest — kom in tovenaarsgewaad!\n\n${location.href}`;
     try{
       if(navigator.share){ await navigator.share({title:'Zweinstein Uitnodiging', text}); }
       else { await navigator.clipboard.writeText(text); flash('Uitnodiging gekopieerd!'); }
