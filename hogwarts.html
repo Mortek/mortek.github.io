@@ -199,6 +199,34 @@
   }
   .seal svg{width:100%;height:100%;display:block}
 
+  /* sound toggle, fixed top-right, mobile + desktop */
+  .sound-toggle{
+    position:fixed;
+    top: max(14px, env(safe-area-inset-top, 0px) + 10px);
+    right: max(14px, env(safe-area-inset-right, 0px) + 10px);
+    width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #f4e1b0, #b8945a 70%, #6e4a14);
+    border: 1.5px solid #c9a14a;
+    color: #2a1c08;
+    cursor:pointer;
+    z-index:60;
+    box-shadow: 0 4px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,235,190,.45);
+    transition: transform .15s ease, box-shadow .15s ease, opacity .3s ease;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    animation: soundIn .6s ease .8s forwards;
+  }
+  @keyframes soundIn{ from{opacity:0; transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  .sound-toggle:hover{ transform: translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,235,190,.5) }
+  .sound-toggle:active{ transform: translateY(1px) }
+  .sound-toggle svg{ width:22px; height:22px; display:block }
+  .sound-toggle .wave-on,
+  .sound-toggle .wave-off{ transition: opacity .15s ease }
+  .sound-toggle.muted .wave-on{ opacity:0 }
+  .sound-toggle:not(.muted) .wave-off{ opacity:0 }
+
   /* reopen button shown after letter closed */
   .reopen{
     position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
@@ -375,6 +403,24 @@
 <body>
 
 <div class="motes" aria-hidden="true" id="motes"></div>
+
+<audio id="bgm" src="/audio/hogwarts.mp3" loop preload="auto"></audio>
+<button class="sound-toggle muted" id="soundToggle" type="button" aria-label="Geluid aan/uit" aria-pressed="false">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <!-- speaker base (always shown) -->
+    <path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/>
+    <!-- waves (when unmuted) -->
+    <g class="wave-on" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M16 9 Q18.2 12 16 15"/>
+      <path d="M18.5 7 Q22 12 18.5 17"/>
+    </g>
+    <!-- cross (when muted) -->
+    <g class="wave-off" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <line x1="16.5" y1="9" x2="21.5" y2="15"/>
+      <line x1="21.5" y1="9" x2="16.5" y2="15"/>
+    </g>
+  </svg>
+</button>
 
 <main class="stage">
  <div class="delivery" id="delivery">
@@ -683,6 +729,48 @@
 
   document.getElementById('closeBtn').addEventListener('click', closeLetter);
   reopenBtn.addEventListener('click', reopen);
+
+  // Background music: starts muted so the browser allows autoplay,
+  // tap the speaker icon to unmute (and back).
+  const bgm = document.getElementById('bgm');
+  const soundToggle = document.getElementById('soundToggle');
+  const TARGET_VOL = 0.55;
+
+  bgm.volume = 0;
+  bgm.muted = true;
+  const tryPlay = () => { const p = bgm.play(); if(p && p.catch) p.catch(()=>{}); };
+  tryPlay();
+  // some mobile browsers need a user gesture before any playback starts
+  const kickstart = () => { tryPlay(); document.removeEventListener('pointerdown', kickstart); };
+  document.addEventListener('pointerdown', kickstart, { once: true });
+
+  function fadeVolume(to, ms){
+    const start = bgm.volume;
+    const t0 = performance.now();
+    cancelAnimationFrame(bgm._raf);
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / ms);
+      bgm.volume = start + (to - start) * k;
+      if(k < 1) bgm._raf = requestAnimationFrame(step);
+    };
+    bgm._raf = requestAnimationFrame(step);
+  }
+
+  soundToggle.addEventListener('click', () => {
+    const willMute = !bgm.muted ? true : false;
+    if(willMute){
+      fadeVolume(0, 250);
+      setTimeout(()=>{ bgm.muted = true; }, 260);
+      soundToggle.classList.add('muted');
+      soundToggle.setAttribute('aria-pressed', 'false');
+    } else {
+      bgm.muted = false;
+      tryPlay();
+      fadeVolume(TARGET_VOL, 400);
+      soundToggle.classList.remove('muted');
+      soundToggle.setAttribute('aria-pressed', 'true');
+    }
+  });
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
     const lines = [];
     if(feest !== 'volwassen') lines.push('12:00–15:00 — kinderfeest');
