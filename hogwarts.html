@@ -404,7 +404,7 @@
 
 <div class="motes" aria-hidden="true" id="motes"></div>
 
-<audio id="bgm" src="/audio/hogwarts.mp3" loop preload="auto"></audio>
+<audio id="bgm" src="/audio/hogwarts.mp3" loop preload="auto" autoplay muted playsinline></audio>
 <button class="sound-toggle muted" id="soundToggle" type="button" aria-label="Geluid aan/uit" aria-pressed="false">
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <!-- speaker base (always shown) -->
@@ -731,18 +731,15 @@
   reopenBtn.addEventListener('click', reopen);
 
   // Background music: starts muted so the browser allows autoplay,
-  // tap the speaker icon to unmute (and back).
+  // tap the speaker icon to unmute. Browsers block sound until a user
+  // gesture — that's why this can't just play out loud on load.
   const bgm = document.getElementById('bgm');
   const soundToggle = document.getElementById('soundToggle');
   const TARGET_VOL = 0.55;
 
-  bgm.volume = 0;
-  bgm.muted = true;
-  const tryPlay = () => { const p = bgm.play(); if(p && p.catch) p.catch(()=>{}); };
-  tryPlay();
-  // some mobile browsers need a user gesture before any playback starts
-  const kickstart = () => { tryPlay(); document.removeEventListener('pointerdown', kickstart); };
-  document.addEventListener('pointerdown', kickstart, { once: true });
+  bgm.volume = TARGET_VOL; // pre-set; muted attribute keeps it silent
+  // kick the muted autoplay (Safari sometimes ignores the attribute)
+  bgm.play().catch(()=>{});
 
   function fadeVolume(to, ms){
     const start = bgm.volume;
@@ -756,21 +753,29 @@
     bgm._raf = requestAnimationFrame(step);
   }
 
-  soundToggle.addEventListener('click', () => {
-    const willMute = !bgm.muted ? true : false;
-    if(willMute){
+  function setMuted(muted){
+    if(muted){
       fadeVolume(0, 250);
-      setTimeout(()=>{ bgm.muted = true; }, 260);
+      setTimeout(()=>{ bgm.muted = true; bgm.volume = TARGET_VOL; }, 260);
       soundToggle.classList.add('muted');
       soundToggle.setAttribute('aria-pressed', 'false');
     } else {
       bgm.muted = false;
-      tryPlay();
+      bgm.volume = 0;
+      const playPromise = bgm.play();
       fadeVolume(TARGET_VOL, 400);
       soundToggle.classList.remove('muted');
       soundToggle.setAttribute('aria-pressed', 'true');
+      if(playPromise && playPromise.catch){
+        playPromise.catch(err => {
+          console.warn('bgm play() rejected:', err);
+          flash('Geluid geblokkeerd — tik nogmaals');
+        });
+      }
     }
-  });
+  }
+
+  soundToggle.addEventListener('click', () => setMuted(!bgm.muted ? true : false));
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
     const lines = [];
     if(feest !== 'volwassen') lines.push('12:00–15:00 — kinderfeest');
