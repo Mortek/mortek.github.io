@@ -135,20 +135,6 @@
     mix-blend-mode:multiply;
     pointer-events:none;
   }
-  /* address on closed envelope */
-  .address{
-    position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);
-    text-align:center; color:#3a2710; z-index:2;
-    font-family:'Tangerine', cursive;
-    line-height:1;
-    pointer-events:none;
-    transition: opacity .4s ease;
-  }
-  .address .line1{font-size: clamp(20px, 3.8vw, 36px); letter-spacing:.5px}
-  .address .name{font-size: clamp(32px, 6.2vw, 60px); margin-top:6px; text-decoration: underline wavy rgba(80,40,10,.35); text-underline-offset:8px}
-  .address .line3{font-size: clamp(16px, 2.6vw, 22px); margin-top:10px; font-family:'IM Fell English', serif; font-style:italic; color:#5a3a18}
-  .envelope-wrap.open .address{opacity:0}
-
   /* back flap (the triangle that opens) */
   .body-flap{
     position:absolute;left:0;right:0;top:0;
@@ -409,13 +395,6 @@
   <div class="envelope-wrap" id="env" aria-label="Uitnodiging">
     <div class="env-body"></div>
 
-    <!-- address (visible while closed) -->
-    <div class="address">
-      <div class="line1">Aan</div>
-      <div class="name" id="addressName">Toekomstige Tovenaar</div>
-      <div class="line3">De kleinste slaapkamer · Ligusterlaan 4</div>
-    </div>
-
     <!-- back flap (opens up & back) -->
     <div class="body-flap" aria-hidden="true">
       <svg viewBox="0 0 100 62" preserveAspectRatio="none">
@@ -563,7 +542,6 @@
   const titleCase = s => s.replace(/\b([a-zà-ÿ])([a-zà-ÿ'’-]*)/gi, (_,a,b)=>a.toUpperCase()+b.toLowerCase());
   const safe = s => s.replace(/[<>]/g,'');
   const naam = raw ? titleCase(safe(raw)).slice(0,60) : 'Toekomstige Tovenaar';
-  document.getElementById('addressName').textContent = naam;
   document.getElementById('letterName').textContent = naam;
   document.title = naam === 'Toekomstige Tovenaar'
     ? 'Zweinstein Uitnodiging'
