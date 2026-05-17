@@ -55,20 +55,61 @@
     perspective:1600px;
   }
 
-  /* ===== ENVELOPE ===== */
-  .envelope-wrap{
+  /* ===== DELIVERY (owl carries envelope in) ===== */
+  .delivery{
     position:relative;
     width:min(560px, 92vw);
+    transform: translate(-140vw, -20vh) rotate(-6deg);
+    animation: deliver 2.6s cubic-bezier(.4,.05,.4,1) .3s forwards;
+    will-change: transform;
+  }
+  @keyframes deliver{
+    0%   { transform: translate(-140vw, -22vh) rotate(-6deg); }
+    55%  { transform: translate(8vw, 4vh) rotate(3deg); }
+    75%  { transform: translate(-2vw, -1vh) rotate(-1.5deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  .delivery.landed{
+    animation: settle 1.1s cubic-bezier(.3,1.3,.4,1) forwards;
+  }
+  @keyframes settle{
+    0%{transform:translate(0,0) rotate(0)}
+    40%{transform:translate(0,6px) rotate(.5deg)}
+    100%{transform:translate(0,0) rotate(0)}
+  }
+
+  /* owl perched above envelope while carrying */
+  .carrier-owl{
+    position:absolute;
+    left:50%;
+    top:-78px;
+    width: clamp(100px, 22%, 150px);
+    transform: translateX(-50%);
+    z-index:8;
+    transform-origin: 50% 80%;
+  }
+  .carrier-owl svg{display:block;width:100%;height:auto;filter: drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .carrier-owl .wings{transform-origin:50% 55%; animation: wingFlap .28s ease-in-out infinite}
+  @keyframes wingFlap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.55) translateY(-2px)}}
+  .carrier-owl .string{stroke:#2a1c08;stroke-width:1.4;opacity:.55;fill:none}
+
+  /* once delivered, owl flies up & off */
+  .carrier-owl.away{
+    animation: flyAway 1.8s cubic-bezier(.4,.0,.6,1) forwards;
+  }
+  @keyframes flyAway{
+    0%{transform: translateX(-50%) translate(0,0) rotate(0); opacity:1}
+    40%{transform: translateX(-50%) translate(20vw,-30vh) rotate(-8deg); opacity:1}
+    100%{transform: translateX(-50%) translate(60vw,-70vh) rotate(-12deg) scale(.55); opacity:0}
+  }
+
+  .envelope-wrap{
+    position:relative;
+    width:100%;
     aspect-ratio: 1.55 / 1;
     transition:transform 1s cubic-bezier(.6,.05,.3,1), opacity .8s ease;
     transform-style:preserve-3d;
-    cursor:pointer;
     filter: drop-shadow(0 30px 40px rgba(0,0,0,.55));
-    animation: enter 1.2s ease both;
-  }
-  @keyframes enter{
-    from{opacity:0; transform:translateY(40px) scale(.92)}
-    to{opacity:1; transform:translateY(0) scale(1)}
   }
   .envelope-wrap.lift{
     transform:translateY(-12px) rotateX(2deg);
@@ -142,21 +183,20 @@
   }
   .seal svg{width:100%;height:100%;display:block}
 
-  /* tap hint */
-  .hint{
-    position:absolute;left:50%;bottom:-58px;transform:translateX(-50%);
-    color:#e7cf9a;font-family:'Cinzel',serif;letter-spacing:.3em;font-size:12px;
-    text-transform:uppercase;opacity:.75;
-    animation: pulse 2.2s ease-in-out infinite;
-    white-space:nowrap;
-    text-shadow: 0 0 14px rgba(255,180,80,.4);
+  /* reopen button shown after letter closed */
+  .reopen{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    color:#e7cf9a;font-family:'Cinzel',serif;letter-spacing:.3em;font-size:11px;
+    text-transform:uppercase;opacity:0;
+    background:rgba(20,12,4,.7);border:1px solid #c9a14a;
+    padding:8px 14px;border-radius:3px;cursor:pointer;
+    transition:opacity .4s ease;z-index:30;
   }
-  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
-  .envelope-wrap.open ~ .hint, .envelope-wrap.open .hint{display:none}
+  .reopen.show{opacity:.9}
 
   /* ===== LETTER ===== */
   .letter{
-    position:absolute;left:50%;top:50%;
+    position:fixed;left:50%;top:50%;
     width:min(640px, 94vw);
     transform: translate(-50%, -42%) scale(.18);
     transform-origin:center;
@@ -165,10 +205,10 @@
     pointer-events:none;
     transition: transform 1.3s cubic-bezier(.2,.6,.2,1), opacity .8s ease;
   }
-  .envelope-wrap.open + .letter{
+  .letter.show{
     opacity:1;
     transform: translate(-50%, -50%) scale(1);
-    z-index:10;
+    z-index:25;
     pointer-events:auto;
   }
   .parchment{
@@ -307,25 +347,9 @@
   .btn:hover{transform:translateY(-1px); background: linear-gradient(180deg, #f8e7b8, #e1c084)}
   .btn:active{transform:translateY(1px); box-shadow:0 2px 0 rgba(80,50,15,.3)}
 
-  /* tiny owl that flies past on open */
-  .owl{
-    position:fixed;left:-120px;top:30%;width:80px;height:60px;z-index:20;
-    pointer-events:none;opacity:0;
-  }
-  .owl.go{animation: fly 2.6s cubic-bezier(.4,.0,.6,1) forwards}
-  @keyframes fly{
-    0%{opacity:0;left:-120px;top:35%;transform:rotate(-4deg) scale(.6)}
-    10%{opacity:1}
-    50%{top:18%;transform:rotate(2deg) scale(.9)}
-    90%{opacity:1}
-    100%{opacity:0;left:110vw;top:40%;transform:rotate(-2deg) scale(1)}
-  }
-  .owl-body{animation: flap .35s ease-in-out infinite}
-  @keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.85)}}
-
   @media (max-width: 480px){
-    .hint{font-size:10px;bottom:-46px}
     .parchment{max-height:90vh}
+    .carrier-owl{top:-62px}
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:.01ms !important; transition-duration:.15s !important}
@@ -337,7 +361,52 @@
 <div class="motes" aria-hidden="true" id="motes"></div>
 
 <main class="stage">
-  <div class="envelope-wrap" id="env" role="button" tabindex="0" aria-label="Open de uitnodiging">
+ <div class="delivery" id="delivery">
+
+  <!-- Owl carrying the envelope -->
+  <div class="carrier-owl" id="carrierOwl" aria-hidden="true">
+    <svg viewBox="0 0 140 130">
+      <!-- strings from talons to envelope corners -->
+      <line class="string" x1="58" y1="112" x2="40" y2="128"/>
+      <line class="string" x1="82" y1="112" x2="100" y2="128"/>
+      <!-- wings (animated) -->
+      <g class="wings">
+        <path d="M14 60 Q40 30 56 70 Q40 80 14 60 Z" fill="#2a1c08"/>
+        <path d="M126 60 Q100 30 84 70 Q100 80 126 60 Z" fill="#2a1c08"/>
+        <path d="M22 58 Q44 38 54 66" fill="none" stroke="#5a4324" stroke-width="1.5"/>
+        <path d="M118 58 Q96 38 86 66" fill="none" stroke="#5a4324" stroke-width="1.5"/>
+      </g>
+      <!-- body -->
+      <ellipse cx="70" cy="78" rx="26" ry="30" fill="#3a2710"/>
+      <ellipse cx="70" cy="78" rx="18" ry="22" fill="#5a4324" opacity=".6"/>
+      <!-- feather tufts -->
+      <path d="M55 56 Q60 50 64 56" stroke="#1a0f04" stroke-width="2" fill="none"/>
+      <path d="M76 56 Q80 50 85 56" stroke="#1a0f04" stroke-width="2" fill="none"/>
+      <!-- head -->
+      <circle cx="70" cy="50" r="22" fill="#4a341a"/>
+      <!-- ear tufts -->
+      <polygon points="53,34 50,22 59,32" fill="#3a2710"/>
+      <polygon points="87,34 90,22 81,32" fill="#3a2710"/>
+      <!-- eyes -->
+      <circle cx="60" cy="50" r="8" fill="#fff"/>
+      <circle cx="80" cy="50" r="8" fill="#fff"/>
+      <circle cx="60" cy="51" r="4.5" fill="#1a0f04"/>
+      <circle cx="80" cy="51" r="4.5" fill="#1a0f04"/>
+      <circle cx="61.5" cy="49" r="1.4" fill="#fff"/>
+      <circle cx="81.5" cy="49" r="1.4" fill="#fff"/>
+      <!-- beak -->
+      <polygon points="70,56 66,64 74,64" fill="#c9a14a"/>
+      <!-- belly speckles -->
+      <circle cx="64" cy="80" r="1.5" fill="#1a0f04" opacity=".5"/>
+      <circle cx="76" cy="84" r="1.5" fill="#1a0f04" opacity=".5"/>
+      <circle cx="68" cy="92" r="1.5" fill="#1a0f04" opacity=".5"/>
+      <!-- talons -->
+      <path d="M58 108 L58 116 M62 108 L62 116" stroke="#c9a14a" stroke-width="2"/>
+      <path d="M78 108 L78 116 M82 108 L82 116" stroke="#c9a14a" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <div class="envelope-wrap" id="env" aria-label="Uitnodiging">
     <div class="env-body"></div>
 
     <!-- address (visible while closed) -->
@@ -400,6 +469,7 @@
       </svg>
     </div>
   </div>
+ </div><!-- /.delivery -->
 
   <!-- LETTER (revealed after open) -->
   <article class="letter" id="letter" aria-hidden="true">
@@ -444,7 +514,9 @@
       <div class="body-text">
         <p>Met genoegen kunnen wij u meedelen dat u een plaats heeft op het <em>Tovenaarsverjaardagsfeest</em> van dit jaar. Hierbij ontvangt u de officiële uitnodiging, bezegeld met het zegel van het kasteel.</p>
 
-        <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten. Vergeet uw toverstok niet — en uw beste feestgewaad.</p>
+        <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten.</p>
+
+        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Verschijning in tovenaarsgewaad is verplicht — Zwerkbalmonteur, Dooddoener, Patronus, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Wie in Dreuzelkleding aankomt, wordt vriendelijk doch beslist door de Sorteerhoed teruggestuurd. Vergeet uw toverstok niet.</p>
 
         <div class="details">
           <h3>· Het Programma ·</h3>
@@ -482,21 +554,7 @@
   </article>
 </main>
 
-<!-- a little owl that flies by when opened -->
-<div class="owl" id="owl" aria-hidden="true">
-  <svg viewBox="0 0 80 60">
-    <g class="owl-body">
-      <ellipse cx="40" cy="38" rx="14" ry="16" fill="#3a2710"/>
-      <circle cx="40" cy="22" r="11" fill="#4a341a"/>
-      <circle cx="35" cy="22" r="3.5" fill="#fff"/><circle cx="45" cy="22" r="3.5" fill="#fff"/>
-      <circle cx="35" cy="22" r="1.8" fill="#1a0f04"/><circle cx="45" cy="22" r="1.8" fill="#1a0f04"/>
-      <polygon points="40,24 38,28 42,28" fill="#c9a14a"/>
-      <!-- wings -->
-      <path d="M10 36 Q22 20 28 38 Q22 42 10 36 Z" fill="#2a1c08"/>
-      <path d="M70 36 Q58 20 52 38 Q58 42 70 36 Z" fill="#2a1c08"/>
-    </g>
-  </svg>
-</div>
+<button class="reopen" id="reopenBtn" type="button">Open de brief opnieuw</button>
 
 <script>
   // get name from URL: ?naam=Liam (also accepts ?name=)
@@ -523,37 +581,58 @@
     motes.appendChild(m);
   }
 
-  // open envelope
+  // auto-sequence: owl delivers envelope → owl flies off → seal cracks → letter opens
   const env = document.getElementById('env');
   const letter = document.getElementById('letter');
-  const owl = document.getElementById('owl');
-  let opened = false;
+  const delivery = document.getElementById('delivery');
+  const carrierOwl = document.getElementById('carrierOwl');
+  const reopenBtn = document.getElementById('reopenBtn');
 
-  function openEnvelope(){
-    if(opened) return;
-    opened = true;
-    env.classList.add('lift');
-    setTimeout(()=> env.classList.add('open'), 220);
-    setTimeout(()=> owl.classList.add('go'), 500);
-    setTimeout(()=> letter.setAttribute('aria-hidden','false'), 1100);
-    // after letter is centered, fade envelope away
-    setTimeout(()=> env.classList.add('gone'), 1500);
+  // Timeline (ms from page load):
+  //   0       page renders, motes drift
+  //   300     delivery animation starts (2600ms duration)
+  //   2900    envelope arrives → settle bounce
+  //   3200    owl releases & flies away (1800ms)
+  //   3600    envelope auto-opens (seal cracks, flap lifts)
+  //   4700    letter materializes & scales to center
+  //   5400    envelope fades to background
+
+  function runSequence(){
+    // owl + envelope already mid-flight via CSS animation
+    setTimeout(()=>{
+      delivery.classList.add('landed');
+    }, 2900);
+    setTimeout(()=>{
+      carrierOwl.classList.add('away');
+    }, 3200);
+    setTimeout(()=>{
+      env.classList.add('open');
+    }, 3600);
+    setTimeout(()=>{
+      letter.classList.add('show');
+      letter.setAttribute('aria-hidden','false');
+    }, 4700);
+    setTimeout(()=>{
+      env.classList.add('gone');
+    }, 5400);
   }
+  runSequence();
+
   function closeLetter(){
-    opened = false;
-    env.classList.remove('gone','open','lift');
+    letter.classList.remove('show');
     letter.setAttribute('aria-hidden','true');
-    owl.classList.remove('go');
+    reopenBtn.classList.add('show');
   }
-
-  env.addEventListener('click', openEnvelope);
-  env.addEventListener('keydown', e=>{
-    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openEnvelope(); }
-  });
+  function reopen(){
+    reopenBtn.classList.remove('show');
+    letter.classList.add('show');
+    letter.setAttribute('aria-hidden','false');
+  }
 
   document.getElementById('closeBtn').addEventListener('click', closeLetter);
+  reopenBtn.addEventListener('click', reopen);
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
-    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n12:00–15:00 — kinderfeest\n15:00–laat — feest voor groot tovenaarsvolk\n\n${location.href}`;
+    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n12:00–15:00 — kinderfeest\n15:00–laat — feest voor groot tovenaarsvolk\n\nLet op: verkleedfeest — kom in tovenaarsgewaad!\n\n${location.href}`;
     try{
       if(navigator.share){ await navigator.share({title:'Zweinstein Uitnodiging', text}); }
       else { await navigator.clipboard.writeText(text); flash('Uitnodiging gekopieerd!'); }
