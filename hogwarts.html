@@ -741,13 +741,15 @@
   // kick the muted autoplay (Safari sometimes ignores the attribute)
   bgm.play().catch(()=>{});
 
+  const clamp01 = v => v < 0 ? 0 : (v > 1 ? 1 : v);
   function fadeVolume(to, ms){
-    const start = bgm.volume;
+    const target = clamp01(to);
+    const start  = clamp01(bgm.volume);
     const t0 = performance.now();
     cancelAnimationFrame(bgm._raf);
     const step = (t) => {
-      const k = Math.min(1, (t - t0) / ms);
-      bgm.volume = start + (to - start) * k;
+      const k = Math.min(1, Math.max(0, (t - t0) / ms));
+      bgm.volume = clamp01(start + (target - start) * k);
       if(k < 1) bgm._raf = requestAnimationFrame(step);
     };
     bgm._raf = requestAnimationFrame(step);
