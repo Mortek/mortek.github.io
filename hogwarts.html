@@ -24,14 +24,17 @@
     --gold:#c9a14a;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html,body{
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
   body{
     font-family:'IM Fell English', Georgia, serif;
     color:var(--ink);
     background:
       radial-gradient(ellipse at 30% 20%, #1b1208 0%, #0b0703 60%, #000 100%);
     min-height:100vh;
-    overflow:hidden;
     position:relative;
     -webkit-font-smoothing:antialiased;
   }
@@ -202,16 +205,19 @@
   /* sound toggle, fixed top-right, mobile + desktop */
   .sound-toggle{
     position:fixed;
-    top: max(14px, env(safe-area-inset-top, 0px) + 10px);
-    right: max(14px, env(safe-area-inset-right, 0px) + 10px);
+    top: max(16px, env(safe-area-inset-top, 0px) + 14px);
+    right: max(16px, env(safe-area-inset-right, 0px) + 14px);
     width:44px;height:44px;
+    will-change: transform;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
     display:flex;align-items:center;justify-content:center;
     border-radius:50%;
     background: radial-gradient(circle at 35% 30%, #f4e1b0, #b8945a 70%, #6e4a14);
     border: 1.5px solid #c9a14a;
     color: #2a1c08;
     cursor:pointer;
-    z-index:60;
+    z-index:9999;
     box-shadow: 0 4px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,235,190,.45);
     transition: transform .15s ease, box-shadow .15s ease, opacity .3s ease;
     -webkit-tap-highlight-color: transparent;
@@ -268,8 +274,11 @@
       0 30px 60px rgba(0,0,0,.55),
       0 0 0 1px rgba(80,50,15,.35) inset,
       0 0 80px rgba(120,70,20,.35) inset;
-    max-height:88vh;
+    max-height: min(88vh, 88dvh);
     overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
   }
   /* deckled, torn edges via mask */
   .parchment::before{
