@@ -1,15 +1,16 @@
-const CACHE = 'mortek-v109';
+const CACHE = 'mortek-v110';
 const PRECACHE = [
   '/',
   '/index.html',
-  '/apps.html',
+  '/games.html',
+  '/crypto-mining-tycoon.html',
   '/shadowrealm.html',
   '/books.html',
   '/music.html',
   '/about.html',
   '/blog.html',
   '/404.html',
-  '/style.min.css?v=76',
+  '/style.min.css?v=77',
   '/site.min.js?v=1',
   '/favicon.svg',
   '/manifest.json',
