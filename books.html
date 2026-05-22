@@ -26,7 +26,8 @@
 <link rel="preload" href="fonts/space-grotesk-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}.slider{position:relative;width:100%}.slider-track{display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.slider-track::-webkit-scrollbar{display:none}.testimonial-slider .testimonial{min-width:300px;flex:0 0 calc(33.333% - 14px);scroll-snap-align:start}</style>
-<link rel="stylesheet" href="style.min.css?v=76">
+<link rel="stylesheet" href="style.min.css?v=79">
+<style>.streaming-links{text-align:center;margin-bottom:40px}.streaming-links h2{font-size:1.3em;color:#fff;margin-bottom:16px}.streaming-badges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}.streaming-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-family:var(--font-heading);font-size:.9em;font-weight:600;color:var(--text);transition:border-color .2s,transform .2s}.streaming-badge:hover{transform:translateY(-2px)}.streaming-badge--amazon-books:hover{border-color:#FF9900;color:#FF9900}.streaming-badge--bookbub:hover{border-color:#29B5A8;color:#29B5A8}</style>
 <noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
 <title>Books — Self-Help Books on Clarity & Growth by Maurice Moret</title>
 <script type="application/ld+json">
@@ -82,9 +83,21 @@
       <h2>Maurice Moret</h2>
       <p><strong>Maurice Moret</strong> is a self-help author dedicated to helping people live with more clarity, intention, and freedom. His writing combines insights from psychology, neuroscience, and practical lived experience to create books that are grounded, honest, and immediately useful. His work covers the full spectrum of personal development — from financial freedom and mental clarity to human behavior, ancient philosophy, and whole health.</p>
       <p style="margin-top:10px;font-size:.85em;color:#fff">mauricemoret1991@gmail.com</p>
-      <a href="https://www.amazon.com/stores/author/B0GVRHDKBW" target="_blank" rel="noopener" class="buy-btn">Amazon Author</a>
-      <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener" class="buy-btn">BookBub</a>
       <a href="mailto:mauricemoret1991@gmail.com" class="buy-btn contact-btn">Contact</a>
+    </div>
+  </div>
+
+  <div class="streaming-links fade-in">
+    <h2>Find My Books On</h2>
+    <div class="streaming-badges">
+      <a href="https://www.amazon.com/stores/author/B0GVRHDKBW" target="_blank" rel="noopener" class="streaming-badge streaming-badge--amazon-books" aria-label="Maurice Moret on Amazon">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M13.958 10.09c0 1.232.029 2.256-.591 3.351-.502.891-1.301 1.438-2.186 1.438-1.214 0-1.922-.924-1.922-2.292 0-2.692 2.415-3.182 4.699-3.182v.685zm3.186 7.705c-.209.189-.512.201-.745.074-1.052-.872-1.238-1.276-1.814-2.106-1.734 1.767-2.962 2.297-5.209 2.297-2.66 0-4.731-1.641-4.731-4.925 0-2.565 1.391-4.309 3.37-5.164 1.715-.754 4.11-.891 5.942-1.095V6.41c0-.548.044-1.197-.276-1.67-.283-.427-.826-.604-1.305-.604-886 0-1.673.455-1.866 1.397-.04.209-.196.415-.406.426l-2.27-.245c-.191-.044-.404-.198-.348-.491.523-2.75 3.001-3.578 5.224-3.578 1.137 0 2.623.302 3.521 1.165 1.139 1.063 1.03 2.481 1.03 4.027v3.648c0 1.096.456 1.578.886 2.168.149.21.181.46-.008.613l-1.995 1.724zm3.312 1.387C18.509 21.17 15.574 22 13.03 22c-3.747 0-7.105-1.386-9.649-3.692-.2-.18-.021-.427.219-.286 2.747 1.6 6.141 2.566 9.645 2.566 2.364 0 4.964-.49 7.357-1.507.361-.154.663.237.354.561zm1.001-1.144c-.272-.351-1.8-.165-2.487-.083-.208.025-.24-.157-.052-.289 1.217-.857 3.214-.609 3.447-.322.233.289-.061 2.286-1.202 3.239-.176.147-.343.068-.265-.125.256-.641.833-2.072.559-2.42z"/></svg>
+        Amazon
+      </a>
+      <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener" class="streaming-badge streaming-badge--bookbub" aria-label="Maurice Moret on BookBub">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        BookBub
+      </a>
     </div>
   </div>
 
@@ -257,17 +270,12 @@
     </div>
   </section>
 
-  <div class="more-apps">
-    <p>More books coming soon. Meanwhile, explore free articles on the <a href="blog.html" style="color:var(--accent)">blog</a>.</p>
-  </div>
 </main>
 
 <footer>
   <div class="footer-icons">
     <a href="mailto:mauricemoret1991@gmail.com" aria-label="Email" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
     <a href="https://www.youtube.com/@MortekMusic" target="_blank" rel="noopener" aria-label="YouTube" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
-    <a href="https://www.amazon.com/stores/author/B0GVRHDKBW" target="_blank" rel="noopener" aria-label="Amazon" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></a>
-    <a href="https://www.bookbub.com/profile/maurice-moret?list=about" target="_blank" rel="noopener" aria-label="BookBub" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></a>
     <a href="https://www.tiktok.com/@mortekofficial" target="_blank" rel="noopener" aria-label="TikTok" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.7a8.18 8.18 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.13z"/></svg></a>
     <a href="https://www.reddit.com/user/MortekOfficial/" target="_blank" rel="noopener" aria-label="Reddit" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></a>
     <a href="https://www.facebook.com/mortekofficial" target="_blank" rel="noopener" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
