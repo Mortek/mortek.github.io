@@ -1,4 +1,4 @@
-const CACHE = 'mortek-v117';
+const CACHE = 'mortek-v118';
 const PRECACHE = [
   '/',
   '/index.html',
