@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.62</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.63</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -508,6 +508,7 @@ let circleIntroDone = false;
 let circleIntroRings = [];
 let circlePostPulseT = -1; // ms into post-settle bass pulse, -1 = idle
 let colorCycleT = 0;
+let centerPulse = 0; // decaying envelope, fed only by real-bass onsets (computeBassHit)
 // Trail canvas for particle trails
 const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
@@ -979,7 +980,7 @@ function manageParticles(energy,data){
 function drawCircle(data,p,energy,dS){
   const baseR=parseFloat(document.getElementById('innerRadius').value);
   const reactR=parseFloat(document.getElementById('reactRadius').value);
-  const bassPulse=reactR>0?getBass(data)*reactR*50*dS:0;
+  const bassPulse=reactR>0?centerPulse*reactR*20*dS:0;
   const cx=W/2,cy=H/2,base=(baseR*0.9+8+energy*6)*dS;
   const innerBase=base+bassPulse;
   const barGlowVal=parseFloat(document.getElementById('barGlow').value)*dS;
@@ -1087,7 +1088,7 @@ function drawFrame(data,dt=33.3){
   if(precomputedFX){
     const fx=precomputedFX[Math.min(frameCount-1,precomputedFX.length-1)];
     bgZoom=fx.zoom;bgBright=fx.bright;bgVig=fx.vig;
-    shakeX=fx.shakeX||0;shakeY=fx.shakeY||0;
+    shakeX=fx.shakeX||0;shakeY=fx.shakeY||0;centerPulse=fx.centerPulse||0;
   } else {
     const hit=computeBassHit(data,liveBassState,1000/dt);
     currentBass=hit.bass;currentBassOnset=hit.onset;
@@ -1097,6 +1098,7 @@ function drawFrame(data,dt=33.3){
     const shakeStr=parseFloat(document.getElementById('cameraShake').value);
     if(hit.onset>0.03){
       const scaledStr=Math.pow(hit.onset,0.55)*2.2;
+      centerPulse=Math.max(centerPulse,scaledStr);
       bgZoom=Math.max(bgZoom,scaledStr*zoomStr*8);
       bgBright=Math.max(bgBright,scaledStr*brightStr*4);
       bgVig=Math.max(bgVig,scaledStr*vigStr*4);
@@ -1107,7 +1109,7 @@ function drawFrame(data,dt=33.3){
     }
     // time-based decay keeps pulse duration consistent regardless of display fps
     const d=dt/33.3;
-    bgZoom*=Math.pow(0.88,d);bgBright*=Math.pow(0.85,d);bgVig*=Math.pow(0.9,d);
+    bgZoom*=Math.pow(0.88,d);bgBright*=Math.pow(0.85,d);bgVig*=Math.pow(0.9,d);centerPulse*=Math.pow(0.88,d);
     shakeX*=Math.pow(0.85,d);shakeY*=Math.pow(0.85,d);
   }
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
@@ -1664,17 +1666,17 @@ document.getElementById('dlBtn').onclick=async function(){
     {
       const bassReactStr=parseFloat(document.getElementById('bassReact').value);
       const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};
-      let z=0,b=0,v=0,sx=0,sy=0;
+      let z=0,b=0,v=0,sx=0,sy=0,cp=0;
       precomputedFX=[];
       const smBins=new Float32Array(binCount);
       for(let i=0;i<totalFrames;i++){
         // smooth in-place (smoothingTimeConstant=0.2) to match Web Audio analyser
         const fr=frames[i];if(fr){for(let j=0;j<fr.length;j++){smBins[j]=smBins[j]*0.2+fr[j]*0.8;fr[j]=smBins[j]+0.5|0;}}
         const hit=computeBassHit(frames[i],st,30);
-        if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
-        z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
+        if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;cp=Math.max(cp,sc);z=Math.max(z,sc*zoomStr*8);b=Math.max(b,sc*brightStr*4);v=Math.max(v,sc*vigStr*4);if(shakeStr>0){sx+=(Math.random()-0.5)*sc*shakeStr*10;sy+=(Math.random()-0.5)*sc*shakeStr*10;}}
+        z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;cp*=0.88;
         const pStr=(hit.onset>0.03&&bassReactStr>0)?Math.pow(hit.onset,0.55)*2.0*bassReactStr:0;
-        precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr,shakeX:sx,shakeY:sy});
+        precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pStr,shakeX:sx,shakeY:sy,centerPulse:cp});
       }
     }
 
@@ -1702,7 +1704,7 @@ document.getElementById('dlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing (bounded memory)
-    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;centerPulse=0;particles=[];frameCount=0;
     barMin.fill(0.5);barMax.fill(0.5);smoothedBars.fill(0);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;    setStatus('Encoding video...');
     const offC=new OffscreenCanvas(W,H);
     const savedCtx=ctx;
@@ -2026,14 +2028,14 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     const zStr=parseFloat(document.getElementById('bassZoom').value),bStr=parseFloat(document.getElementById('brightPulse').value);
     const vStr=parseFloat(document.getElementById('vigPulse').value),skStr=parseFloat(document.getElementById('cameraShake').value);
     const brStr=parseFloat(document.getElementById('bassReact').value);
-    {const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};let z=0,b=0,v=0,sx=0,sy=0;precomputedFX=[];
+    {const st={prev:0,envFast:0,envSlow:0.05,cooldown:0,sustainTimer:0};let z=0,b=0,v=0,sx=0,sy=0,cp=0;precomputedFX=[];
     const smBins=new Float32Array(binCount);
     for(let i=0;i<frames.length;i++){const fr=frames[i];if(fr){for(let j=0;j<fr.length;j++){smBins[j]=smBins[j]*0.2+fr[j]*0.8;fr[j]=smBins[j]+0.5|0;}}
     const hit=computeBassHit(frames[i],st,30);
-    if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
-    z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;
+    if(hit.onset>0.03){const sc=Math.pow(hit.onset,0.55)*2.2;cp=Math.max(cp,sc);z=Math.max(z,sc*zStr*8);b=Math.max(b,sc*bStr*4);v=Math.max(v,sc*vStr*4);if(skStr>0){sx+=(Math.random()-0.5)*sc*skStr*10;sy+=(Math.random()-0.5)*sc*skStr*10;}}
+    z*=0.88;b*=0.85;v*=0.9;sx*=0.85;sy*=0.85;cp*=0.88;
     const pS=(hit.onset>0.03&&brStr>0)?Math.pow(hit.onset,0.55)*2.0*brStr:0;
-    precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pS,shakeX:sx,shakeY:sy});}}
+    precomputedFX.push({zoom:z,bright:b,vig:v,particleBass:pS,shakeX:sx,shakeY:sy,centerPulse:cp});}}
 
     // Step 4: Encode audio first (small footprint, needed for progressive muxing)
     setShortsStatus('Encoding audio...');btn.textContent='Encoding audio...';
@@ -2058,7 +2060,7 @@ document.getElementById('shortsDlBtn').onclick=async function(){
     if(writable)await writable.write(preamble);
 
     // Step 5: Encode video with progressive cluster flushing
-    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;    setShortsStatus('Encoding video...');
+    liveBassState.prev=0;liveBassState.envFast=0;liveBassState.envSlow=0.05;liveBassState.cooldown=0;liveBassState.sustainTimer=0;currentBass=0;currentBassOnset=0;bgZoom=0;bgBright=0;bgVig=0;bgHue=0;shakeX=0;shakeY=0;colorCycleT=0;centerPulse=0;particles=[];frameCount=0;barMin.fill(0.5);barMax.fill(0.5);circleIntroT=0;circleIntroAnimT=-1;circleIntroDone=false;circleIntroRings=[];circlePostPulseT=-1;    setShortsStatus('Encoding video...');
     const offC=new OffscreenCanvas(SW,SH);const savedCtx=ctx;ctx=offC.getContext('2d');
     // Run warmup frames to prime particles and bass tracking (not encoded)
     for(let i=0;i<warmupFrames;i++){drawFrame(frames[i]);frames[i]=null;}
