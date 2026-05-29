@@ -94,7 +94,7 @@ select:hover{border-color:#a07fff}
 <div id="appContent">
 
 <div class="top-bar">
-  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.65</span></h1>
+  <h1>Music Visualizer <span style="font-size:11px;font-weight:400;color:#555;vertical-align:middle">v3.7.66</span></h1>
   <span style="margin-left:auto;display:flex;gap:8px">
     <button class="sm-btn" id="savePrefBtn">Save Preferences</button>
     <button class="sm-btn dl-top-btn" id="dlBtn" disabled>Download Video</button>
@@ -1125,20 +1125,10 @@ function drawFrame(data,dt=33.3){
       // burst shockwaves — 5 staggered, brighter/bigger than the old pop-in
       circleIntroRings=[{t:0,maxT:800},{t:-110,maxT:800},{t:-220,maxT:800},{t:-330,maxT:800},{t:-440,maxT:800}];
     }
-    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=INTRO_REVEAL){circleIntroDone=true;circlePostPulseT=0;circleIntroRings.push({t:0,maxT:850});}}
+    if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=INTRO_REVEAL){circleIntroDone=true;circlePostPulseT=0;}}
   }
   if(circlePostPulseT>=0){circlePostPulseT+=dt;if(circlePostPulseT>=600)circlePostPulseT=-1;}
   circleIntroRings=circleIntroRings.filter(r=>{r.t+=dt;return r.t<r.maxT;});
-
-  // Bass pulse punctuating the end of the intro — swells the center visualizer
-  // and kicks bg zoom/brightness. Derived from circlePostPulseT (intro state),
-  // so it renders identically in the live preview and the exported video.
-  if(circleIntroDone&&circlePostPulseT>=0){
-    const pt=Math.sin((circlePostPulseT/600)*Math.PI); // 0 -> 1 -> 0
-    centerPulse=Math.max(centerPulse,1.6*pt);
-    bgZoom=Math.max(bgZoom,0.05*pt);
-    bgBright=Math.max(bgBright,0.14*pt);
-  }
 
   ctx.clearRect(0,0,W,H);
   // Camera shake + Ken Burns: applied to entire frame
@@ -1250,7 +1240,7 @@ function drawFrame(data,dt=33.3){
     ctx.restore();
   } else if(circlePostPulseT>=0){
     const t=circlePostPulseT/600;
-    const s=1+0.22*Math.sin(t*Math.PI);
+    const s=1+0.12*Math.sin(t*Math.PI);
     ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);ctx.translate(-cx,-cy);
     drawCircle(data,p,energy,dS);
     ctx.restore();
@@ -1258,12 +1248,6 @@ function drawFrame(data,dt=33.3){
     drawCircle(data,p,energy,dS);
   }
 
-  // --- BURST flash: white bloom at the moment of reveal, decays ~320ms ---
-  if(circleIntroAnimT>=0&&circleIntroAnimT<320&&!circleIntroDone){
-    const fa=Math.pow(1-circleIntroAnimT/320,2)*0.8;
-    ctx.save();ctx.globalCompositeOperation='lighter';
-    ctx.fillStyle=`rgba(255,255,255,${fa})`;ctx.fillRect(0,0,W,H);ctx.restore();
-  }
   ctx.restore(); // camera shake + ken burns
 }
 
