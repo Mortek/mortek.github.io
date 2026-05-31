@@ -32,17 +32,23 @@ async function launch(headful) {
   return puppeteer.launch({ executablePath: CHROME, headless: headful ? false : 'new', args: LAUNCH_ARGS });
 }
 
-async function openPage(browser, url) {
-  const page = await browser.newPage();
+// `ctx` may be a Browser (default context, e.g. the WebCodecs probe) or a
+// BrowserContext (per-render isolated context) — both expose newPage().
+async function openPage(ctx, url) {
+  const page = await ctx.newPage();
   await page.evaluateOnNewDocument(() => { try { delete window.showSaveFilePicker; } catch {} });
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForSelector('#dlBtn');
   return page;
 }
 
-async function setDownloadDir(page, dir) {
-  const client = await page.target().createCDPSession();
-  await client.send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: dir });
+// Per-context download dir: Browser.setDownloadBehavior scoped to browserContextId
+// isolates downloads so concurrent renders (separate contexts) never cross-capture.
+async function setDownloadDir(page, dir, browserContextId) {
+  const client = await page.createCDPSession();
+  await client.send('Browser.setDownloadBehavior', {
+    behavior: 'allow', downloadPath: dir, browserContextId, eventsEnabled: true,
+  });
 }
 
 async function uploadAndWait(page, selector, filePath, labelId) {
@@ -87,10 +93,11 @@ async function waitForWebm(dir, timeoutMs) {
 
 // ---- Render one video (kind: 'tiktok' | 'youtube' | 'landscape') ----
 async function renderOne(browser, origin, kind, assets, outPath) {
-  const page = await openPage(browser, origin + '/music_visualizer.html');
+  const context = await browser.createBrowserContext();
+  const page = await openPage(context, origin + '/music_visualizer.html');
   const dlDir = await fs.mkdtemp(path.join(assets.folder, '.render-tmp-'));
   try {
-    await setDownloadDir(page, dlDir);
+    await setDownloadDir(page, dlDir, context.id);
     if (kind === 'landscape') {
       await page.click('.tab-btn[data-tab="landscape"]');
       await uploadAndWait(page, '#imgInput', assets.landscape, 'imgLabel');
@@ -111,11 +118,13 @@ async function renderOne(browser, origin, kind, assets, outPath) {
       await page.click('#shortsDlBtn');
       await awaitStatusDone(page, 'shortsStatus', RENDER_TIMEOUT_MS);
     }
-    const webm = await waitForWebm(dlDir, 60000);
+    // Encoding is already finished when status says "Done!"; this only waits
+    // for Chrome to flush the Blob to disk, but allow ample margin for large files.
+    const webm = await waitForWebm(dlDir, 120000);
     await fs.rename(webm, outPath);
   } finally {
     await fs.rm(dlDir, { recursive: true, force: true }).catch(() => {});
-    await page.close().catch(() => {});
+    await context.close().catch(() => {});
   }
 }
 
