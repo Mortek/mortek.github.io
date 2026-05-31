@@ -29,7 +29,15 @@ function parseArgs(argv) {
 
 // ---- Browser helpers ----
 async function launch(headful) {
-  return puppeteer.launch({ executablePath: CHROME, headless: headful ? false : 'new', args: LAUNCH_ARGS });
+  // protocolTimeout (default 180s) caps any single CDP call, including the
+  // awaitStatusDone waitForFunction that stays pending for the whole encode.
+  // Raise it above RENDER_TIMEOUT_MS so the per-render timeout governs instead.
+  return puppeteer.launch({
+    executablePath: CHROME,
+    headless: headful ? false : 'new',
+    args: LAUNCH_ARGS,
+    protocolTimeout: RENDER_TIMEOUT_MS + 60000,
+  });
 }
 
 // `ctx` may be a Browser (default context, e.g. the WebCodecs probe) or a
