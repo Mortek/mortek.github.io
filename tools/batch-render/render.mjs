@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { promises as fs } from 'node:fs';
+import { promises as fs, createWriteStream } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
@@ -12,7 +12,6 @@ const LOGO = '/home/maurice/Documents/Music/Youtube/profile_picture_transparant_
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const LAUNCH_ARGS = ['--no-sandbox', '--mute-audio', '--autoplay-policy=no-user-gesture-required'];
 const RENDER_TIMEOUT_MS = 30 * 60 * 1000; // per render: full-song landscape encodes take minutes
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- CLI parsing ----
 function parseArgs(argv) {
@@ -43,23 +42,53 @@ async function launch(headless) {
   });
 }
 
-// `ctx` may be a Browser (default context, e.g. the WebCodecs probe) or a
-// BrowserContext (per-render isolated context) — both expose newPage().
-async function openPage(ctx, url) {
-  const page = await ctx.newPage();
-  await page.evaluateOnNewDocument(() => { try { delete window.showSaveFilePicker; } catch {} });
+// Generic page (used by the WebCodecs probe). Render pages use openRenderPage.
+async function openPage(browser, url) {
+  const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForSelector('#dlBtn');
   return page;
 }
 
-// Per-context download dir: Browser.setDownloadBehavior scoped to browserContextId
-// isolates downloads so concurrent renders (separate contexts) never cross-capture.
-async function setDownloadDir(page, dir, browserContextId) {
-  const client = await page.createCDPSession();
-  await client.send('Browser.setDownloadBehavior', {
-    behavior: 'allow', downloadPath: dir, browserContextId, eventsEnabled: true,
+// Runs IN THE PAGE: replaces showSaveFilePicker with a shim whose writable
+// streams each chunk (base64) to Node via window.__mvWrite. This keeps the
+// page on its low-memory streaming path instead of buffering the whole video
+// in a Blob, and pipes the bytes straight to disk on our side.
+const STREAMING_SHIM = () => {
+  const toB64 = (u8) => {
+    let s = ''; const CH = 0x8000;
+    for (let i = 0; i < u8.length; i += CH) s += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
+    return btoa(s);
+  };
+  window.showSaveFilePicker = async () => ({
+    createWritable: async () => ({
+      write: async (data) => {
+        const u8 = data instanceof Uint8Array ? data
+          : data instanceof ArrayBuffer ? new Uint8Array(data)
+          : new Uint8Array(await data.arrayBuffer());
+        await window.__mvWrite(toB64(u8));
+      },
+      close: async () => { await window.__mvClose(); },
+      abort: async () => { await window.__mvAbort(); },
+    }),
   });
+};
+
+// A render page wired to stream the page's WebM output into `ws` (a Node
+// write stream). Each render uses its own page + stream, so concurrent renders
+// stay isolated. Backpressure: __mvWrite resolves on drain, pausing the encode.
+async function openRenderPage(browser, url, ws) {
+  const page = await browser.newPage();
+  await page.exposeFunction('__mvWrite', (b64) => new Promise((resolve) => {
+    const buf = Buffer.from(b64, 'base64');
+    if (ws.write(buf)) resolve(); else ws.once('drain', resolve);
+  }));
+  await page.exposeFunction('__mvClose', () => new Promise((resolve) => ws.end(resolve)));
+  await page.exposeFunction('__mvAbort', () => { if (!ws.destroyed) ws.destroy(); });
+  await page.evaluateOnNewDocument(STREAMING_SHIM);
+  await page.goto(url, { waitUntil: 'load' });
+  await page.waitForSelector('#dlBtn');
+  return page;
 }
 
 // Click via the element's own DOM .click() rather than a coordinate-based mouse
@@ -90,32 +119,13 @@ async function awaitStatusDone(page, statusId, timeoutMs) {
   if (result.startsWith('error')) throw new Error('Render reported ' + result);
 }
 
-// Waits for a single settled .webm (no .crdownload, size stable ~1.5s).
-async function waitForWebm(dir, timeoutMs) {
-  const deadline = Date.now() + timeoutMs;
-  let lastSize = -1, stableSince = 0;
-  while (Date.now() < deadline) {
-    const files = await fs.readdir(dir);
-    const downloading = files.some((f) => f.endsWith('.crdownload'));
-    const webm = files.find((f) => f.toLowerCase().endsWith('.webm'));
-    if (webm && !downloading) {
-      const { size } = await fs.stat(path.join(dir, webm));
-      if (size === lastSize && size > 0) {
-        if (Date.now() - stableSince > 1500) return path.join(dir, webm);
-      } else { lastSize = size; stableSince = Date.now(); }
-    }
-    await sleep(500);
-  }
-  throw new Error('Timed out waiting for .webm download in ' + dir);
-}
-
 // ---- Render one video (kind: 'tiktok' | 'youtube' | 'landscape') ----
 async function renderOne(browser, origin, kind, assets, outPath) {
-  const context = await browser.createBrowserContext();
-  const page = await openPage(context, origin + '/music_visualizer.html');
   const dlDir = await fs.mkdtemp(path.join(assets.folder, '.render-tmp-'));
+  const outTmp = path.join(dlDir, 'out.webm');
+  const ws = createWriteStream(outTmp);
+  const page = await openRenderPage(browser, origin + '/music_visualizer.html', ws);
   try {
-    await setDownloadDir(page, dlDir, context.id);
     if (kind === 'landscape') {
       await domClick(page, '.tab-btn[data-tab="landscape"]');
       await uploadAndWait(page, '#imgInput', assets.landscape, 'imgLabel');
@@ -136,13 +146,13 @@ async function renderOne(browser, origin, kind, assets, outPath) {
       await domClick(page, '#shortsDlBtn');
       await awaitStatusDone(page, 'shortsStatus', RENDER_TIMEOUT_MS);
     }
-    // Encoding is already finished when status says "Done!"; this only waits
-    // for Chrome to flush the Blob to disk, but allow ample margin for large files.
-    const webm = await waitForWebm(dlDir, 120000);
-    await fs.rename(webm, outPath);
+    // The page awaits writable.close() (-> __mvClose -> ws end/finish) before
+    // setting status "Done!", so the file is fully flushed to disk by now.
+    await fs.rename(outTmp, outPath);
   } finally {
+    if (!ws.writableFinished && !ws.destroyed) ws.destroy();
     await fs.rm(dlDir, { recursive: true, force: true }).catch(() => {});
-    await context.close().catch(() => {});
+    await page.close().catch(() => {});
   }
 }
 
