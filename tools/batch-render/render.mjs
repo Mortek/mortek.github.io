@@ -10,7 +10,16 @@ import { LANDSCAPE_PROFILE, SHORTS_PROFILE, HUE_ENABLED, applyProfileInPage } fr
 const CHROME = '/usr/bin/google-chrome';
 const LOGO = '/home/maurice/Documents/Music/Youtube/profile_picture_transparant_background.png';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const LAUNCH_ARGS = ['--no-sandbox', '--mute-audio', '--autoplay-policy=no-user-gesture-required'];
+const LAUNCH_ARGS = [
+  '--no-sandbox', '--mute-audio', '--autoplay-policy=no-user-gesture-required',
+  // Keep headful render windows running full-speed when they lose focus or get
+  // occluded by other apps — otherwise Chrome throttles/suspends the backgrounded
+  // window and uploads/decodes/encodes stall past our timeouts (mass 60s failures).
+  '--disable-background-timer-throttling',
+  '--disable-backgrounding-occluded-windows',
+  '--disable-renderer-backgrounding',
+  '--disable-features=CalculateNativeWinOcclusion',
+];
 const RENDER_TIMEOUT_MS = 30 * 60 * 1000; // per render: full-song landscape encodes take minutes
 
 // ---- CLI parsing ----
