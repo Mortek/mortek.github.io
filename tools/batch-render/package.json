@@ -1,0 +1,10 @@
+{
+  "name": "batch-render",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Headless batch renderer for music_visualizer.html",
+  "bin": { "batch-render": "./render.mjs" },
+  "scripts": { "test": "node --test" },
+  "dependencies": { "puppeteer-core": "^23.0.0" }
+}
