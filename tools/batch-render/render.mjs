@@ -129,12 +129,16 @@ async function awaitStatusDone(page, statusId, timeoutMs) {
 }
 
 // ---- Render one video (kind: 'tiktok' | 'youtube' | 'landscape') ----
-async function renderOne(browser, origin, kind, assets, outPath) {
+// Each render uses a FRESH browser that is closed afterwards. A single
+// long-lived Chrome degrades over many renders (GPU/renderer resources
+// accumulate) and starts timing out; a per-render browser stays healthy.
+async function renderOne(useHeadless, origin, kind, assets, outPath) {
+  const browser = await launch(useHeadless);
   const dlDir = await fs.mkdtemp(path.join(assets.folder, '.render-tmp-'));
   const outTmp = path.join(dlDir, 'out.webm');
   const ws = createWriteStream(outTmp);
-  const page = await openRenderPage(browser, origin + '/music_visualizer.html', ws);
   try {
+    const page = await openRenderPage(browser, origin + '/music_visualizer.html', ws);
     if (kind === 'landscape') {
       await domClick(page, '.tab-btn[data-tab="landscape"]');
       await uploadAndWait(page, '#imgInput', assets.landscape, 'imgLabel');
@@ -161,7 +165,7 @@ async function renderOne(browser, origin, kind, assets, outPath) {
   } finally {
     if (!ws.writableFinished && !ws.destroyed) ws.destroy();
     await fs.rm(dlDir, { recursive: true, force: true }).catch(() => {});
-    await page.close().catch(() => {});
+    await browser.close().catch(() => {});
   }
 }
 
@@ -213,18 +217,16 @@ async function main() {
   }
 
   const { server, origin } = await startServer(REPO_ROOT);
-  let browser = await launch(args.headless);
 
+  // Decide headless vs headful once (renders each launch their own browser).
   // Only headless risks missing WebCodecs; if so, fall back to headful (GPU).
-  if (args.headless) {
-    const probe = await openPage(browser, origin + '/music_visualizer.html');
-    const ok = await probe.evaluate(() => typeof VideoEncoder !== 'undefined');
+  let useHeadless = args.headless;
+  if (useHeadless) {
+    const probe = await launch(true);
+    const pg = await openPage(probe, origin + '/music_visualizer.html');
+    const ok = await pg.evaluate(() => typeof VideoEncoder !== 'undefined');
     await probe.close();
-    if (!ok) {
-      console.warn('WebCodecs unavailable headless — relaunching headful.');
-      await browser.close();
-      browser = await launch(false);
-    }
+    if (!ok) { console.warn('WebCodecs unavailable headless — using headful (GPU).'); useHeadless = false; }
   }
 
   const results = { done: [], skipped: [], failed: [] };
@@ -234,17 +236,26 @@ async function main() {
       const skip = await shouldSkip(job);
       if (skip) { console.log(`SKIP   ${label} — ${skip}`); results.skipped.push({ label, skip }); return; }
       console.log(`RENDER ${label} ...`);
-      try {
-        await renderOne(browser, origin, job.kind, job.assets, job.out);
+      let lastErr = null;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          await renderOne(useHeadless, origin, job.kind, job.assets, job.out);
+          lastErr = null;
+          break;
+        } catch (err) {
+          lastErr = err;
+          if (attempt === 1) console.warn(`RETRY  ${label} — ${err.message}`);
+        }
+      }
+      if (lastErr) {
+        console.error(`FAIL   ${label} — ${lastErr.message}`);
+        results.failed.push({ label, error: lastErr.message });
+      } else {
         console.log(`DONE   ${label} -> ${path.basename(job.out)}`);
         results.done.push(label);
-      } catch (err) {
-        console.error(`FAIL   ${label} — ${err.message}`);
-        results.failed.push({ label, error: err.message });
       }
     });
   } finally {
-    await browser.close().catch(() => {});
     server.close();
   }
 
