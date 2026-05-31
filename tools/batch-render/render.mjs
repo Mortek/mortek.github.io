@@ -16,11 +16,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- CLI parsing ----
 function parseArgs(argv) {
-  const out = { overwrite: false, headful: false, concurrency: 1, folder: null };
+  // Headful is the DEFAULT: a visible Chrome gets GPU acceleration, which is
+  // dramatically faster for this canvas+VP8 workload. --headless runs windowless
+  // (CPU/SwiftShader, much slower) for unattended use without a display.
+  const out = { overwrite: false, headless: false, concurrency: 1, folder: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--overwrite') out.overwrite = true;
-    else if (a === '--headful') out.headful = true;
+    else if (a === '--headless') out.headless = true;
     else if (a === '--concurrency') out.concurrency = Math.max(1, parseInt(argv[++i], 10) || 1);
     else if (!a.startsWith('--')) out.folder = a;
   }
@@ -28,13 +31,13 @@ function parseArgs(argv) {
 }
 
 // ---- Browser helpers ----
-async function launch(headful) {
+async function launch(headless) {
   // protocolTimeout (default 180s) caps any single CDP call, including the
   // awaitStatusDone waitForFunction that stays pending for the whole encode.
   // Raise it above RENDER_TIMEOUT_MS so the per-render timeout governs instead.
   return puppeteer.launch({
     executablePath: CHROME,
-    headless: headful ? false : 'new',
+    headless: headless ? 'new' : false,
     args: LAUNCH_ARGS,
     protocolTimeout: RENDER_TIMEOUT_MS + 60000,
   });
@@ -57,6 +60,13 @@ async function setDownloadDir(page, dir, browserContextId) {
   await client.send('Browser.setDownloadBehavior', {
     behavior: 'allow', downloadPath: dir, browserContextId, eventsEnabled: true,
   });
+}
+
+// Click via the element's own DOM .click() rather than a coordinate-based mouse
+// event, so the fixed-position Donate button (z-index:100, top-right) can't
+// intercept clicks on the Download buttons. Also viewport/layout-independent.
+async function domClick(page, selector) {
+  await page.$eval(selector, (el) => el.click());
 }
 
 async function uploadAndWait(page, selector, filePath, labelId) {
@@ -107,23 +117,23 @@ async function renderOne(browser, origin, kind, assets, outPath) {
   try {
     await setDownloadDir(page, dlDir, context.id);
     if (kind === 'landscape') {
-      await page.click('.tab-btn[data-tab="landscape"]');
+      await domClick(page, '.tab-btn[data-tab="landscape"]');
       await uploadAndWait(page, '#imgInput', assets.landscape, 'imgLabel');
       await uploadAndWait(page, '#audioInput', assets.mp3, 'audioLabel');
       await uploadAndWait(page, '#logoInput', LOGO, 'logoLabel');
       await page.evaluate(applyProfileInPage, LANDSCAPE_PROFILE, HUE_ENABLED);
       await page.waitForFunction(() => !document.getElementById('dlBtn').disabled, { timeout: 60000 });
-      await page.click('#dlBtn');
+      await domClick(page, '#dlBtn');
       await awaitStatusDone(page, 'status', RENDER_TIMEOUT_MS);
     } else {
       const portrait = kind === 'tiktok' ? assets.tiktok : assets.youtube;
-      await page.click('.tab-btn[data-tab="shorts"]');
+      await domClick(page, '.tab-btn[data-tab="shorts"]');
       await uploadAndWait(page, '#portraitInput', portrait, 'portraitLabel');
       await uploadAndWait(page, '#shortsAudioInput', assets.mp3, 'shortsAudioLabel');
       await uploadAndWait(page, '#shortsLogoInput', LOGO, 'shortsLogoLabel');
       await page.evaluate(applyProfileInPage, SHORTS_PROFILE, HUE_ENABLED);
       await page.waitForFunction(() => !document.getElementById('shortsDlBtn').disabled, { timeout: 60000 });
-      await page.click('#shortsDlBtn');
+      await domClick(page, '#shortsDlBtn');
       await awaitStatusDone(page, 'shortsStatus', RENDER_TIMEOUT_MS);
     }
     // Encoding is already finished when status says "Done!"; this only waits
@@ -169,7 +179,7 @@ async function runPool(items, concurrency, worker) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.folder) {
-    console.error('Usage: node render.mjs "<folder>" [--overwrite] [--headful] [--concurrency N]');
+    console.error('Usage: node render.mjs "<folder>" [--overwrite] [--headless] [--concurrency N]');
     process.exit(2);
   }
   try { await fs.access(LOGO); } catch { console.error('Logo not found: ' + LOGO); process.exit(2); }
@@ -184,17 +194,17 @@ async function main() {
   }
 
   const { server, origin } = await startServer(REPO_ROOT);
-  let browser = await launch(args.headful);
+  let browser = await launch(args.headless);
 
-  // WebCodecs probe; relaunch headful if unavailable headless.
-  if (!args.headful) {
+  // Only headless risks missing WebCodecs; if so, fall back to headful (GPU).
+  if (args.headless) {
     const probe = await openPage(browser, origin + '/music_visualizer.html');
     const ok = await probe.evaluate(() => typeof VideoEncoder !== 'undefined');
     await probe.close();
     if (!ok) {
       console.warn('WebCodecs unavailable headless — relaunching headful.');
       await browser.close();
-      browser = await launch(true);
+      browser = await launch(false);
     }
   }
 
