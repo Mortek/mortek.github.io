@@ -128,7 +128,7 @@ async function awaitStatusDone(page, statusId, timeoutMs) {
   if (result.startsWith('error')) throw new Error('Render reported ' + result);
 }
 
-// ---- Render one video (kind: 'tiktok' | 'youtube' | 'landscape') ----
+// ---- Render one video (kind: 'youtube' | 'landscape') ----
 // Each render uses a FRESH browser that is closed afterwards. A single
 // long-lived Chrome degrades over many renders (GPU/renderer resources
 // accumulate) and starts timing out; a per-render browser stays healthy.
@@ -142,17 +142,16 @@ async function renderOne(useHeadless, origin, kind, assets, outPath) {
     if (kind === 'landscape') {
       await domClick(page, '.tab-btn[data-tab="landscape"]');
       await uploadAndWait(page, '#imgInput', assets.landscape, 'imgLabel');
-      await uploadAndWait(page, '#audioInput', assets.mp3, 'audioLabel');
+      await uploadAndWait(page, '#audioInput', assets.audio, 'audioLabel');
       await uploadAndWait(page, '#logoInput', LOGO, 'logoLabel');
       await page.evaluate(applyProfileInPage, LANDSCAPE_PROFILE, HUE_ENABLED);
       await page.waitForFunction(() => !document.getElementById('dlBtn').disabled, { timeout: 60000 });
       await domClick(page, '#dlBtn');
       await awaitStatusDone(page, 'status', RENDER_TIMEOUT_MS);
     } else {
-      const portrait = kind === 'tiktok' ? assets.tiktok : assets.youtube;
       await domClick(page, '.tab-btn[data-tab="shorts"]');
-      await uploadAndWait(page, '#portraitInput', portrait, 'portraitLabel');
-      await uploadAndWait(page, '#shortsAudioInput', assets.mp3, 'shortsAudioLabel');
+      await uploadAndWait(page, '#portraitInput', assets.youtube, 'portraitLabel');
+      await uploadAndWait(page, '#shortsAudioInput', assets.audio, 'shortsAudioLabel');
       await uploadAndWait(page, '#shortsLogoInput', LOGO, 'shortsLogoLabel');
       await page.evaluate(applyProfileInPage, SHORTS_PROFILE, HUE_ENABLED);
       await page.waitForFunction(() => !document.getElementById('shortsDlBtn').disabled, { timeout: 60000 });
@@ -169,10 +168,9 @@ async function renderOne(useHeadless, origin, kind, assets, outPath) {
   }
 }
 
-// ---- Build the ordered job list (shorts first, then landscape) ----
+// ---- Build the ordered job list (YouTube short first, then landscape) ----
 function jobsForSong(assets, overwrite) {
   const plan = [
-    { kind: 'tiktok',    src: assets.tiktok,    out: path.join(assets.folder, `${assets.title} Tik Tok.webm`) },
     { kind: 'youtube',   src: assets.youtube,   out: path.join(assets.folder, `${assets.title} Youtube shorts.webm`) },
     { kind: 'landscape', src: assets.landscape, out: path.join(assets.folder, `${assets.title}.webm`) },
   ];
@@ -208,7 +206,7 @@ async function main() {
   try { await fs.access(LOGO); } catch { console.error('Logo not found: ' + LOGO); process.exit(2); }
 
   const songFolders = await findSongFolders(args.folder);
-  if (songFolders.length === 0) { console.error('No .mp3 found in ' + args.folder); process.exit(2); }
+  if (songFolders.length === 0) { console.error('No .wav found in ' + args.folder); process.exit(2); }
 
   const jobs = [];
   for (const folder of songFolders) {

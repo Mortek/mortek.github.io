@@ -6,33 +6,33 @@ async function entryNames(dir) {
   return ents;
 }
 
-function hasMp3(ents) {
-  return ents.some((e) => e.isFile() && e.name.toLowerCase().endsWith('.mp3'));
+function hasWav(ents) {
+  return ents.some((e) => e.isFile() && e.name.toLowerCase().endsWith('.wav'));
 }
 
-// A song folder is one that directly contains a .mp3. If `root` is itself a
+// A song folder is one that directly contains a .wav. If `root` is itself a
 // song folder, return [root]; otherwise recurse exactly one level.
 export async function findSongFolders(root) {
   const abs = path.resolve(root);
   const ents = await entryNames(abs);
-  if (hasMp3(ents)) return [abs];
+  if (hasWav(ents)) return [abs];
   const out = [];
   for (const e of ents) {
     if (!e.isDirectory()) continue;
     const sub = path.join(abs, e.name);
-    if (hasMp3(await entryNames(sub))) out.push(sub);
+    if (hasWav(await entryNames(sub))) out.push(sub);
   }
   return out.sort();
 }
 
-// Resolve the assets for a single song folder. `title` is the mp3 basename.
+// Resolve the assets for a single song folder. `title` is the wav basename.
 // Image variants are matched case-insensitively by exact name.
 export async function resolveSongAssets(folder) {
   const abs = path.resolve(folder);
   const files = (await entryNames(abs)).filter((e) => e.isFile()).map((e) => e.name);
-  const mp3 = files.find((n) => n.toLowerCase().endsWith('.mp3'));
-  if (!mp3) return null;
-  const title = mp3.replace(/\.mp3$/i, '');
+  const wav = files.find((n) => n.toLowerCase().endsWith('.wav'));
+  if (!wav) return null;
+  const title = wav.replace(/\.wav$/i, '');
   const find = (name) => {
     const hit = files.find((n) => n.toLowerCase() === name.toLowerCase());
     return hit ? path.join(abs, hit) : null;
@@ -40,9 +40,8 @@ export async function resolveSongAssets(folder) {
   return {
     title,
     folder: abs,
-    mp3: path.join(abs, mp3),
+    audio: path.join(abs, wav),
     landscape: find(`${title}.png`),
-    tiktok: find(`${title} Tik Tok.png`),
     youtube: find(`${title} Youtube shorts.png`),
   };
 }

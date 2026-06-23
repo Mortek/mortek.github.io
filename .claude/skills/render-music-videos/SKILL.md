@@ -1,31 +1,30 @@
 ---
 name: render-music-videos
-description: Use when the user wants to batch-render Mortek music-visualizer videos for a song folder — generates the TikTok short, YouTube short, and landscape .webm by driving music_visualizer.html headlessly. Triggers - "render the videos for <folder>", "make the visualizer videos", "batch render music videos".
+description: Use when the user wants to batch-render Mortek music-visualizer videos for a song folder — generates the YouTube short and landscape .webm by driving music_visualizer.html headlessly. Triggers - "render the videos for <folder>", "make the visualizer videos", "batch render music videos".
 ---
 
 # Render Music Videos
 
-Batch-renders the three visualizer videos (TikTok short, YouTube short, landscape) for one song folder or a parent of song folders, using the headless renderer at `tools/batch-render/`. It drives the real `music_visualizer.html` via puppeteer-core + system Chrome, so output is identical to rendering by hand.
+Batch-renders the two visualizer videos (YouTube short, landscape) for one song folder or a parent of song folders, using the headless renderer at `tools/batch-render/`. It drives the real `music_visualizer.html` via puppeteer-core + system Chrome, so output is identical to rendering by hand.
 
 ## Expected folder contents (per song)
 
-- `<title>.mp3` — audio (defines `<title>`)
+- `<title>.wav` — audio (defines `<title>`)
 - `<title>.png` — landscape image
-- `<title> Tik Tok.png` — TikTok portrait image
 - `<title> Youtube shorts.png` — YouTube Shorts portrait image (matched case-insensitively)
 
-Any other PNG (e.g. `<title> 2MB.png`) is ignored. The logo is always
+Any other PNG (e.g. `<title> 2MB.png`, `<title> Tik Tok.png`) is ignored. The logo is always
 `/home/maurice/Documents/Music/Youtube/profile_picture_transparant_background.png`.
 
 ## How to run
 
 1. First time only, install deps: `cd tools/batch-render && npm install`
-2. Run the batch (renders shorts first, then landscape; skips any `.webm` that already exists):
+2. Run the batch (renders the YouTube short first, then landscape; skips any `.webm` that already exists):
    `node tools/batch-render/render.mjs "<folder>"`
 
-`<folder>` can be a single song folder (contains an `.mp3`) or a parent folder (recurses one level into song subfolders).
+`<folder>` can be a single song folder (contains a `.wav`) or a parent folder (recurses one level into song subfolders).
 
-Outputs land in the same folder: `<title> Tik Tok.webm`, `<title> Youtube shorts.webm`, `<title>.webm`. Report the final `Summary:` line and any `FAIL`/`SKIP` reasons. A non-zero exit means a render failed or an image variant was missing.
+Outputs land in the same folder: `<title> Youtube shorts.webm`, `<title>.webm`. Report the final `Summary:` line and any `FAIL`/`SKIP` reasons. A non-zero exit means a render failed or an image variant was missing.
 
 ### Flags
 - `--overwrite` — re-render even if the target `.webm` exists (default: skip existing, so re-runs resume).

@@ -5,7 +5,7 @@ import { findSongFolders, resolveSongAssets } from '../discover.mjs';
 
 const FOLDER = '/home/maurice/Downloads/Epic Viking Warrior Music/Age Of Heroes';
 
-test('findSongFolders returns the folder itself when it contains an mp3', async () => {
+test('findSongFolders returns the folder itself when it contains a wav', async () => {
   const folders = await findSongFolders(FOLDER);
   assert.deepEqual(folders, [FOLDER]);
 });
@@ -16,12 +16,11 @@ test('findSongFolders recurses one level into a parent of song folders', async (
   assert.ok(folders.includes(FOLDER), 'should include the Age Of Heroes subfolder');
 });
 
-test('resolveSongAssets finds all three variants and ignores decoys', async () => {
+test('resolveSongAssets finds the audio + image variants and ignores decoys', async () => {
   const a = await resolveSongAssets(FOLDER);
   assert.equal(a.title, 'Age Of Heroes');
-  assert.equal(path.basename(a.mp3), 'Age Of Heroes.mp3');
+  assert.equal(path.basename(a.audio), 'Age Of Heroes.wav');
   assert.equal(path.basename(a.landscape), 'Age Of Heroes.png');
-  assert.equal(path.basename(a.tiktok), 'Age Of Heroes Tik Tok.png');
   assert.equal(path.basename(a.youtube), 'Age Of Heroes Youtube shorts.png');
   assert.ok(!a.landscape.includes('2MB'));
 });
