@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mortek.github.io/about.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.7</priority>
     <image:image>
       <image:loc>https://mortek.github.io/books/profielfoto.jpeg</image:loc>
@@ -12,17 +12,17 @@
   </url>
   <url>
     <loc>https://mortek.github.io/apps.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/books.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/Dopamine_Detox.jpg</image:loc>
@@ -54,8 +54,28 @@
     </image:image>
   </url>
   <url>
+    <loc>https://mortek.github.io/crypto-mining-tycoon.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/games.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/google34aec91f668b0a6a.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/hogwarts.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
@@ -65,47 +85,72 @@
   </url>
   <url>
     <loc>https://mortek.github.io/music_visualizer.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/privacy_policy.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/shadowrealm.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/shadowrealm-payment-policy.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/shadowrealm-privacy.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/shadowrealm-tos.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/void-swarm.html</loc>
+    <lastmod>2026-10-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/blog/dopamine-detox.html</loc>
-    <lastmod>2026-02-12</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/read-people-like-a-book.html</loc>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/stop-overthinking.html</loc>
-    <lastmod>2026-01-15</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/the-discipline-blueprint.html</loc>
-    <lastmod>2026-02-26</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/the-stoic-mind.html</loc>
-    <lastmod>2026-01-29</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/wealth-without-permission.html</loc>
-    <lastmod>2026-03-12</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/whole.html</loc>
-    <lastmod>2026-04-09</lastmod>
+    <lastmod>2026-10-11</lastmod>
     <priority>0.6</priority>
   </url>
 </urlset>
