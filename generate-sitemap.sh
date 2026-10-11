@@ -28,6 +28,7 @@ get_priority() {
 # Root HTML files (excluding 404)
 for f in *.html; do
   [ "$f" = "404.html" ] && continue
+  case "$f" in google*.html) continue ;; esac
   [ "$f" = "privacy_policy.html" ] || [ "$f" = "music_visualizer.html" ] || true
 
   if [ "$f" = "index.html" ]; then
