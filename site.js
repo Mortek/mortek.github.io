@@ -109,25 +109,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
-  /* === Blog category filter === */
+  /* === Blog filters: type (books/games) + topic === */
   const filters = document.querySelectorAll('.filter-btn');
+  const typeBtns = document.querySelectorAll('.type-btn');
   if (filters.length) {
     const cards = document.querySelectorAll('.article-card');
-    filters.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filters.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cat = btn.dataset.filter;
-        cards.forEach(card => {
-          const badge = card.querySelector('.article-badge');
-          if (cat === 'all' || (badge && badge.textContent.trim() === cat)) {
-            card.classList.remove('filter-hidden');
-          } else {
-            card.classList.add('filter-hidden');
-          }
-        });
-      });
+    let cat = 'all', type = 'all';
+    const apply = () => cards.forEach(card => {
+      const badge = card.querySelector('.article-badge');
+      const okCat = cat === 'all' || (badge && badge.textContent.trim() === cat);
+      const okType = type === 'all' || card.dataset.type === type;
+      card.classList.toggle('filter-hidden', !(okCat && okType));
     });
+    filters.forEach(btn => btn.addEventListener('click', () => {
+      filters.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      cat = btn.dataset.filter; apply();
+    }));
+    typeBtns.forEach(btn => btn.addEventListener('click', () => {
+      typeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      type = btn.dataset.type; apply();
+    }));
+    const q = new URLSearchParams(location.search).get('type');
+    const pre = q && document.querySelector('.type-btn[data-type="' + q + '"]');
+    if (pre) pre.click();
   }
 
   /* === Blog post TOC === */

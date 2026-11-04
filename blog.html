@@ -26,7 +26,7 @@
 <link rel="preload" href="fonts/space-grotesk-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}</style>
-<link rel="stylesheet" href="style.min.css?v=80">
+<link rel="stylesheet" href="style.min.css?v=81">
 <noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
 <title>Blog — Personal Development Articles by Maurice Moret</title>
 </head>
@@ -48,10 +48,16 @@
 <main id="main-content" class="blog-main">
   <div class="icon" aria-hidden="true">&#9997;&#65039;</div>
   <h1>The <span>Blog</span></h1>
-  <p class="blog-intro">Articles on personal development, productivity, and creative living by Maurice Moret.</p>
+  <p class="blog-intro">Articles on personal development, productivity and creative living, plus guides and strategy for our games, by Maurice Moret.</p>
+
+  <div class="blog-filters blog-filters--type" role="group" aria-label="Filter by type">
+    <button class="type-btn active" data-type="all">All</button>
+    <button class="type-btn type-btn--book" data-type="books">Books</button>
+    <button class="type-btn type-btn--game" data-type="games">Games</button>
+  </div>
 
   <div class="blog-filters">
-    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn active" data-filter="all">All topics</button>
     <button class="filter-btn" data-filter="Mindset">Mindset</button>
     <button class="filter-btn" data-filter="Philosophy">Philosophy</button>
     <button class="filter-btn" data-filter="Neuroscience">Neuroscience</button>
@@ -59,41 +65,172 @@
     <button class="filter-btn" data-filter="Finance">Finance</button>
     <button class="filter-btn" data-filter="Behavior">Behavior</button>
     <button class="filter-btn" data-filter="Wellness">Wellness</button>
+    <button class="filter-btn" data-filter="Guide">Guide</button>
+    <button class="filter-btn" data-filter="Strategy">Strategy</button>
+    <button class="filter-btn" data-filter="Tips">Tips</button>
+    <button class="filter-btn" data-filter="Genre">Genre</button>
   </div>
 
   <div class="article-grid">
-    <a href="blog/stop-overthinking.html" class="article-card fade-in">
-      <span class="article-badge">Mindset</span>
+    <!-- GAME-POSTS -->
+    <a href="blog/shadowrealm-casino-lottery-gambling-guide.html" class="article-card fade-in" data-type="games" data-game="shadowrealm">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Shadowrealm Casinos and Lottery: How In-Game Gambling Works</h3>
+      <p>Casinos, roulette, player-owned tables and the weekly lottery in Shadowrealm: Age of Darkness, with a sensible way to gamble in-game gold.</p>
+    </a>
+    <a href="blog/progress-faster-tower-defense-kingdom.html" class="article-card fade-in" data-type="games" data-game="tower-defense-kingdom">
+      <span class="article-badge">Strategy</span><span class="article-type article-type--game">Game</span>
+      <h3>How to Progress Faster in Tower Defense Kingdom</h3>
+      <p>How to progress faster in Tower Defense Kingdom: the daily challenge, castle income, relics, mutators and endless mode, and what to do with your gems.</p>
+    </a>
+    <a href="blog/is-capy-kingdom-worth-playing.html" class="article-card fade-in" data-type="games" data-game="capy-kingdom">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Is Capy Kingdom Worth Playing? An Honest Look From the Dev</h3>
+      <p>Is Capy Kingdom worth playing? The honest developer answer: what it is, how it makes money, how much time it asks, and who should skip it.</p>
+    </a>
+    <a href="blog/crypto-mining-tycoon-is-it-worth-playing.html" class="article-card fade-in" data-type="games" data-game="crypto-mining-tycoon">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Is Crypto Mining Tycoon Worth Playing? An Honest Look</h3>
+      <p>An honest developer review of Crypto Mining Tycoon: what is free, what the store sells and who should skip it.</p>
+    </a>
+    <a href="blog/idle-survivor-games-android-explained.html" class="article-card fade-in" data-type="games" data-game="void-swarm">
+      <span class="article-badge">Genre</span><span class="article-type article-type--game">Game</span>
+      <h3>Idle Survivor Games on Android: What the Genre Is and Why</h3>
+      <p>What an idle survivor game on Android is, how it differs from a classic swarm survivor, and what to check before you pick one to play.</p>
+    </a>
+    <a href="blog/shadowrealm-crime-jail-stables-guide.html" class="article-card fade-in" data-type="games" data-game="shadowrealm">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Shadowrealm Jail and Crime Guide: Stables, Heists, Breakouts</h3>
+      <p>How crime, jail, the Black Stables and jailbreaks work in Shadowrealm: Age of Darkness, with the real odds and sentence lengths.</p>
+    </a>
+    <a href="blog/tower-defense-kingdom-beginner-tips.html" class="article-card fade-in" data-type="games" data-game="tower-defense-kingdom">
+      <span class="article-badge">Tips</span><span class="article-type article-type--game">Game</span>
+      <h3>Tower Defense Kingdom Beginner Tips: 9 Ways to Win Early</h3>
+      <p>Nine beginner tips for Tower Defense Kingdom: which towers to build first, what to upgrade, how to use the level info panel, and how to save gold.</p>
+    </a>
+    <a href="blog/capy-kingdom-what-to-upgrade-first.html" class="article-card fade-in" data-type="games" data-game="capy-kingdom">
+      <span class="article-badge">Strategy</span><span class="article-type article-type--game">Game</span>
+      <h3>Capy Kingdom: What to Upgrade First to Progress Faster</h3>
+      <p>What to upgrade first in Capy Kingdom: split coins across Power, Speed and Money, spend gems wisely, merge smartly and put pets to work.</p>
+    </a>
+    <a href="blog/crypto-mining-tycoon-progress-faster.html" class="article-card fade-in" data-type="games" data-game="crypto-mining-tycoon">
+      <span class="article-badge">Strategy</span><span class="article-type article-type--game">Game</span>
+      <h3>How to Progress Faster in Crypto Mining Tycoon: 5 Systems</h3>
+      <p>Which systems to use first to speed up Crypto Mining Tycoon: energy modes, the Mining Rig, research and managers.</p>
+    </a>
+    <a href="blog/idle-base-offline-earnings-explained.html" class="article-card fade-in" data-type="games" data-game="void-swarm">
+      <span class="article-badge">Strategy</span><span class="article-type article-type--game">Game</span>
+      <h3>Idle Base and Offline Earnings in Void Swarm, Explained</h3>
+      <p>How the Void Swarm idle base works: buildings, offline earnings, research, prestige for Void Cores, Ascension and the optional boosts.</p>
+    </a>
+    <a href="blog/shadowrealm-ranks-and-progression-guide.html" class="article-card fade-in" data-type="games" data-game="shadowrealm">
+      <span class="article-badge">Strategy</span><span class="article-type article-type--game">Game</span>
+      <h3>How to Rank Up Faster in Shadowrealm: A Progression Guide</h3>
+      <p>All eight rank thresholds in Shadowrealm and a priority list for progressing faster: cities, talents, gear, the Reliquary and the stronghold.</p>
+    </a>
+    <a href="blog/tower-fusion-guide.html" class="article-card fade-in" data-type="games" data-game="tower-defense-kingdom">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Tower Fusion Guide: Merge Elements in Tower Defense Kingdom</h3>
+      <p>How fusion works in Tower Defense Kingdom: the rules, all six fusion towers, what carries over and when merging two towers is worth it.</p>
+    </a>
+    <a href="blog/capy-kingdom-rebirth-guide.html" class="article-card fade-in" data-type="games" data-game="capy-kingdom">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>How Rebirth Works in Capy Kingdom: Golden Yuzu and the Tree</h3>
+      <p>How rebirth works in Capy Kingdom: what Golden Yuzu does, what the Yuzu Tree gives, and how to tell when a reset is worth it.</p>
+    </a>
+    <a href="blog/crypto-mining-tycoon-idle-clicker-games-explained.html" class="article-card fade-in" data-type="games" data-game="crypto-mining-tycoon">
+      <span class="article-badge">Genre</span><span class="article-type article-type--game">Game</span>
+      <h3>Idle Clicker Games for Android Explained, With an Example</h3>
+      <p>What idle clicker games are, why prestige resets matter, and how Crypto Mining Tycoon uses the genre formula.</p>
+    </a>
+    <a href="blog/weapon-evolutions-guide.html" class="article-card fade-in" data-type="games" data-game="void-swarm">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>Void Swarm Weapon Evolutions: How Evolving Works Step by Step</h3>
+      <p>How weapon evolutions work in Void Swarm: the max-level plus matching passive rule, example pairings, slot limits and how to plan a build.</p>
+    </a>
+    <a href="blog/what-is-shadowrealm-age-of-darkness-browser-rpg.html" class="article-card fade-in" data-type="games" data-game="shadowrealm">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>What Is Shadowrealm? A Free Dark Fantasy Browser RPG Explained</h3>
+      <p>What Shadowrealm: Age of Darkness is, what you do in it, what the optional purchases are, and who will enjoy this free dark fantasy browser RPG.</p>
+    </a>
+    <a href="blog/elemental-combos-explained.html" class="article-card fade-in" data-type="games" data-game="tower-defense-kingdom">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>How Elemental Combos Work in Tower Defense Kingdom</h3>
+      <p>All 11 elemental combos in Tower Defense Kingdom: what triggers them, what they do, and how combo mastery makes them stronger over time.</p>
+    </a>
+    <a href="blog/idle-shooter-games-android-explained.html" class="article-card fade-in" data-type="games" data-game="capy-kingdom">
+      <span class="article-badge">Genre</span><span class="article-type article-type--game">Game</span>
+      <h3>Idle Shooter Games for Android Explained: How They Work</h3>
+      <p>What an idle shooter is, why the loop works on a phone, and what to look for in one, with Capy Kingdom as the worked example.</p>
+    </a>
+    <a href="blog/crypto-mining-tycoon-prestige-and-ascension-explained.html" class="article-card fade-in" data-type="games" data-game="crypto-mining-tycoon">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>How Prestige and Ascension Work in Crypto Mining Tycoon</h3>
+      <p>A clear explanation of prestige levels, milestones, Ascension and Quantum Shards in Crypto Mining Tycoon.</p>
+    </a>
+    <a href="blog/void-swarm-beginner-tips.html" class="article-card fade-in" data-type="games" data-game="void-swarm">
+      <span class="article-badge">Tips</span><span class="article-type article-type--game">Game</span>
+      <h3>Void Swarm Beginner Tips: What to Do in Your First Days</h3>
+      <p>Beginner tips for Void Swarm: movement, level-up choices, early upgrades, missions and how to make the idle base work for you from day one.</p>
+    </a>
+    <a href="blog/shadowrealm-beginner-tips.html" class="article-card fade-in" data-type="games" data-game="shadowrealm">
+      <span class="article-badge">Tips</span><span class="article-type article-type--game">Game</span>
+      <h3>Shadowrealm Beginner Tips: Your First Day in the Dark Realm</h3>
+      <p>The first-day checklist for Shadowrealm: Age of Darkness, from energy and early actions to claiming your stronghold.</p>
+    </a>
+    <a href="blog/what-is-tower-defense-kingdom.html" class="article-card fade-in" data-type="games" data-game="tower-defense-kingdom">
+      <span class="article-badge">Genre</span><span class="article-type article-type--game">Game</span>
+      <h3>Tower Defense Kingdom: Elemental Tower Defense for Android</h3>
+      <p>What is Tower Defense Kingdom? A tour of the elemental tower defense game for Android: 100 maps, combos, fusion, relics and a daily challenge.</p>
+    </a>
+    <a href="blog/capy-kingdom-beginner-tips.html" class="article-card fade-in" data-type="games" data-game="capy-kingdom">
+      <span class="article-badge">Tips</span><span class="article-type article-type--game">Game</span>
+      <h3>Capy Kingdom Beginner Tips: Your First Day, Step by Step</h3>
+      <p>Capy Kingdom beginner tips for your first day: the three upgrade cards, why a boss loss is not a setback, and how to use offline earnings.</p>
+    </a>
+    <a href="blog/crypto-mining-tycoon-beginner-tips.html" class="article-card fade-in" data-type="games" data-game="crypto-mining-tycoon">
+      <span class="article-badge">Tips</span><span class="article-type article-type--game">Game</span>
+      <h3>Crypto Mining Tycoon Beginner Tips: 6 Ways to Start Strong</h3>
+      <p>Six practical beginner tips for Crypto Mining Tycoon: combos, upgrades, challenges, energy and your first prestige.</p>
+    </a>
+    <a href="blog/what-is-void-swarm-idle-survivor.html" class="article-card fade-in" data-type="games" data-game="void-swarm">
+      <span class="article-badge">Guide</span><span class="article-type article-type--game">Game</span>
+      <h3>What Is Void Swarm: Idle Survivor? A Full Overview</h3>
+      <p>A plain-language overview of Void Swarm: Idle Survivor, what a run feels like, what the idle base does and how the free-to-play side works.</p>
+    </a>
+    <!-- /GAME-POSTS -->
+    <a href="blog/stop-overthinking.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Mindset</span><span class="article-type article-type--book">Book</span>
       <h3>Why You Can't Stop Overthinking (And How to Finally Break Free)</h3>
       <p>Why overthinking happens, how it hijacks your decision-making and wellbeing, and a clear set of tools to quiet your mind and build mental clarity.</p>
     </a>
-    <a href="blog/the-stoic-mind.html" class="article-card fade-in">
-      <span class="article-badge">Philosophy</span>
+    <a href="blog/the-stoic-mind.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Philosophy</span><span class="article-type article-type--book">Book</span>
       <h3>How Stoic Philosophy Can Save Your Sanity in the Modern World</h3>
       <p>Applying Stoic philosophy to modern life — a complete daily practice for managing anxiety, handling adversity, and building a grounded, intentional mindset.</p>
     </a>
-    <a href="blog/dopamine-detox.html" class="article-card fade-in">
-      <span class="article-badge">Neuroscience</span>
+    <a href="blog/dopamine-detox.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Neuroscience</span><span class="article-type article-type--book">Book</span>
       <h3>Your Brain on Dopamine: How Technology Rewires Your Motivation</h3>
       <p>How your brain's dopamine reward system was hijacked by smartphones and social media — and a practical four-phase detox protocol to take it back.</p>
     </a>
-    <a href="blog/the-discipline-blueprint.html" class="article-card fade-in">
-      <span class="article-badge">Habits</span>
+    <a href="blog/the-discipline-blueprint.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Habits</span><span class="article-type article-type--book">Book</span>
       <h3>Why Motivation Fails and What to Build Instead</h3>
       <p>Why motivation always fails, and a practical system for showing up every day — based on environment design, identity, and habit stacking rather than inspiration.</p>
     </a>
-    <a href="blog/wealth-without-permission.html" class="article-card fade-in">
-      <span class="article-badge">Finance</span>
+    <a href="blog/wealth-without-permission.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Finance</span><span class="article-type article-type--book">Book</span>
       <h3>Why Financial Freedom Doesn't Require Anyone's Permission</h3>
       <p>Breaking the invisible money script most people inherit — and building genuine financial freedom through the wealth equation, compound growth, and powerful mindset shifts.</p>
     </a>
-    <a href="blog/read-people-like-a-book.html" class="article-card fade-in">
-      <span class="article-badge">Behavior</span>
+    <a href="blog/read-people-like-a-book.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Behavior</span><span class="article-type article-type--book">Book</span>
       <h3>The Hidden Language of Human Behavior: How to Read People</h3>
       <p>Body language, micro-expressions, personality frameworks, and the hidden signals people send in everyday conversations, negotiations, and social situations.</p>
     </a>
-    <a href="blog/whole.html" class="article-card fade-in">
-      <span class="article-badge">Wellness</span>
+    <a href="blog/whole.html" class="article-card fade-in" data-type="books">
+      <span class="article-badge">Wellness</span><span class="article-type article-type--book">Book</span>
       <h3>Why True Health Is More Than Physical Fitness</h3>
       <p>All six dimensions of human health, why partial wellness is not wellness, and a personalized whole health framework — realistic enough to maintain and meaningful enough to matter.</p>
     </a>
@@ -112,6 +249,6 @@
   <p>&copy; 2026 Mortek</p>
 </footer>
 
-<script src="site.min.js?v=1"></script>
+<script src="site.min.js?v=2"></script>
 </body>
 </html>

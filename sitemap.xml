@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mortek.github.io/about.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.7</priority>
     <image:image>
       <image:loc>https://mortek.github.io/books/profielfoto.jpeg</image:loc>
@@ -11,18 +11,23 @@
     </image:image>
   </url>
   <url>
+    <loc>https://mortek.github.io/ads-privacy.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/apps.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/books.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://mortek.github.io/books/book_covers/Dopamine_Detox.jpg</image:loc>
@@ -55,97 +60,222 @@
   </url>
   <url>
     <loc>https://mortek.github.io/crypto-mining-tycoon.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/games.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/hogwarts.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/music.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/music_visualizer.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/privacy_policy.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/shadowrealm.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/shadowrealm-payment-policy.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/shadowrealm-privacy.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/shadowrealm-tos.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/void-swarm.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/blog/capy-kingdom-beginner-tips.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/capy-kingdom-rebirth-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/capy-kingdom-what-to-upgrade-first.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/crypto-mining-tycoon-beginner-tips.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/crypto-mining-tycoon-idle-clicker-games-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/crypto-mining-tycoon-is-it-worth-playing.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/crypto-mining-tycoon-prestige-and-ascension-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/crypto-mining-tycoon-progress-faster.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/blog/dopamine-detox.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/elemental-combos-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/idle-base-offline-earnings-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/idle-shooter-games-android-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/idle-survivor-games-android-explained.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/is-capy-kingdom-worth-playing.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/progress-faster-tower-defense-kingdom.html</loc>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/read-people-like-a-book.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/shadowrealm-beginner-tips.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/shadowrealm-casino-lottery-gambling-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/shadowrealm-crime-jail-stables-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/shadowrealm-ranks-and-progression-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/stop-overthinking.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/the-discipline-blueprint.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/the-stoic-mind.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/tower-defense-kingdom-beginner-tips.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/tower-fusion-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/void-swarm-beginner-tips.html</loc>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/wealth-without-permission.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/weapon-evolutions-guide.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/what-is-shadowrealm-age-of-darkness-browser-rpg.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/what-is-tower-defense-kingdom.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/what-is-void-swarm-idle-survivor.html</loc>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mortek.github.io/blog/whole.html</loc>
-    <lastmod>2026-10-11</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <priority>0.6</priority>
   </url>
 </urlset>

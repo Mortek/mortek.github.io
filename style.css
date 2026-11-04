@@ -2081,3 +2081,41 @@ h1 span { color: var(--accent); }
   .changelog-date { margin-left: 0; font-size: 0.65em; margin-bottom: 2px; }
   .book-card { flex: 0 0 calc(100% - 16px); }
 }
+
+/* === Blog type tags (Book / Game) and type filter === */
+.article-type {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.7em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin: 0 0 14px 8px;
+}
+.article-type--book { color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.35); background: rgba(96, 165, 250, 0.08); }
+.article-type--game { color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.35); background: rgba(74, 222, 128, 0.08); }
+.blog-filters--type { margin-bottom: 14px; }
+.type-btn {
+  font-family: var(--font-heading);
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 22px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.type-btn:hover { color: #fff; border-color: var(--text-muted); }
+.type-btn.active { background: #fff; border-color: #fff; color: var(--bg); }
+.type-btn--book.active { background: #60a5fa; border-color: #60a5fa; color: var(--bg); }
+.type-btn--game.active { background: #4ade80; border-color: #4ade80; color: var(--bg); }
+.article-inline { margin: 28px auto; text-align: center; }
+.article-inline img { display: block; margin: 0 auto; max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border); }
+.article-inline--portrait img { max-width: 300px; }
+.article-inline figcaption { font-size: 0.82em; color: var(--text-muted); margin-top: 10px; }

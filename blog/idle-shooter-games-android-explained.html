@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Idle shooter games for Android explained: how auto-firing, upgrades, bosses, offline earnings and prestige fit together, using Capy Kingdom as a worked example.">
+<meta name="theme-color" content="#141416">
+<meta name="view-transition" content="same-origin">
+<meta property="og:title" content="Idle Shooter Games for Android Explained: How They Work | Mortek Blog">
+<meta property="og:description" content="Idle shooter games for Android explained: how auto-firing, upgrades, bosses, offline earnings and prestige fit together, using Capy Kingdom as a worked example.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mortek.github.io/blog/idle-shooter-games-android-explained.html">
+<meta property="og:image" content="https://mortek.github.io/blog/img/capy-kingdom/banner.webp">
+<meta property="article:published_time" content="2026-10-14">
+<meta property="article:author" content="Maurice Moret">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Idle Shooter Games for Android Explained: How They Work | Mortek Blog">
+<meta name="twitter:description" content="Idle shooter games for Android explained: how auto-firing, upgrades, bosses, offline earnings and prestige fit together, using Capy Kingdom as a worked example.">
+<meta name="twitter:image" content="https://mortek.github.io/blog/img/capy-kingdom/banner.webp">
+<link rel="alternate" type="application/rss+xml" title="Maurice Moret's Blog" href="https://mortek.github.io/feed.xml">
+<link rel="canonical" href="https://mortek.github.io/blog/idle-shooter-games-android-explained.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="manifest" href="../manifest.json">
+<style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}</style>
+<link rel="stylesheet" href="../style.min.css?v=81">
+<noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
+<title>Idle Shooter Games for Android Explained: How They Work | Mortek Blog</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Idle Shooter Games for Android Explained: How They Work",
+  "description": "Idle shooter games for Android explained: how auto-firing, upgrades, bosses, offline earnings and prestige fit together, using Capy Kingdom as a worked example.",
+  "author": {
+    "@type": "Person",
+    "name": "Maurice Moret"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mortek",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://mortek.github.io/icon-512.png"
+    }
+  },
+  "datePublished": "2026-10-14",
+  "dateModified": "2026-10-14",
+  "url": "https://mortek.github.io/blog/idle-shooter-games-android-explained.html",
+  "image": "https://mortek.github.io/blog/img/capy-kingdom/banner.webp",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://mortek.github.io/blog/idle-shooter-games-android-explained.html"
+  },
+  "wordCount": 938,
+  "about": {
+    "@type": "VideoGame",
+    "name": "Capy Kingdom: Idle Shooter",
+    "url": "https://play.google.com/store/apps/details?id=com.mortek.capykingdom"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://mortek.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://mortek.github.io/blog.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Idle shooter games explained"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an idle shooter game?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An idle shooter is a game where your character fires automatically while you spend currency on upgrades. Numbers grow quickly, progress continues even when the app is closed, and you play in short sessions instead of reacting to every enemy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do idle shooters need an internet connection?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on the game. Capy Kingdom saves progress on your device with no account, so the core game does not depend on a login. Rewarded ads and the support chat naturally need a connection."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is prestige in an idle game?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Prestige is a reset you choose. You give up your current run and get a permanent bonus in return, so the next climb is faster. In Capy Kingdom this is called rebirth, and it pays Golden Yuzu."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header>
+  <a href="/" class="logo" aria-label="Mortek home">Mortek</a>
+  <nav aria-label="Main navigation">
+    <a href="../games.html">Games</a> &nbsp;&middot;&nbsp;
+    <a href="../books.html">Books</a> &nbsp;&middot;&nbsp;
+    <a href="../music.html">Music</a> &nbsp;&middot;&nbsp;
+    <a href="../blog.html" class="active">Blog</a> &nbsp;&middot;&nbsp;
+    <a href="../about.html">About</a>
+  </nav>
+  <a href="../music_visualizer.html" class="vis-btn">Visualizer</a>
+</header>
+
+<main id="main-content" class="blog-post">
+  <div class="blog-post-header">
+    <nav class="breadcrumb"><a href="/">Home</a><span>/</span><a href="../blog.html">Blog</a><span>/</span>Idle shooter games explained</nav>
+    <h1>Idle Shooter Games for Android Explained: How They Work</h1>
+    <p class="post-subtitle">Auto-fire, big numbers and a loop you can play in short bursts.</p>
+    <p class="post-meta">By Maurice Moret &middot; October 2026 &middot; <span class="reading-time">4 min read</span></p>
+    <div class="article-banner"><img src="img/capy-kingdom/banner.webp" alt="Capy Kingdom: Idle Shooter key art" width="1024" height="500" loading="lazy"></div>
+  </div>
+
+  <article class="blog-post-content">
+<p>Idle shooter games for Android sit in a corner of mobile gaming that is easy to like and hard to describe. You open the game, a character is already shooting, numbers are going up, and you wonder what exactly you are supposed to do. Here is the genre explained plainly, using my own game, <a href="https://play.google.com/store/apps/details?id=com.mortek.capykingdom" target="_blank" rel="noopener">Capy Kingdom</a>, as the worked example.</p>
+
+<h2>The core idea: the game plays itself, you steer</h2>
+<p>In an idle shooter your character fires on its own. You do not aim and you do not dodge. Your decisions happen between the shots: which upgrade to buy, which weapon to equip, when to try a boss and when to start over. It is closer to managing a small economy than to a twitch shooter, which is why it works with one thumb on a bus.</p>
+
+<figure class="article-inline article-inline--portrait"><img src="img/capy-kingdom/combat.webp" width="540" height="960" alt="Capy Kingdom idle shooter combat screen with an auto-firing capybara, pets and menu buttons around the edges" loading="lazy"><figcaption>An idle shooter screen: the hero and pets fire alone, the buttons are where your decisions live.</figcaption></figure>
+
+<h2>The loop in four steps</h2>
+<p>Almost every game in this genre runs the same loop, with different art:</p>
+<ul>
+<li><strong>Fight:</strong> enemies appear, your hero kills them, coins drop.</li>
+<li><strong>Upgrade:</strong> you spend coins on stronger shots, faster movement or more income.</li>
+<li><strong>Hit a wall:</strong> a boss or stage is too tough for your current power.</li>
+<li><strong>Grow past it:</strong> through upgrades, a better collection, time away from the game, or a prestige reset.</li>
+</ul>
+<p>In Capy Kingdom, a stage has 5 steps and the fifth is a boss with a timer. If the boss wins, you simply drop back to farm the previous step. That soft failure is a design choice I care about: the wall should feel like a puzzle, not a punishment. If you are new to the game itself, <a href="capy-kingdom-beginner-tips.html">my beginner tips</a> walk through the first day.</p>
+
+<h2>Why the numbers get so big</h2>
+<p>Idle shooters grow exponentially. Enemy health goes up by a fixed percentage each stage, and your upgrade costs rise on a similar curve, so numbers quickly leave millions behind and move to letters and abbreviations. You can see this in the screenshots of Capy Kingdom, where costs read like 524ab or 7.90ad. It looks silly, but it is the genre's way of making every purchase feel like progress.</p>
+<p>The healthy version of this has a pace you can feel. Doubling your play time should help a little, not double your progress. I tuned Capy Kingdom with a balance prototype so that active play, idle play and offline earnings all end up in the same neighborhood instead of one beating the others.</p>
+
+<h2>Collecting and merging</h2>
+<p>Most idle shooters add a collection layer so that coins are not the only thing to chase. In Capy Kingdom you open crates for weapons and eggs for pets, and the odds of each are shown before you open them. You can merge several identical-rarity items into one random item of the next rarity, with locked and equipped items protected. If you like that part of the genre, the <a href="capy-kingdom-what-to-upgrade-first.html">upgrade order article</a> explains how to use it without wasting gems.</p>
+
+<figure class="article-inline article-inline--portrait"><img src="img/capy-kingdom/weapons.webp" width="540" height="960" alt="Capy Kingdom weapons collection screen with weapons grouped by rarity from Epic to Exotic and buttons for Merge all, Auto merge and Crates" loading="lazy"><figcaption>The weapons collection, sorted by rarity, with merge buttons at the bottom.</figcaption></figure>
+
+<figure class="article-inline article-inline--portrait"><img src="img/capy-kingdom/pets.webp" width="540" height="960" alt="Capy Kingdom pets screen with three equipped pets and a grid of Common and Rare pets" loading="lazy"><figcaption>Pets fight beside the hero, each with its own perk.</figcaption></figure>
+
+<h2>Offline earnings and short sessions</h2>
+<p>The genre's best idea for phones is that the game keeps earning when you are not looking. Your kingdom pays coins while the app is closed, and you collect them when you come back. In Capy Kingdom that offline pay is capped at 8 hours at the start, so it rewards a daily check-in rather than constant babysitting. Other timers work the same way: the Diamond Spring slowly fills with gems, and pet trips run from 30 minutes up to 8 hours.</p>
+
+<h2>Prestige: the reset that makes you stronger</h2>
+<p>Every idle game eventually runs out of cheap upgrades. The answer is prestige: you give up the current run and receive a permanent currency that boosts the next one. Capy Kingdom calls it rebirth and pays Golden Yuzu, which you spend in a Yuzu Tree of 44 permanent perks. I explain the whole system in the <a href="capy-kingdom-rebirth-guide.html">rebirth guide</a>.</p>
+
+<h2>Idle versus active: you can choose</h2>
+<p>A common worry is that idle games play themselves so completely that there is nothing left to do. The best ones give you a dial rather than a switch. In Capy Kingdom you can check in twice a day and still progress, but if you want to play for longer there is always something to act on: a boss to try, a daily Boss Rush with a new twist, missions to finish, and a collection to merge. Both styles end up in the same neighborhood of progress, because coins are log-elastic: more play time buys a few more stages, not a different game. That is intentional, and it is what makes the genre comfortable.</p>
+
+<h2>What to look for in an idle shooter</h2>
+<ul>
+<li><strong>Fair monetization:</strong> optional rewarded ads are fine, but ads that interrupt you are not. Check what is a convenience and what is a requirement.</li>
+<li><strong>A soft wall:</strong> losing a boss should send you somewhere useful.</li>
+<li><strong>Visible odds:</strong> loot boxes should tell you what you are paying for.</li>
+<li><strong>No account:</strong> a game that saves on your device respects your time.</li>
+<li><strong>Short sessions:</strong> you should be able to do something meaningful in a minute.</li>
+</ul>
+<p>Capy Kingdom is free, its ads are optional rewarded ones only, and nothing is required to progress. For my honest summary, see <a href="is-capy-kingdom-worth-playing.html">is Capy Kingdom worth playing</a>.</p>
+
+<h2>Try it</h2>
+<p>The fastest way to understand the genre is to watch a calm capybara do the work for five minutes. <a href="https://play.google.com/store/apps/details?id=com.mortek.capykingdom" target="_blank" rel="noopener">Install Capy Kingdom from Google Play</a> and see whether the loop clicks for you.</p>
+
+<h2>Frequently Asked Questions</h2>
+<h3>What is an idle shooter game?</h3>
+<p>An idle shooter is a game where your character fires automatically while you spend currency on upgrades. Numbers grow quickly, progress continues even when the app is closed, and you play in short sessions instead of reacting to every enemy.</p>
+<h3>Do idle shooters need an internet connection?</h3>
+<p>It depends on the game. Capy Kingdom saves progress on your device with no account, so the core game does not depend on a login. Rewarded ads and the support chat naturally need a connection.</p>
+<h3>What is prestige in an idle game?</h3>
+<p>Prestige is a reset you choose. You give up your current run and get a permanent bonus in return, so the next climb is faster. In Capy Kingdom this is called rebirth, and it pays Golden Yuzu.</p>
+  </article>
+
+  <div class="blog-cta">
+    <img src="../apps/capy kingdom/app_icon.png" alt="Capy Kingdom: Idle Shooter app icon" width="256" height="256" loading="lazy">
+    <div class="blog-cta-text">
+      <h3>Capy Kingdom: Idle Shooter</h3>
+      <p>A calm capybara hero shoots on its own. Upgrade, merge and earn even offline.</p>
+      <a href="https://play.google.com/store/apps/details?id=com.mortek.capykingdom" target="_blank" rel="noopener" class="buy-btn">Get it on Google Play</a>
+    </div>
+  </div>
+  
+
+  <div class="related-posts">
+    <h3>Keep Reading</h3>
+    <div class="related-grid">
+      <a href="capy-kingdom-beginner-tips.html" class="related-card"><span class="related-badge">Tips</span><h4>Capy Kingdom Beginner Tips: Your First Day, Step by Step</h4></a>
+      <a href="capy-kingdom-rebirth-guide.html" class="related-card"><span class="related-badge">Guide</span><h4>How Rebirth Works in Capy Kingdom: Golden Yuzu and the Tree</h4></a>
+      <a href="what-is-tower-defense-kingdom.html" class="related-card"><span class="related-badge">Genre</span><h4>Tower Defense Kingdom: Elemental Tower Defense for Android</h4></a>
+      </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-icons">
+    <a href="mailto:mauricemoret1991@gmail.com" aria-label="Email" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
+    <a href="https://www.youtube.com/@MortekMusic" target="_blank" rel="noopener" aria-label="YouTube" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+    <a href="https://www.tiktok.com/@mortekofficial" target="_blank" rel="noopener" aria-label="TikTok" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.7a8.18 8.18 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.13z"/></svg></a>
+    <a href="https://www.reddit.com/user/MortekOfficial/" target="_blank" rel="noopener" aria-label="Reddit" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></a>
+    <a href="https://www.facebook.com/mortekofficial" target="_blank" rel="noopener" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+    <a href="https://www.instagram.com/mortek_official/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+  </div>
+  <p>&copy; 2026 Mortek</p>
+</footer>
+
+<script src="../site.min.js?v=1"></script>
+</body>
+</html>

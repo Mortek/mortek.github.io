@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="How do elemental tower combos work? A full guide to steam, lava, plasma and every other combo in Tower Defense Kingdom, with damage, effects and mastery.">
+<meta name="theme-color" content="#141416">
+<meta name="view-transition" content="same-origin">
+<meta property="og:title" content="How Elemental Combos Work in Tower Defense Kingdom | Mortek Blog">
+<meta property="og:description" content="How do elemental tower combos work? A full guide to steam, lava, plasma and every other combo in Tower Defense Kingdom, with damage, effects and mastery.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mortek.github.io/blog/elemental-combos-explained.html">
+<meta property="og:image" content="https://mortek.github.io/blog/img/tower-defense-kingdom/banner.webp">
+<meta property="article:published_time" content="2026-10-15">
+<meta property="article:author" content="Maurice Moret">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Elemental Combos Work in Tower Defense Kingdom | Mortek Blog">
+<meta name="twitter:description" content="How do elemental tower combos work? A full guide to steam, lava, plasma and every other combo in Tower Defense Kingdom, with damage, effects and mastery.">
+<meta name="twitter:image" content="https://mortek.github.io/blog/img/tower-defense-kingdom/banner.webp">
+<link rel="alternate" type="application/rss+xml" title="Maurice Moret's Blog" href="https://mortek.github.io/feed.xml">
+<link rel="canonical" href="https://mortek.github.io/blog/elemental-combos-explained.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="manifest" href="../manifest.json">
+<style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}</style>
+<link rel="stylesheet" href="../style.min.css?v=81">
+<noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
+<title>How Elemental Combos Work in Tower Defense Kingdom | Mortek Blog</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How Elemental Combos Work in Tower Defense Kingdom",
+  "description": "How do elemental tower combos work? A full guide to steam, lava, plasma and every other combo in Tower Defense Kingdom, with damage, effects and mastery.",
+  "author": {
+    "@type": "Person",
+    "name": "Maurice Moret"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Mortek",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://mortek.github.io/icon-512.png"
+    }
+  },
+  "datePublished": "2026-10-15",
+  "dateModified": "2026-10-15",
+  "url": "https://mortek.github.io/blog/elemental-combos-explained.html",
+  "image": "https://mortek.github.io/blog/img/tower-defense-kingdom/banner.webp",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://mortek.github.io/blog/elemental-combos-explained.html"
+  },
+  "wordCount": 954,
+  "about": {
+    "@type": "VideoGame",
+    "name": "Tower Defense Kingdom",
+    "url": "https://play.google.com/store/apps/details?id=com.mortek.towerdefensekingdom"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://mortek.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://mortek.github.io/blog.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Elemental combos explained"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do combos trigger in Tower Defense Kingdom?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When towers of different elements hit the same enemy within 1.5 seconds of each other, the game checks the elements involved and fires the matching combo, adding bonus damage and a status effect to that enemy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many combos are there?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "There are 11: six pair combos, four triple combos and one four element combo called Cataclysm. The more different elements land on an enemy inside the window, the stronger the combo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is combo mastery?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every time you trigger a combo it counts towards a lifetime total. At 25, 100, 300, 800 and 2000 triggers the combo levels up, adding 5 percent damage per level and extra effect duration at levels 3 and 5."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header>
+  <a href="/" class="logo" aria-label="Mortek home">Mortek</a>
+  <nav aria-label="Main navigation">
+    <a href="../games.html">Games</a> &nbsp;&middot;&nbsp;
+    <a href="../books.html">Books</a> &nbsp;&middot;&nbsp;
+    <a href="../music.html">Music</a> &nbsp;&middot;&nbsp;
+    <a href="../blog.html" class="active">Blog</a> &nbsp;&middot;&nbsp;
+    <a href="../about.html">About</a>
+  </nav>
+  <a href="../music_visualizer.html" class="vis-btn">Visualizer</a>
+</header>
+
+<main id="main-content" class="blog-post">
+  <div class="blog-post-header">
+    <nav class="breadcrumb"><a href="/">Home</a><span>/</span><a href="../blog.html">Blog</a><span>/</span>Elemental combos explained</nav>
+    <h1>How Elemental Combos Work in Tower Defense Kingdom</h1>
+    <p class="post-subtitle">Every pair, triple and four element combo, what it does and how to trigger it on purpose.</p>
+    <p class="post-meta">By Maurice Moret &middot; October 2026 &middot; <span class="reading-time">4 min read</span></p>
+    <div class="article-banner"><img src="img/tower-defense-kingdom/banner.webp" alt="Tower Defense Kingdom key art" width="1024" height="500" loading="lazy"></div>
+  </div>
+
+  <article class="blog-post-content">
+<p>The rule that makes <strong>elemental combos</strong> in Tower Defense Kingdom work is simple: if towers of different elements hit the same enemy within 1.5 seconds, the game fires a combo. The enemy takes bonus damage and gets a status effect such as burn, freeze, stun or root. Once you know the table below you can plan a defence around it instead of hoping combos happen by accident. If you have not met the game yet, start with <a href="what-is-tower-defense-kingdom.html">what Tower Defense Kingdom is</a>.</p>
+
+<h2>The four elements</h2>
+<p>Each element plays a role. <strong>Fire</strong> burns, <strong>ice</strong> slows, <strong>lightning</strong> chains between nearby enemies, and <strong>earth</strong> hits an area on impact. On their own they are fine. Together they are the point of the game, because every combo gets its own effect and its own damage multiplier.</p>
+
+<figure class="article-inline"><img src="img/tower-defense-kingdom/battle.webp" width="960" height="540" alt="Battle screen with the combo log on the left listing Steam Combo, Plasma Combo, Freeze Chain, Avalanche and kill streaks" loading="lazy"><figcaption>The log on the left names every combo as it lands: steam, plasma, freeze chain, avalanche and more.</figcaption></figure>
+
+<h2>The six pair combos</h2>
+<ul>
+<li><strong>Steam (fire and ice)</strong>: 1.5x damage and a slow for 2 seconds.</li>
+<li><strong>Lava (earth and fire)</strong>: 2x damage and melted armour for 3 seconds. Combo damage ignores armour, so lava is useful against heavily armoured enemies.</li>
+<li><strong>Plasma (fire and lightning)</strong>: 2.5x damage and a burn for 4 seconds, the biggest pair multiplier.</li>
+<li><strong>Freeze Chain (ice and lightning)</strong>: 1x damage but the enemy is frozen for 3 seconds. It is a crowd control combo, not a damage one.</li>
+<li><strong>Permafrost (earth and ice)</strong>: 1.5x damage, root and slow for 4 seconds.</li>
+<li><strong>Earthquake (earth and lightning)</strong>: 2x damage and a stun for 2 seconds.</li>
+</ul>
+<p>Notice that three of the six are mainly about control: Freeze Chain, Permafrost and Earthquake. Those buy time for the rest of your towers, and time is damage.</p>
+
+<h2>Triple and four element combos</h2>
+<p>When three different elements land in the window, you get a stronger triple combo:</p>
+<ul>
+<li><strong>Tempest (fire, ice, lightning)</strong>: 3.5x damage, burn and freeze.</li>
+<li><strong>Primordial (earth, fire, ice)</strong>: 3x damage, melted armour and root for 5 seconds.</li>
+<li><strong>Eruption (earth, fire, lightning)</strong>: 4x damage, burn and stun.</li>
+<li><strong>Avalanche (earth, ice, lightning)</strong>: 3x damage, freeze, slow and root for 5 seconds.</li>
+</ul>
+<p>And when all four elements hit the same enemy in the window you get <strong>Cataclysm</strong>: 6x damage with burn, freeze, stun and melted armour for 6 seconds. You can see Avalanche and Plasma in the combo log of the screenshot above.</p>
+
+<h2>How to trigger combos on purpose</h2>
+<p>Because the window is 1.5 seconds and tied to a single enemy, what matters is that your towers cover the same stretch of path. On the ring of build slots around the castle, that means towers on neighbouring slots usually see the same enemies. A few habits help:</p>
+<ul>
+<li><strong>Mix elements on neighbouring slots.</strong> Two fire towers side by side never make a combo. A fire tower next to an ice tower does.</li>
+<li><strong>Build one of each early.</strong> With all four elements in range of each other, any pair or triple can happen.</li>
+<li><strong>Use range upgrades.</strong> More range means more towers can hit the same enemy inside the window.</li>
+<li><strong>Do not rely on a single element.</strong> Some enemies resist or are immune to certain elements. A defence with all four always has an answer.</li>
+</ul>
+<p>If you find your combos are too random, <a href="tower-fusion-guide.html">tower fusion</a> is the reliable way to get one. A fusion tower triggers the combo of its two elements on every hit by itself.</p>
+
+<h2>Which combo should you aim for?</h2>
+<p>It depends on what is walking towards your castle. Against a large crowd of weak enemies, Earthquake and Freeze Chain hold them in place so area damage and chains can pile onto them. Against a single tough enemy or a boss, prefer damage: Plasma for pairs, Eruption or Tempest when you have three elements working. Remember that bosses are not meant to be held down for free, so treat control combos as a help, not a plan.</p>
+<p>Also watch for enemies that ignore an element. Some are immune to fire, ice, lightning or earth, and a few cannot be slowed or stunned at all. If a combo you rely on needs the element they ignore, pick a different pair. This is another reason to keep all four elements on the ring.</p>
+
+<figure class="article-inline"><img src="img/tower-defense-kingdom/fusion.webp" width="960" height="540" alt="Level 7 Thunder Spire with a fused fire and ice tower, other elemental towers and a long list of combos such as Permafrost, Tempest and Plasma in the log" loading="lazy"><figcaption>Level 7, Thunder Spire: a fused tower on the ring and a long combo log, including Tempest and Permafrost.</figcaption></figure>
+
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Stacking one element.</strong> Four fire towers deal decent damage, but you will never see a combo, and one fire immune enemy walks through them.</li>
+<li><strong>Putting all upgrades into one tower.</strong> Combos need several elements to hit, so spread the early upgrades.</li>
+<li><strong>Ignoring the log.</strong> If you never see a combo name, your towers are not overlapping. Move one.</li>
+</ul>
+
+<h2>Combo mastery</h2>
+<p>Every trigger of a combo adds to a lifetime count for that combo. At 25, 100, 300, 800 and 2000 triggers it gains a mastery level. Each level adds 5 percent to that combo's damage, and levels 3 and 5 each add one second of effect duration. It is a slow, quiet reward for playing the way the game wants you to. Your favourite combos improve without you spending anything.</p>
+<p>The relics in the game also push the same direction. There are relics that raise combo damage and stun or freeze chance, and the <a href="progress-faster-tower-defense-kingdom.html">guide to progressing faster</a> shows how to get them.</p>
+
+<h2>Try it</h2>
+<p>The quickest way to understand combos is to see them. Place a fire, an ice and a lightning tower on neighbouring slots in the first level and watch the log. <a href="https://play.google.com/store/apps/details?id=com.mortek.towerdefensekingdom" target="_blank" rel="noopener">Play Tower Defense Kingdom on Google Play</a> and try to land your first Tempest. If you want a second opinion on what to build, our <a href="tower-defense-kingdom-beginner-tips.html">beginner tips</a> have a starter plan.</p>
+
+<h2>Frequently Asked Questions</h2>
+<h3>How do combos trigger in Tower Defense Kingdom?</h3>
+<p>When towers of different elements hit the same enemy within 1.5 seconds of each other, the game checks the elements involved and fires the matching combo, adding bonus damage and a status effect to that enemy.</p>
+<h3>How many combos are there?</h3>
+<p>There are 11: six pair combos, four triple combos and one four element combo called Cataclysm. The more different elements land on an enemy inside the window, the stronger the combo.</p>
+<h3>What is combo mastery?</h3>
+<p>Every time you trigger a combo it counts towards a lifetime total. At 25, 100, 300, 800 and 2000 triggers the combo levels up, adding 5 percent damage per level and extra effect duration at levels 3 and 5.</p>
+  </article>
+
+  <div class="blog-cta">
+    <img src="../apps/tower defense kingdom/app_icon.png" alt="Tower Defense Kingdom app icon" width="256" height="256" loading="lazy">
+    <div class="blog-cta-text">
+      <h3>Tower Defense Kingdom</h3>
+      <p>Defend your kingdom across 100 maps with elemental towers, fusion and relics.</p>
+      <a href="https://play.google.com/store/apps/details?id=com.mortek.towerdefensekingdom" target="_blank" rel="noopener" class="buy-btn">Get it on Google Play</a>
+    </div>
+  </div>
+  
+
+  <div class="related-posts">
+    <h3>Keep Reading</h3>
+    <div class="related-grid">
+      <a href="what-is-tower-defense-kingdom.html" class="related-card"><span class="related-badge">Genre</span><h4>Tower Defense Kingdom: Elemental Tower Defense for Android</h4></a>
+      <a href="tower-fusion-guide.html" class="related-card"><span class="related-badge">Guide</span><h4>Tower Fusion Guide: Merge Elements in Tower Defense Kingdom</h4></a>
+      <a href="is-capy-kingdom-worth-playing.html" class="related-card"><span class="related-badge">Guide</span><h4>Is Capy Kingdom Worth Playing? An Honest Look From the Dev</h4></a>
+      </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-icons">
+    <a href="mailto:mauricemoret1991@gmail.com" aria-label="Email" class="footer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
+    <a href="https://www.youtube.com/@MortekMusic" target="_blank" rel="noopener" aria-label="YouTube" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+    <a href="https://www.tiktok.com/@mortekofficial" target="_blank" rel="noopener" aria-label="TikTok" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.7a8.18 8.18 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.13z"/></svg></a>
+    <a href="https://www.reddit.com/user/MortekOfficial/" target="_blank" rel="noopener" aria-label="Reddit" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></a>
+    <a href="https://www.facebook.com/mortekofficial" target="_blank" rel="noopener" aria-label="Facebook" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+    <a href="https://www.instagram.com/mortek_official/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+  </div>
+  <p>&copy; 2026 Mortek</p>
+</footer>
+
+<script src="../site.min.js?v=1"></script>
+</body>
+</html>
