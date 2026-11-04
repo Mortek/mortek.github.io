@@ -59,6 +59,11 @@
     </image:image>
   </url>
   <url>
+    <loc>https://mortek.github.io/capy-kingdom.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/crypto-mining-tycoon.html</loc>
     <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
@@ -110,6 +115,11 @@
   </url>
   <url>
     <loc>https://mortek.github.io/shadowrealm-tos.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/tower-defense-kingdom.html</loc>
     <lastmod>2026-11-04</lastmod>
     <priority>0.5</priority>
   </url>
