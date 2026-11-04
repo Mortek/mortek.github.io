@@ -609,7 +609,7 @@
 
         <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten.</p>
 
-        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Verschijning in tovenaarsgewaad is verplicht — Huiself, Dooddoener, Kobold, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Wie in Dreuzelkleding aankomt, wordt vriendelijk doch beslist door de Sorteerhoed teruggestuurd. Vergeet uw toverstok niet.</p>
+        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Verschijning in tovenaarsgewaad is verplicht, Huiself, Dooddoener, Kobold, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Wie in Dreuzelkleding aankomt, wordt vriendelijk doch beslist door de Sorteerhoed teruggestuurd. Vergeet uw toverstok niet.</p>
 
         <div class="details">
           <h3>· Het Programma ·</h3>
@@ -619,17 +619,17 @@
               <div class="what">Datum van het feest (op een dag dat de sterren goed staan)</div>
             </div>
             <div class="row" id="rowKids" data-part="kind">
-              <div class="when">12:00 – 15:00</div>
-              <div class="what">Het Jonge Tovenaarsfeest — voor leerlingen van alle huizen</div>
+              <div class="when">12:00, 15:00</div>
+              <div class="what">Het Jonge Tovenaarsfeest, voor leerlingen van alle huizen</div>
             </div>
             <div class="row" id="rowAdults" data-part="volwassen">
-              <div class="when">15:00 – laat</div>
-              <div class="what">Het Grote Tovenaarsbal — voor heksen &amp; tovenaars van leeftijd</div>
+              <div class="when">15:00, laat</div>
+              <div class="what">Het Grote Tovenaarsbal, voor heksen &amp; tovenaars van leeftijd</div>
             </div>
           </div>
         </div>
 
-        <p>Wij verwachten uw uil — of een eenvoudig Dreuzelbericht — uiterlijk drie dagen voor het feest, opdat de Grote Zaal kan worden ingericht.</p>
+        <p>Wij verwachten uw uil, of een eenvoudig Dreuzelbericht, uiterlijk drie dagen voor het feest, opdat de Grote Zaal kan worden ingericht.</p>
 
         <p style="margin-top:14px"><em>Hoogachtend,</em></p>
       </div>
@@ -661,8 +661,8 @@
     ? 'Zweinstein Uitnodiging'
     : `Zweinstein Uitnodiging · ${naam}`;
 
-  // ?feest=kind  → show only the 12:00–15:00 row
-  // ?feest=volwassen → show only the 15:00–laat row
+  // ?feest=kind  → show only the 12:00 tot 15:00 row
+  // ?feest=volwassen → show only the 15:00 tot laat row
   // (omitted / any other value) → show both
   const feestRaw = (params.get('feest') || params.get('part') || '').toLowerCase().trim();
   const feestAliases = {
@@ -741,7 +741,7 @@
 
   // Background music: starts muted so the browser allows autoplay,
   // tap the speaker icon to unmute. Browsers block sound until a user
-  // gesture — that's why this can't just play out loud on load.
+  // gesture, that's why this can't just play out loud on load.
   const bgm = document.getElementById('bgm');
   const soundToggle = document.getElementById('soundToggle');
   const TARGET_VOL = 0.55;
@@ -780,7 +780,7 @@
       if(playPromise && playPromise.catch){
         playPromise.catch(err => {
           console.warn('bgm play() rejected:', err);
-          flash('Geluid geblokkeerd — tik nogmaals');
+          flash('Geluid geblokkeerd, tik nogmaals');
         });
       }
     }
@@ -789,9 +789,9 @@
   soundToggle.addEventListener('click', () => setMuted(!bgm.muted ? true : false));
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
     const lines = [];
-    if(feest !== 'volwassen') lines.push('12:00–15:00 — kinderfeest');
-    if(feest !== 'kind')      lines.push('15:00–laat — feest voor groot tovenaarsvolk');
-    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n${lines.join('\n')}\n\nLet op: verkleedfeest — kom in tovenaarsgewaad!\n\n${location.href}`;
+    if(feest !== 'volwassen') lines.push('12:00 tot 15:00, kinderfeest');
+    if(feest !== 'kind')      lines.push('15:00 tot laat, feest voor groot tovenaarsvolk');
+    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Tovenaarsverjaardagsfeest op 11 juli!\n\n${lines.join('\n')}\n\nLet op: verkleedfeest, kom in tovenaarsgewaad!\n\n${location.href}`;
     try{
       if(navigator.share){ await navigator.share({title:'Zweinstein Uitnodiging', text}); }
       else { await navigator.clipboard.writeText(text); flash('Uitnodiging gekopieerd!'); }

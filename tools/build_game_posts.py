@@ -55,7 +55,7 @@ for p in posts:
     faq = p.get("faq", [])
     head = head_tpl
     head = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{esc(desc)}">', head)
-    head = head.replace("Why True Health Is More Than Physical Fitness — Mortek Blog", esc(title) + " | Mortek Blog")
+    head = head.replace("Why True Health Is More Than Physical Fitness, Mortek Blog", esc(title) + " | Mortek Blog")
     head = re.sub(r'(<meta (?:property="og:description"|name="twitter:description") content=")[^"]*"', lambda m: m.group(1) + esc(desc) + '"', head)
     head = head.replace("https://mortek.github.io/blog/whole.html", url).replace("https://mortek.github.io/og-books.png", og)
     head = head.replace('content="2026-04-09"', f'content="{p["date"]}"')

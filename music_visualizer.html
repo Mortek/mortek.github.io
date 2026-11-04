@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Mortek Music Visualizer — Create music videos with custom visuals, particles, and color schemes.">
+<meta name="description" content="Mortek Music Visualizer, Create music videos with custom visuals, particles, and color schemes.">
 <meta name="theme-color" content="#0d0d18">
-<title>Music Visualizer — Mortek</title>
+<title>Music Visualizer | Mortek</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -88,7 +88,7 @@ select:hover{border-color:#a07fff}
 
 <div class="top-bar-fixed">
   <a class="back-btn" href="/">&#8592; Back to Website</a>
-  <a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">Donate<span class="tooltip">This tool is free and ad-free. If you enjoy it, a small donation helps me keep building and improving it. Completely optional — no pressure!</span></a>
+  <a class="donate-btn" href="https://www.paypal.com/donate/?hosted_button_id=J4GL9EXM3CD3G" target="_blank" rel="noopener">Donate<span class="tooltip">This tool is free and ad-free. If you enjoy it, a small donation helps me keep building and improving it. Completely optional, no pressure!</span></a>
 </div>
 
 <div id="appContent">
@@ -514,8 +514,8 @@ const trailC = document.createElement('canvas');
 trailC.width = 1280; trailC.height = 720;
 const trailX = trailC.getContext('2d');
 
-// Weighted bass extractor — emphasises kick/sub-bass (~45-190Hz). Used for
-// continuous visual effects (the inner-ring breathing) — NOT for onset triggers.
+// Weighted bass extractor, emphasises kick/sub-bass (~45-190Hz). Used for
+// continuous visual effects (the inner-ring breathing), NOT for onset triggers.
 // With fftSize=2048 @ 44.1-48kHz each bin ≈ 21-23Hz, so bins 2-8 cover ~45-190Hz.
 const BASS_WEIGHTS=[0.7,1.0,1.0,0.9,0.7,0.5,0.4];
 const BASS_WSUM=BASS_WEIGHTS.reduce((a,b)=>a+b,0);
@@ -524,7 +524,7 @@ function getBass(data){
   for(let i=0;i<BASS_WEIGHTS.length;i++) s+=data[i+2]*BASS_WEIGHTS[i];
   return s/BASS_WSUM/255;
 }
-// Sub-bass band: bins 1-3 at fftSize=2048 (~23-70Hz) — where cinematic "booms",
+// Sub-bass band: bins 1-3 at fftSize=2048 (~23-70Hz), where cinematic "booms",
 // 808 drops and taiko sub-pulses live. A regular kick has lots of 100-300Hz
 // body, so its sub-dominance ratio is lower; big cinematic bass hits dominate
 // in this low band specifically, which lets us pick them out of a busy mix.
@@ -547,16 +547,15 @@ function getHighMid(data){
   let s=0;for(let i=25;i<100;i++) s+=data[i];
   return s/75/255;
 }
-// Multi-detector bass onset gated on the SUB band (~23-70Hz). Real bass —
-// kicks, 808s, sub sines, reese, wobbles, growls — has strong energy below
+// Multi-detector bass onset gated on the SUB band (~23-70Hz). Real bass, // kicks, 808s, sub sines, reese, wobbles, growls, has strong energy below
 // 80Hz. Vocals, orchestral pads and ambient layers sit higher and produce
 // a lot of mid-bass energy without true sub content, so they fall out of
 // the trigger when we ignore the low/mid bands here. (low/mid still drive
-// the breathing ring — see drawCircle.) Three detectors:
-//   1. Transient — sharp sub-band attack (kicks, 808 hits, snare-on-bass)
-//   2. Adaptive  — sub-band peak above its own slow baseline (wobble/wub,
+// the breathing ring, see drawCircle.) Three detectors:
+//   1. Transient, sharp sub-band attack (kicks, 808 hits, snare-on-bass)
+//   2. Adaptive, sub-band peak above its own slow baseline (wobble/wub,
 //                  growl peaks, reese movement, 8-bit square attacks)
-//   3. Sustain   — periodic fire while sub is held high (sub sines, reese
+//   3. Sustain, periodic fire while sub is held high (sub sines, reese
 //                  drones, 808 tails, sustained growls)
 // fps param normalises all frame-count timers so render (30fps) and
 // live preview (~60fps) trigger at the same wall-clock intervals.
@@ -570,7 +569,7 @@ function computeBassHit(data,state,fps=60){
   state.prev=sub;
   if(state.cooldown>0){state.cooldown--;return {bass:low,onset:0};}
   // What "real bass" looks like spectrally (per user perception):
-  // it's the kick / 808 / synth bass IN THE FULL MIX — broadband, sub
+  // it's the kick / 808 / synth bass IN THE FULL MIX, broadband, sub
   // comparable to hi-mid (sub/hmid ≈ 1.0-1.5). What "not bass" looks like:
   // either an orchestral pad/drone (sub-dominant, sub/hmid > 1.65) where
   // only the low instruments are loud, or a section without real low
@@ -579,23 +578,23 @@ function computeBassHit(data,state,fps=60){
   // distinct from a kick happening within a song.
   const ok=sub<=hmid*1.65&&sub>hmid*0.85;
   const cd=Math.round(14*fps/30); // ~467ms at any fps
-  // 1. Transient — sharp sub-band attack (kick / 808 in the mix)
+  // 1. Transient, sharp sub-band attack (kick / 808 in the mix)
   // sub>envSlow*1.12: sub must spike ≥12% above its own running average.
   // Rejects orchestral passages where sub is consistently elevated but not
-  // spiking (sub/envSlow ≈ 1.0–1.1); passes kicks/808s that spike clearly
+  // spiking (sub/envSlow ≈ 1.0 to 1.1); passes kicks/808s that spike clearly
   // above the recent baseline (sub/envSlow ≥ 1.15+).
   if(delta>0.10&&sub>0.65&&sub>state.envSlow*1.12&&ok&&state.envSlow>0.65){
     state.cooldown=cd; state.sustainTimer=0;
     return {bass:low,onset:Math.min(delta*4,1.0)};
   }
-  // 2. Adaptive — wobble/wub/growl peaks
+  // 2. Adaptive, wobble/wub/growl peaks
   const baseline=Math.max(state.envSlow,0.15);
   const ratio=state.envFast/baseline;
   if(ratio>1.40&&state.envFast>0.55&&delta>0.05&&ok&&state.envSlow>0.65){
     state.cooldown=cd; state.sustainTimer=0;
     return {bass:low,onset:Math.min((ratio-1)*1.5,0.85)};
   }
-  // 3. Sustain — periodic fire on held sub-bass (~1500ms at any fps)
+  // 3. Sustain, periodic fire on held sub-bass (~1500ms at any fps)
   if(state.envSlow>0.75&&state.envFast>0.75&&ok){
     state.sustainTimer++;
     if(state.sustainTimer>=Math.round(45*fps/30)){
@@ -1114,7 +1113,7 @@ function drawFrame(data,dt=33.3){
   }
   if(hueStr>0) bgHue+=hueStr; else bgHue=0;
 
-  // Circle intro — Charge & Burst: charge (core glow + inward rings) -> burst
+  // Circle intro, Charge & Burst: charge (core glow + inward rings) -> burst
   // (flash + outward shockwaves) -> reveal (spin + scale spring) -> settle.
   const INTRO_CHARGE=1500, INTRO_REVEAL=1100;
   if(!circleIntroDone){
@@ -1122,7 +1121,7 @@ function drawFrame(data,dt=33.3){
     if(_cip) circleIntroT+=dt;
     if(circleIntroAnimT<0&&circleIntroT>=INTRO_CHARGE){
       circleIntroAnimT=0;
-      // burst shockwaves — 5 staggered, brighter/bigger than the old pop-in
+      // burst shockwaves, 5 staggered, brighter/bigger than the old pop-in
       circleIntroRings=[{t:0,maxT:800},{t:-110,maxT:800},{t:-220,maxT:800},{t:-330,maxT:800},{t:-440,maxT:800}];
     }
     if(circleIntroAnimT>=0){circleIntroAnimT+=dt;if(circleIntroAnimT>=INTRO_REVEAL){circleIntroDone=true;circlePostPulseT=0;}}
@@ -1202,7 +1201,7 @@ function drawFrame(data,dt=33.3){
       ctx.shadowColor=pc;ctx.shadowBlur=18*dS;
       ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.stroke();ctx.restore();
     }
-    // core glow — brightens with charge, gentle energy flicker
+    // core glow, brightens with charge, gentle energy flicker
     const flick=0.85+0.15*Math.sin(circleIntroT*0.02);
     const coreR=(18+50*chg)*dS;
     const g=ctx.createRadialGradient(cx,cy,0,cx,cy,coreR);
@@ -1306,7 +1305,7 @@ async function initAudio(buf, ctx){
   if(animId) cancelAnimationFrame(animId);
   loop();
   // If context is already running (passed in from user-gesture handler)
-  // this is instant. Otherwise wait for resume — if browser blocks it the
+  // this is instant. Otherwise wait for resume, if browser blocks it the
   // catch falls through and the play button works as a manual fallback.
   try{await audioCtx.resume();}catch(e){}
   playPreview();
@@ -1395,7 +1394,7 @@ document.getElementById('imgInput').onchange=e=>{
     document.getElementById('imgLabel').classList.add('loaded');
     document.getElementById('imgWrap').classList.add('has-file');
     applyImageColors(img);
-    setStatus('Image loaded — colors extracted!');
+    setStatus('Image loaded, colors extracted!');
     if(!animId) loop();
   };
   img.onerror=()=>setStatus('Error loading image');
@@ -1434,7 +1433,7 @@ document.getElementById('audioInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   setStatus('Loading audio...');
   // Create AudioContext NOW, synchronously in the user-gesture handler.
-  // This gives us a 'running' context immediately — no resume() needed.
+  // This gives us a 'running' context immediately, no resume() needed.
   if(audioCtx) audioCtx.close();
   audioCtx=new AudioContext();
   const gestureCtx=audioCtx;
@@ -1446,7 +1445,7 @@ document.getElementById('audioInput').onchange=e=>{
       document.getElementById('audioLabel').classList.add('loaded');
       document.getElementById('audioWrap').classList.add('has-file');
       document.getElementById('dlBtn').disabled=false;
-      setStatus('Audio loaded! Previewing — configure your look, then download.');
+      setStatus('Audio loaded! Previewing, configure your look, then download.');
       initAudio(buf, gestureCtx);
     }, ()=>setStatus('Error decoding audio'));
   };
