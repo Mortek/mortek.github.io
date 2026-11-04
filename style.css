@@ -2119,3 +2119,6 @@ h1 span { color: var(--accent); }
 .article-inline img { display: block; margin: 0 auto; max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border); }
 .article-inline--portrait img { max-width: 300px; }
 .article-inline figcaption { font-size: 0.82em; color: var(--text-muted); margin-top: 10px; }
+
+/* Complete collection spans two columns */
+.playlist--wide { flex: 1 1 100%; max-width: 872px; }
