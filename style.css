@@ -2122,3 +2122,8 @@ h1 span { color: var(--accent); }
 
 /* Complete collection spans two columns */
 .playlist--wide { flex: 1 1 100%; max-width: 872px; }
+
+/* Two coming-soon teasers side by side */
+.teaser-row { margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.teaser-row .roblox-teaser { margin: 0; }
+@media (max-width: 640px) { .teaser-row { grid-template-columns: 1fr; } }
