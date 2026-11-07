@@ -66,6 +66,16 @@ for f in *.html; do
   echo "  </url>" >> "$OUT"
 done
 
+# Terms of Service pages (terms/index.html and terms/<game>/index.html)
+for f in terms/index.html terms/*/index.html; do
+  url="$DOMAIN/${f%index.html}"
+  echo "  <url>" >> "$OUT"
+  echo "    <loc>$url</loc>" >> "$OUT"
+  echo "    <lastmod>$DATE</lastmod>" >> "$OUT"
+  echo "    <priority>0.3</priority>" >> "$OUT"
+  echo "  </url>" >> "$OUT"
+done
+
 # Blog posts
 for f in blog/*.html; do
   url="$DOMAIN/$f"
