@@ -1,0 +1,9 @@
+:root{--bg:#0b0d14;--fg:#e6e8ef;--muted:#9aa3b5;--accent:#5fe3ff}
+@media (prefers-color-scheme: light){:root{--bg:#fafbfd;--fg:#1a1d26;--muted:#555d6e;--accent:#007a99}}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:0 auto;padding:24px 16px}
+h1,h2{line-height:1.25}a{color:var(--accent)}.muted{color:var(--muted)}
+header,footer{max-width:720px;margin:0 auto}
+header{padding:0 0 12px;border-bottom:1px solid var(--muted);margin-bottom:12px}
+header a{font-weight:700;text-decoration:none}
+footer{margin-top:32px;padding-top:12px;border-top:1px solid var(--muted);color:var(--muted);font-size:.9em}
+ul{padding-left:22px}li{margin-bottom:6px}
