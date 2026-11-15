@@ -29,6 +29,7 @@ get_priority() {
 for f in *.html; do
   [ "$f" = "404.html" ] && continue
   case "$f" in google*.html) continue ;; esac
+  grep -qi "noindex" "$f" && continue
   [ "$f" = "privacy_policy.html" ] || [ "$f" = "music_visualizer.html" ] || true
 
   if [ "$f" = "index.html" ]; then

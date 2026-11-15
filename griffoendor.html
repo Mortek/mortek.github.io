@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex,noai,noimageai,notranslate">
+<meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="googlebot-news" content="noindex,nosnippet">
+<meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="slurp" content="noindex,nofollow,noarchive">
+<meta name="GPTBot" content="noindex,nofollow">
+<meta name="ClaudeBot" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Griffoendor Uitnodiging</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&family=Tangerine:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment-1:#f3e2bf;
+    --parchment-2:#e7cf9a;
+    --parchment-3:#caa86b;
+    --ink:#3b2a14;
+    --ink-soft:#5a4324;
+    --wax:#7a0e16;
+    --wax-dark:#4e0810;
+    --envelope:#e9d5a9;
+    --envelope-dark:#b8945a;
+    --envelope-shadow:#6b4a1d;
+    --gold:#c9a14a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+  body{
+    font-family:'IM Fell English', Georgia, serif;
+    color:var(--ink);
+    background:
+      radial-gradient(ellipse at 30% 20%, #1b1208 0%, #0b0703 60%, #000 100%);
+    min-height:100vh;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* drifting candle motes in the background */
+  .motes{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .mote{position:absolute;width:3px;height:3px;border-radius:50%;
+    background:radial-gradient(circle,#ffd58a 0%,rgba(255,180,80,.4) 40%,transparent 70%);
+    filter:blur(.5px);opacity:0;animation:drift 14s linear infinite}
+  @keyframes drift{
+    0%{transform:translate(0,110vh) scale(.6);opacity:0}
+    10%{opacity:.9}
+    90%{opacity:.7}
+    100%{transform:translate(var(--dx,20px),-10vh) scale(1);opacity:0}
+  }
+
+  .stage{
+    position:relative;z-index:1;
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    perspective:1600px;
+  }
+
+  /* ===== DELIVERY (wand conjures the envelope) ===== */
+  .delivery{
+    position:relative;
+    width:min(560px, 92vw);
+    opacity:0;
+    transform: scale(.35) rotate(-8deg);
+    filter: blur(6px) brightness(2);
+    animation: conjure 1.5s cubic-bezier(.2,.8,.3,1) 2.3s forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes conjure{
+    0%   { opacity:0; transform: scale(.35) rotate(-8deg); filter: blur(6px) brightness(2.2); }
+    55%  { opacity:1; transform: scale(1.06) rotate(2deg); filter: blur(0) brightness(1.5) drop-shadow(0 0 30px rgba(255,200,80,.9)); }
+    100% { opacity:1; transform: scale(1) rotate(0); filter: blur(0) brightness(1) drop-shadow(0 0 0 rgba(255,200,80,0)); }
+  }
+  .delivery.landed{
+    animation: settle 1.1s cubic-bezier(.3,1.3,.4,1) forwards;
+    opacity:1; filter:none;
+  }
+  @keyframes settle{
+    0%{transform:translate(0,0) rotate(0)}
+    40%{transform:translate(0,6px) rotate(.5deg)}
+    100%{transform:translate(0,0) rotate(0)}
+  }
+
+  /* the wand: sweeps in, draws a spiral, flicks, then fades */
+  .wand{
+    position:fixed;left:0;top:0;
+    width:clamp(170px, 34vw, 260px);
+    z-index:40;
+    pointer-events:none;
+    opacity:0;
+    transform-origin: 92% 92%;
+    transform: translate(-30vw, 60vh) rotate(-30deg);
+    animation: wandMove 3.6s cubic-bezier(.45,.05,.35,1) .2s forwards;
+    filter: drop-shadow(0 0 10px rgba(255,200,90,.7)) drop-shadow(0 6px 10px rgba(0,0,0,.6));
+  }
+  .wand svg{display:block;width:100%;height:auto;overflow:visible}
+  @keyframes wandMove{
+    0%   { opacity:0; transform: translate(-30vw, 62vh) rotate(-35deg); }
+    10%  { opacity:1; }
+    28%  { transform: translate(calc(50vw - 20px), calc(50vh - 90px)) rotate(-18deg); }
+    40%  { transform: translate(calc(50vw - 70px), calc(50vh - 60px)) rotate(-48deg); }
+    52%  { transform: translate(calc(50vw + 40px), calc(50vh - 80px)) rotate(-4deg); }
+    64%  { transform: translate(calc(50vw - 40px), calc(50vh - 110px)) rotate(-40deg); }
+    /* the flick */
+    74%  { transform: translate(calc(50vw + 10px), calc(50vh - 70px)) rotate(14deg); }
+    82%  { opacity:1; transform: translate(calc(50vw + 10px), calc(50vh - 70px)) rotate(-6deg); }
+    100% { opacity:0; transform: translate(calc(50vw + 60vw), calc(50vh - 50vh)) rotate(-20deg) scale(.6); }
+  }
+  .wand .tip-glow{ animation: tipPulse .35s ease-in-out infinite alternate; transform-origin:center; transform-box:fill-box }
+  @keyframes tipPulse{ from{opacity:.55; transform:scale(.8)} to{opacity:1; transform:scale(1.35)} }
+
+  /* sparkle particles (spawned from JS) */
+  .spark{
+    position:fixed;z-index:39;pointer-events:none;
+    width:var(--s,6px);height:var(--s,6px);margin:calc(var(--s,6px) / -2) 0 0 calc(var(--s,6px) / -2);
+    border-radius:50%;
+    background:radial-gradient(circle,#fff6d0 0%,#ffd45a 40%,rgba(255,150,40,.0) 72%);
+    box-shadow:0 0 8px 2px rgba(255,200,80,.8);
+    animation: sparkFade var(--d,900ms) ease-out forwards;
+  }
+  .spark.red{ background:radial-gradient(circle,#ffd0c8 0%,#e0303a 45%,rgba(160,20,30,0) 72%); box-shadow:0 0 8px 2px rgba(220,50,50,.8) }
+  @keyframes sparkFade{
+    0%  { opacity:1; transform:translate(0,0) scale(1) }
+    100%{ opacity:0; transform:translate(var(--tx,0px),var(--ty,30px)) scale(.1) }
+  }
+
+  .envelope-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio: 1.55 / 1;
+    transition:transform 1s cubic-bezier(.6,.05,.3,1), opacity .8s ease;
+    transform-style:preserve-3d;
+    filter: drop-shadow(0 30px 40px rgba(0,0,0,.55));
+  }
+  .envelope-wrap.lift{
+    transform:translateY(-12px) rotateX(2deg);
+  }
+  .envelope-wrap.open .body-flap{ transform: rotateX(-172deg); }
+  .envelope-wrap.gone{ opacity:0; transform:translateY(-30px) scale(.85); pointer-events:none; }
+
+  .env-body{
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, var(--envelope) 0%, #d9bf8a 60%, var(--envelope-dark) 100%);
+    border-radius:6px;
+    box-shadow:
+      inset 0 0 0 1px rgba(120,80,30,.35),
+      inset 0 -30px 60px rgba(100,60,10,.25),
+      inset 0 30px 80px rgba(255,235,190,.35);
+  }
+  /* paper grain */
+  .env-body::before{
+    content:"";position:absolute;inset:0;border-radius:6px;
+    background:
+      repeating-linear-gradient(45deg, rgba(120,80,30,.05) 0 2px, transparent 2px 6px),
+      radial-gradient(ellipse at 50% 60%, rgba(120,80,30,.18), transparent 70%);
+    mix-blend-mode:multiply;
+    pointer-events:none;
+  }
+  /* back flap (the triangle that opens) */
+  .body-flap{
+    position:absolute;left:0;right:0;top:0;
+    height:62%;
+    transform-origin: 50% 0%;
+    transform: rotateX(0deg);
+    transition: transform 1.1s cubic-bezier(.7,.02,.3,1);
+    z-index:5;
+    pointer-events:none;
+  }
+  .body-flap svg{display:block;width:100%;height:100%}
+  /* front lower flap (V shape pocket) sits above letter */
+  .front-pocket{
+    position:absolute;left:0;right:0;bottom:0;height:64%;
+    z-index:7;
+    pointer-events:none;
+  }
+  .front-pocket svg{display:block;width:100%;height:100%}
+
+  /* WAX SEAL */
+  .seal{
+    position:absolute;left:50%;top:62%;
+    width: clamp(80px, 14%, 110px); aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    z-index:6;
+    transition:transform .55s cubic-bezier(.5,-.4,.4,1.4), opacity .5s ease .15s;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,.45));
+  }
+  .envelope-wrap.open .seal{
+    transform: translate(-50%,40vh) rotate(38deg) scale(.6);
+    opacity:0;
+  }
+  .seal svg{width:100%;height:100%;display:block}
+
+  /* sound toggle, fixed top-right, mobile + desktop */
+  .sound-toggle{
+    position:fixed;
+    top: max(16px, env(safe-area-inset-top, 0px) + 14px);
+    right: max(16px, env(safe-area-inset-right, 0px) + 14px);
+    width:44px;height:44px;
+    will-change: transform;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #f4e1b0, #b8945a 70%, #6e4a14);
+    border: 1.5px solid #c9a14a;
+    color: #2a1c08;
+    cursor:pointer;
+    z-index:9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,235,190,.45);
+    transition: transform .15s ease, box-shadow .15s ease, opacity .3s ease;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    animation: soundIn .6s ease .8s forwards;
+  }
+  @keyframes soundIn{ from{opacity:0; transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  .sound-toggle:hover{ transform: translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,235,190,.5) }
+  .sound-toggle:active{ transform: translateY(1px) }
+  .sound-toggle svg{ width:22px; height:22px; display:block }
+  .sound-toggle .wave-on,
+  .sound-toggle .wave-off{ transition: opacity .15s ease }
+  .sound-toggle.muted .wave-on{ opacity:0 }
+  .sound-toggle:not(.muted) .wave-off{ opacity:0 }
+
+  /* reopen button shown after letter closed */
+  .reopen{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    color:#e7cf9a;font-family:'Cinzel',serif;letter-spacing:.3em;font-size:11px;
+    text-transform:uppercase;opacity:0;
+    background:rgba(20,12,4,.7);border:1px solid #c9a14a;
+    padding:8px 14px;border-radius:3px;cursor:pointer;
+    transition:opacity .4s ease;z-index:30;
+  }
+  .reopen.show{opacity:.9}
+
+  /* ===== LETTER ===== */
+  .letter{
+    position:fixed;left:50%;top:50%;
+    width:min(640px, 94vw);
+    transform: translate(-50%, -42%) scale(.18);
+    transform-origin:center;
+    opacity:0;
+    z-index:4;
+    pointer-events:none;
+    transition: transform 1.3s cubic-bezier(.2,.6,.2,1), opacity .8s ease;
+  }
+  .letter.show{
+    opacity:1;
+    transform: translate(-50%, -50%) scale(1);
+    z-index:25;
+    pointer-events:auto;
+  }
+  .parchment{
+    position:relative;
+    padding: clamp(28px, 6vw, 56px) clamp(24px, 6vw, 56px) clamp(38px, 7vw, 70px);
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.35), transparent 55%),
+      radial-gradient(ellipse at 80% 95%, rgba(120,70,20,.22), transparent 60%),
+      linear-gradient(180deg, var(--parchment-1) 0%, var(--parchment-2) 60%, var(--parchment-3) 100%);
+    color:var(--ink);
+    border-radius:4px;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,.55),
+      0 0 0 1px rgba(80,50,15,.35) inset,
+      0 0 80px rgba(120,70,20,.35) inset;
+    max-height: min(88vh, 88dvh);
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
+  }
+  /* deckled, torn edges via mask */
+  .parchment::before{
+    content:"";position:absolute;inset:0;border-radius:4px;pointer-events:none;
+    background:
+      repeating-linear-gradient(60deg, rgba(100,60,20,.04) 0 2px, transparent 2px 7px),
+      repeating-linear-gradient(-60deg, rgba(100,60,20,.04) 0 2px, transparent 2px 7px);
+    mix-blend-mode:multiply;
+  }
+  .parchment::after{
+    content:"";position:absolute;inset:0;border-radius:4px;pointer-events:none;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(90,50,10,.25), transparent 10%),
+      radial-gradient(circle at 88% 30%, rgba(90,50,10,.22), transparent 9%),
+      radial-gradient(circle at 30% 85%, rgba(90,50,10,.2), transparent 11%),
+      radial-gradient(circle at 75% 70%, rgba(90,50,10,.18), transparent 8%);
+    mix-blend-mode:multiply;
+    opacity:.55;
+  }
+
+  .crest{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    margin-bottom: clamp(14px, 3vw, 22px);
+  }
+  .crest svg{width: clamp(72px, 12vw, 110px); height:auto; display:block}
+  .crest .school{
+    font-family:'Cinzel', serif;font-weight:900;
+    font-size: clamp(18px, 3.4vw, 26px);
+    letter-spacing:.18em;
+    color:#2a1c08;
+    text-align:center;
+  }
+  .crest .motto{
+    font-style:italic;font-size: clamp(11px, 2vw, 13px);
+    color:var(--ink-soft);letter-spacing:.1em;
+  }
+  .head-meta{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    font-size: clamp(11px, 1.8vw, 13px);
+    color:var(--ink-soft);
+    border-top:1px solid rgba(80,50,15,.3);
+    border-bottom:1px solid rgba(80,50,15,.3);
+    padding:8px 4px;margin-bottom: clamp(14px, 3vw, 22px);
+    font-family:'Cinzel', serif;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .head-meta b{font-weight:700;color:#3a2710}
+
+  .salutation{
+    font-family:'Tangerine', cursive;
+    font-size: clamp(34px, 6.5vw, 56px);
+    line-height:1.05;
+    color:#2a1c08;
+    margin-bottom: clamp(10px, 2vw, 16px);
+  }
+  .salutation .name{
+    text-decoration: underline wavy rgba(80,40,10,.5);
+    text-underline-offset:8px;
+  }
+  .body-text{
+    font-size: clamp(15px, 2.4vw, 18px);
+    line-height:1.65;
+    color:#2a1c08;
+  }
+  .body-text p{margin-bottom: clamp(10px, 2vw, 14px)}
+  .body-text em{color:#5a3a18}
+
+  .details{
+    margin: clamp(14px, 3vw, 22px) 0;
+    padding: clamp(12px, 2.5vw, 18px) clamp(14px, 3vw, 20px);
+    border: 1.5px double rgba(80,50,15,.5);
+    border-radius:3px;
+    background: linear-gradient(180deg, rgba(255,245,210,.4), rgba(180,140,80,.12));
+  }
+  .details h3{
+    font-family:'Cinzel', serif;font-weight:700;
+    font-size: clamp(13px, 2.3vw, 16px);
+    letter-spacing:.22em;text-transform:uppercase;text-align:center;
+    color:#3a2710;margin-bottom:10px;
+  }
+  .schedule{display:flex;flex-direction:column;gap:8px}
+  .row{
+    display:grid;grid-template-columns: auto 1fr;gap:14px;align-items:baseline;
+    font-size: clamp(14px, 2.3vw, 17px);
+  }
+  .row .when{
+    font-family:'Cinzel', serif;font-weight:700;color:#5a0e10;
+    white-space:nowrap;
+  }
+  .row .what{color:#2a1c08;font-style:italic}
+
+  .sig{
+    display:flex;flex-direction:column;align-items:flex-end;
+    margin-top: clamp(18px, 4vw, 28px);
+    gap:2px;
+  }
+  .sig .name-sig{
+    font-family:'Tangerine', cursive;
+    font-size: clamp(28px, 5vw, 42px);
+    color:#2a1c08;line-height:1;
+  }
+  .sig .title{
+    font-style:italic;font-size: clamp(12px, 2vw, 14px);
+    color:var(--ink-soft);
+  }
+
+  .actions{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+    margin-top: clamp(18px, 3vw, 24px);
+  }
+  .btn{
+    appearance:none;border:1.5px solid rgba(80,50,15,.55);
+    background: linear-gradient(180deg, #f4e1b0, #d9b878);
+    color:#2a1c08;font-family:'Cinzel', serif;letter-spacing:.18em;
+    text-transform:uppercase;font-size:12px;font-weight:700;
+    padding:10px 18px;border-radius:3px;cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
+    box-shadow:0 4px 0 rgba(80,50,15,.3), 0 6px 14px rgba(0,0,0,.25);
+  }
+  .btn:hover{transform:translateY(-1px); background: linear-gradient(180deg, #f8e7b8, #e1c084)}
+  .btn:active{transform:translateY(1px); box-shadow:0 2px 0 rgba(80,50,15,.3)}
+
+  @media (max-width: 480px){
+    .parchment{max-height:90vh}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; transition-duration:.15s !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="motes" aria-hidden="true" id="motes"></div>
+
+<audio id="bgm" src="/audio/hogwarts.mp3" loop preload="auto" autoplay muted playsinline></audio>
+<button class="sound-toggle muted" id="soundToggle" type="button" aria-label="Geluid aan/uit" aria-pressed="false">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <!-- speaker base (always shown) -->
+    <path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/>
+    <!-- waves (when unmuted) -->
+    <g class="wave-on" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M16 9 Q18.2 12 16 15"/>
+      <path d="M18.5 7 Q22 12 18.5 17"/>
+    </g>
+    <!-- cross (when muted) -->
+    <g class="wave-off" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <line x1="16.5" y1="9" x2="21.5" y2="15"/>
+      <line x1="21.5" y1="9" x2="16.5" y2="15"/>
+    </g>
+  </svg>
+</button>
+
+<!-- Magic wand: draws sparkles, flicks, conjures the envelope -->
+<div class="wand" id="wand" aria-hidden="true">
+  <svg viewBox="0 0 200 60">
+    <defs>
+      <linearGradient id="wandG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#8a5a2b"/>
+        <stop offset=".5" stop-color="#5a3414"/>
+        <stop offset="1" stop-color="#2e1a08"/>
+      </linearGradient>
+      <radialGradient id="tipG" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#fffbe0"/>
+        <stop offset=".4" stop-color="#ffd45a" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#ff9a30" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <!-- tip glow (left end) -->
+    <circle class="tip-glow" cx="8" cy="30" r="14" fill="url(#tipG)"/>
+    <!-- shaft, tapered -->
+    <path d="M8 29 L150 25 L150 35 L8 31 Z" fill="url(#wandG)" stroke="#1d1005" stroke-width=".6"/>
+    <!-- carved knots -->
+    <circle cx="60" cy="30" r="2.2" fill="#3e2410"/>
+    <circle cx="104" cy="30" r="1.8" fill="#3e2410"/>
+    <path d="M20 29.5 L146 26.5" stroke="#b27c43" stroke-width=".8" opacity=".6"/>
+    <!-- handle with gold bands -->
+    <path d="M150 23 Q170 21 190 24 Q197 30 190 36 Q170 39 150 37 Z" fill="#4a2a10" stroke="#1d1005" stroke-width=".6"/>
+    <rect x="150" y="23" width="4" height="14" fill="#c9a14a"/>
+    <rect x="172" y="22.5" width="3" height="15" fill="#c9a14a"/>
+    <circle cx="192" cy="30" r="4" fill="#c9a14a" stroke="#6e4a14" stroke-width=".6"/>
+  </svg>
+</div>
+
+<main class="stage">
+ <div class="delivery" id="delivery">
+
+  <div class="envelope-wrap" id="env" aria-label="Uitnodiging">
+    <div class="env-body"></div>
+
+    <!-- back flap (opens up & back) -->
+    <div class="body-flap" aria-hidden="true">
+      <svg viewBox="0 0 100 62" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="flapG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d9bf8a"/>
+            <stop offset="1" stop-color="#b8945a"/>
+          </linearGradient>
+        </defs>
+        <polygon points="0,0 100,0 50,62" fill="url(#flapG)" stroke="rgba(80,50,15,.4)" stroke-width=".4"/>
+      </svg>
+    </div>
+
+    <!-- front pocket (the V at the bottom in front of letter) -->
+    <div class="front-pocket" aria-hidden="true">
+      <svg viewBox="0 0 100 64" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="pocketG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#cda771"/>
+            <stop offset="1" stop-color="#a17b40"/>
+          </linearGradient>
+        </defs>
+        <polygon points="0,64 100,64 100,0 50,46 0,0" fill="url(#pocketG)" stroke="rgba(80,50,15,.4)" stroke-width=".4"/>
+      </svg>
+    </div>
+
+    <!-- wax seal -->
+    <div class="seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="waxG" cx="40%" cy="35%" r="65%">
+            <stop offset="0" stop-color="#c0151f"/>
+            <stop offset="50%" stop-color="#7a0e16"/>
+            <stop offset="100%" stop-color="#3e060c"/>
+          </radialGradient>
+        </defs>
+        <!-- drips -->
+        <path d="M14,52 q-4,10 2,18 q6,-6 6,-14 z" fill="#5a0810" opacity=".9"/>
+        <path d="M86,54 q4,10 -2,18 q-6,-6 -6,-14 z" fill="#5a0810" opacity=".9"/>
+        <path d="M50,90 q-6,-2 -10,4 q8,4 12,-2 z" fill="#5a0810" opacity=".8"/>
+        <!-- main blob -->
+        <circle cx="50" cy="50" r="38" fill="url(#waxG)"/>
+        <!-- crinkled edge -->
+        <circle cx="50" cy="50" r="38" fill="none" stroke="#2a0408" stroke-width="1" stroke-dasharray="3 2" opacity=".55"/>
+        <!-- monogram H -->
+        <g fill="#f4d27a" opacity=".92" font-family="Cinzel, serif" font-weight="900">
+          <text x="50" y="62" text-anchor="middle" font-size="38" letter-spacing="0">G</text>
+        </g>
+        <!-- shine -->
+        <ellipse cx="38" cy="36" rx="10" ry="5" fill="rgba(255,200,160,.35)"/>
+      </svg>
+    </div>
+  </div>
+ </div><!-- /.delivery -->
+
+  <!-- LETTER (revealed after open) -->
+  <article class="letter" id="letter" aria-hidden="true">
+    <div class="parchment">
+      <div class="crest">
+        <!-- Griffoendor crest -->
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="shieldG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#a3141f"/>
+              <stop offset="1" stop-color="#5e0a12"/>
+            </linearGradient>
+          </defs>
+          <path d="M60 8 L106 22 V58 C106 86 86 104 60 114 C34 104 14 86 14 58 V22 Z"
+            fill="url(#shieldG)" stroke="#d9ac3c" stroke-width="3"/>
+          <path d="M60 15 L100 27 V58 C100 82 83 98 60 107 C37 98 20 82 20 58 V27 Z"
+            fill="none" stroke="#e8c15a" stroke-width="1" opacity=".7"/>
+          <!-- gold lion, simplified rampant silhouette -->
+          <g fill="#e8c15a" stroke="#6e4a14" stroke-width=".6" stroke-linejoin="round">
+            <path d="M44 84 L50 66 L46 58 L52 50 L50 40 L58 34 L66 36 L72 30 L76 36 L72 42 L78 48 L74 56 L80 62 L74 66 L70 74 L76 84 L70 86 L64 76 L58 78 L52 86 Z"/>
+            <path d="M80 62 Q92 56 90 70 Q86 66 80 68 Z"/>
+            <path d="M52 50 Q40 44 42 56 Q46 54 52 56 Z"/>
+          </g>
+          <circle cx="68" cy="43" r="1.3" fill="#5e0a12"/>
+          <!-- banner -->
+          <path d="M16 96 Q60 110 104 96 L98 108 Q60 120 22 108 Z" fill="#e8c15a" stroke="#6e4a14" stroke-width="1"/>
+          <text x="60" y="108" text-anchor="middle" font-family="Cinzel, serif" font-weight="700" font-size="7" fill="#4a0a10" letter-spacing=".8">GRIFFOENDOR</text>
+        </svg>
+        <div class="school">Zweinstein<br><span style="font-size:.7em;letter-spacing:.3em">Huis Griffoendor</span></div>
+        <div class="motto">Moed, durf en ridderlijkheid</div>
+      </div>
+
+      <div class="head-meta">
+        <span><b>Schoolhoofd</b> · Albus Perkamentus</span>
+        <span><b>Huis</b> · Griffoendor</span>
+      </div>
+
+      <div class="salutation">
+        Beste <span class="name" id="letterName">Toekomstige Tovenaar</span>,
+      </div>
+
+      <div class="body-text">
+        <p>Met genoegen laten wij u weten dat u een plaats heeft op het <em>Tovenaarsverjaardagsfeest</em> van Huis Griffoendor. Hierbij ontvangt u de officiële uitnodiging, bezegeld met het zegel van het kasteel.</p>
+
+        <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten.</p>
+
+        <p><strong>Let wel:</strong> dit is een <em>verkleedfeest</em>. Wij verwachten alle gasten in <em>Harry Potter-stijl</em>: tovenaarsgewaad, een Griffoendor-das, een bril met litteken, of een ander wezen uit de tovenaarswereld is bijzonder welkom. Vergeet uw toverstok niet.</p>
+
+        <div class="details">
+          <h3>· Het Programma ·</h3>
+          <div class="schedule">
+            <div class="row">
+              <div class="when">12 December</div>
+              <div class="what">Datum van het feest (op een dag dat de sterren goed staan)</div>
+            </div>
+            <div class="row">
+              <div class="when">12:00, 16:00</div>
+              <div class="what">Het Grote Griffoendor-feest, voor heksen &amp; tovenaars van alle leeftijden</div>
+            </div>
+          </div>
+        </div>
+
+        <p>Wij verwachten uw uil, of een eenvoudig Dreuzelbericht, uiterlijk drie dagen voor het feest, opdat de Grote Zaal kan worden ingericht.</p>
+
+        <p style="margin-top:14px"><em>Hoogachtend,</em></p>
+      </div>
+
+      <div class="sig">
+        <div class="name-sig">Minerva Anderling</div>
+        <div class="title">Adjunct-Schoolhoofd, namens het Comité van Festiviteiten</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="closeBtn" type="button">Sluit de brief</button>
+        <button class="btn" id="shareBtn" type="button">Kopieer de uitnodiging</button>
+      </div>
+    </div>
+  </article>
+</main>
+
+<button class="reopen" id="reopenBtn" type="button">Open de brief opnieuw</button>
+
+<script>
+  // get name from URL: ?naam=Liam (also accepts ?name=)
+  const params = new URLSearchParams(location.search);
+  const raw = (params.get('naam') || params.get('name') || '').trim();
+  const titleCase = s => s.replace(/\b([a-zà-ÿ])([a-zà-ÿ'’-]*)/gi, (_,a,b)=>a.toUpperCase()+b.toLowerCase());
+  const safe = s => s.replace(/[<>]/g,'');
+  const naam = raw ? titleCase(safe(raw)).slice(0,60) : 'Toekomstige Tovenaar';
+  document.getElementById('letterName').textContent = naam;
+  document.title = naam === 'Toekomstige Tovenaar'
+    ? 'Griffoendor Uitnodiging'
+    : `Griffoendor Uitnodiging · ${naam}`;
+
+
+  // floating motes
+  const motes = document.getElementById('motes');
+  for(let i=0;i<28;i++){
+    const m = document.createElement('div');
+    m.className = 'mote';
+    m.style.left = Math.random()*100 + 'vw';
+    m.style.setProperty('--dx', (Math.random()*120-60)+'px');
+    m.style.animationDelay = (Math.random()*14)+'s';
+    m.style.animationDuration = (10 + Math.random()*10)+'s';
+    motes.appendChild(m);
+  }
+
+  // auto-sequence: wand sweeps in and draws sparkles -> flick conjures the
+  // envelope -> seal cracks -> letter opens
+  const env = document.getElementById('env');
+  const letter = document.getElementById('letter');
+  const delivery = document.getElementById('delivery');
+  const wand = document.getElementById('wand');
+  const reopenBtn = document.getElementById('reopenBtn');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Timeline (ms from page load):
+  //   200     wand flies in (3600ms animation), sparkle trail follows the tip
+  //   ~2500   the flick: sparkle burst, envelope materialises (1500ms)
+  //   4000    envelope lands -> settle bounce
+  //   4300    seal cracks, flap lifts
+  //   5400    letter materialises & scales to center
+  //   6100    envelope fades to background
+
+  function spawnSpark(x, y, big){
+    const s = document.createElement('div');
+    s.className = 'spark' + (Math.random() < .3 ? ' red' : '');
+    const size = (big ? 6 : 3) + Math.random() * (big ? 9 : 5);
+    s.style.setProperty('--s', size + 'px');
+    s.style.setProperty('--d', (600 + Math.random() * 700) + 'ms');
+    const spread = big ? 160 : 36;
+    s.style.setProperty('--tx', (Math.random() * spread * 2 - spread) + 'px');
+    s.style.setProperty('--ty', (big ? Math.random() * 200 - 90 : 20 + Math.random() * 50) + 'px');
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1400);
+  }
+
+  // sparkle trail: follow the wand tip while the wand is on screen
+  function trail(){
+    const r = wand.getBoundingClientRect();
+    // tip is at the left end, vertically centered, after rotation use the
+    // left-middle of the unrotated box mapped through the wand's transform
+    const cs = getComputedStyle(wand);
+    if(parseFloat(cs.opacity) > .05){
+      const m = new DOMMatrix(cs.transform);
+      const w = wand.offsetWidth, h = wand.offsetHeight;
+      // transform-origin is 92% 92%; tip local point is (4% w, 50% h)
+      const ox = w * .92, oy = h * .92;
+      const px = w * .04 - ox, py = h * .5 - oy;
+      const x = m.a * px + m.c * py + m.e + ox;
+      const y = m.b * px + m.d * py + m.f + oy;
+      spawnSpark(x, y, false);
+      spawnSpark(x, y, false);
+    }
+    if(performance.now() < trailEnd) requestAnimationFrame(trail);
+  }
+  let trailEnd = 0;
+
+  function runSequence(){
+    if(reduceMotion){
+      delivery.style.opacity = 1;
+      delivery.style.filter = 'none';
+      delivery.style.transform = 'none';
+      wand.style.display = 'none';
+    } else {
+      trailEnd = performance.now() + 3900;
+      setTimeout(() => requestAnimationFrame(trail), 200);
+      // the flick: burst of sparks where the envelope appears
+      setTimeout(() => {
+        const r = env.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        for(let i = 0; i < 46; i++) setTimeout(() => spawnSpark(cx + (Math.random()-.5) * r.width * .8, cy + (Math.random()-.5) * r.height * .6, true), i * 18);
+      }, 2450);
+    }
+    setTimeout(()=>{ delivery.classList.add('landed'); }, 4000);
+    setTimeout(()=>{ env.classList.add('open'); }, 4300);
+    setTimeout(()=>{
+      letter.classList.add('show');
+      letter.setAttribute('aria-hidden','false');
+    }, 5400);
+    setTimeout(()=>{ env.classList.add('gone'); }, 6100);
+  }
+  runSequence();
+
+  function closeLetter(){
+    letter.classList.remove('show');
+    letter.setAttribute('aria-hidden','true');
+    reopenBtn.classList.add('show');
+  }
+  function reopen(){
+    reopenBtn.classList.remove('show');
+    letter.classList.add('show');
+    letter.setAttribute('aria-hidden','false');
+  }
+
+  document.getElementById('closeBtn').addEventListener('click', closeLetter);
+  reopenBtn.addEventListener('click', reopen);
+
+  // Background music: starts muted so the browser allows autoplay,
+  // tap the speaker icon to unmute. Browsers block sound until a user
+  // gesture, that's why this can't just play out loud on load.
+  const bgm = document.getElementById('bgm');
+  const soundToggle = document.getElementById('soundToggle');
+  const TARGET_VOL = 0.55;
+
+  bgm.volume = TARGET_VOL; // pre-set; muted attribute keeps it silent
+  // kick the muted autoplay (Safari sometimes ignores the attribute)
+  bgm.play().catch(()=>{});
+
+  const clamp01 = v => v < 0 ? 0 : (v > 1 ? 1 : v);
+  function fadeVolume(to, ms){
+    const target = clamp01(to);
+    const start  = clamp01(bgm.volume);
+    const t0 = performance.now();
+    cancelAnimationFrame(bgm._raf);
+    const step = (t) => {
+      const k = Math.min(1, Math.max(0, (t - t0) / ms));
+      bgm.volume = clamp01(start + (target - start) * k);
+      if(k < 1) bgm._raf = requestAnimationFrame(step);
+    };
+    bgm._raf = requestAnimationFrame(step);
+  }
+
+  function setMuted(muted){
+    if(muted){
+      fadeVolume(0, 250);
+      setTimeout(()=>{ bgm.muted = true; bgm.volume = TARGET_VOL; }, 260);
+      soundToggle.classList.add('muted');
+      soundToggle.setAttribute('aria-pressed', 'false');
+    } else {
+      bgm.muted = false;
+      bgm.volume = 0;
+      const playPromise = bgm.play();
+      fadeVolume(TARGET_VOL, 400);
+      soundToggle.classList.remove('muted');
+      soundToggle.setAttribute('aria-pressed', 'true');
+      if(playPromise && playPromise.catch){
+        playPromise.catch(err => {
+          console.warn('bgm play() rejected:', err);
+          flash('Geluid geblokkeerd, tik nogmaals');
+        });
+      }
+    }
+  }
+
+  soundToggle.addEventListener('click', () => setMuted(!bgm.muted ? true : false));
+  document.getElementById('shareBtn').addEventListener('click', async ()=>{
+    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Griffoendor-verjaardagsfeest op 12 december, van 12:00 tot 16:00!\n\nLet op: verkleedfeest, kom in Harry Potter-stijl!\n\n${location.href}`;
+    try{
+      if(navigator.share){ await navigator.share({title:'Griffoendor Uitnodiging', text}); }
+      else { await navigator.clipboard.writeText(text); flash('Uitnodiging gekopieerd!'); }
+    }catch(e){}
+  });
+
+  function flash(msg){
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style,{
+      position:'fixed',left:'50%',bottom:'24px',transform:'translateX(-50%)',
+      background:'rgba(30,15,5,.92)',color:'#f4e1b0',padding:'10px 16px',
+      borderRadius:'4px',fontFamily:"'Cinzel', serif",letterSpacing:'.15em',
+      fontSize:'12px',textTransform:'uppercase',border:'1px solid #c9a14a',zIndex:50
+    });
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 2200);
+  }
+
+  // tap hint
+  const hint = document.createElement('div');
+  hint.className = 'hint';
+  hint.textContent = 'Tik om te openen';
+  env.appendChild(hint);
+</script>
+</body>
+</html>
