@@ -11,7 +11,7 @@
 <meta name="GPTBot" content="noindex,nofollow">
 <meta name="ClaudeBot" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<title>Griffoendor Uitnodiging</title>
+<title>Fae's Verjaardag, Griffoendor Uitnodiging</title>
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -547,7 +547,7 @@
           <text x="60" y="108" text-anchor="middle" font-family="Cinzel, serif" font-weight="700" font-size="7" fill="#4a0a10" letter-spacing=".8">GRIFFOENDOR</text>
         </svg>
         <div class="school">Zweinstein<br><span style="font-size:.7em;letter-spacing:.3em">Huis Griffoendor</span></div>
-        <div class="motto">Moed, durf en ridderlijkheid</div>
+        <div class="motto">Verjaardagsfeest van Fae</div>
       </div>
 
       <div class="head-meta">
@@ -560,7 +560,7 @@
       </div>
 
       <div class="body-text">
-        <p>Met genoegen laten wij u weten dat u een plaats heeft op het <em>Tovenaarsverjaardagsfeest</em> van Huis Griffoendor. Hierbij ontvangt u de officiële uitnodiging, bezegeld met het zegel van het kasteel.</p>
+        <p>Met genoegen laten wij u weten dat u een plaats heeft op het <em>Tovenaarsverjaardagsfeest van Fae</em>, in Huis Griffoendor. Fae wordt een jaartje ouder, en dat vieren wij graag met u. Hierbij ontvangt u de officiële uitnodiging, bezegeld met het zegel van het kasteel.</p>
 
         <p>De Sorteerhoed heeft uw aanwezigheid voorspeld, en de keukenelfen zijn reeds begonnen aan voorbereidingen die met geen Vergrootspreuk zijn te bevatten.</p>
 
@@ -574,13 +574,13 @@
               <div class="what">Datum van het feest (op een dag dat de sterren goed staan)</div>
             </div>
             <div class="row">
-              <div class="when">12:00, 16:00</div>
-              <div class="what">Het Grote Griffoendor-feest, voor heksen &amp; tovenaars van alle leeftijden</div>
+              <div class="when">12:00 tot 16:00</div>
+              <div class="what">Het Grote Griffoendor-feest van Fae, voor heksen &amp; tovenaars van alle leeftijden. <strong>Om 16:00 uur precies sluit de Grote Zaal.</strong></div>
             </div>
           </div>
         </div>
 
-        <p>Wij verwachten uw uil, of een eenvoudig Dreuzelbericht, uiterlijk drie dagen voor het feest, opdat de Grote Zaal kan worden ingericht.</p>
+        <p>Wij verwachten uw uil, of een eenvoudig Dreuzelbericht, uiterlijk drie dagen voor het feest, opdat de Grote Zaal kan worden ingericht. Houd er rekening mee dat het feest eindigt om <strong>16:00 uur</strong>.</p>
 
         <p style="margin-top:14px"><em>Hoogachtend,</em></p>
       </div>
@@ -609,8 +609,8 @@
   const naam = raw ? titleCase(safe(raw)).slice(0,60) : 'Toekomstige Tovenaar';
   document.getElementById('letterName').textContent = naam;
   document.title = naam === 'Toekomstige Tovenaar'
-    ? 'Griffoendor Uitnodiging'
-    : `Griffoendor Uitnodiging · ${naam}`;
+    ? 'Fae\'s Verjaardag, Griffoendor Uitnodiging'
+    : `Fae\'s Verjaardag · ${naam}`;
 
 
   // floating motes
@@ -767,9 +767,9 @@
 
   soundToggle.addEventListener('click', () => setMuted(!bgm.muted ? true : false));
   document.getElementById('shareBtn').addEventListener('click', async ()=>{
-    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Griffoendor-verjaardagsfeest op 12 december, van 12:00 tot 16:00!\n\nLet op: verkleedfeest, kom in Harry Potter-stijl!\n\n${location.href}`;
+    const text = `Beste ${naam},\n\nJe bent uitgenodigd op het Griffoendor-verjaardagsfeest van Fae op 12 december, van 12:00 tot 16:00 (het feest eindigt om 16:00 uur)!\n\nLet op: verkleedfeest, kom in Harry Potter-stijl!\n\n${location.href}`;
     try{
-      if(navigator.share){ await navigator.share({title:'Griffoendor Uitnodiging', text}); }
+      if(navigator.share){ await navigator.share({title:'Fae\'s Verjaardag, Griffoendor Uitnodiging', text}); }
       else { await navigator.clipboard.writeText(text); flash('Uitnodiging gekopieerd!'); }
     }catch(e){}
   });
