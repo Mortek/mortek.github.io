@@ -26,7 +26,7 @@
 <link rel="preload" href="fonts/space-grotesk-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{--bg:#141416;--surface:#1E1E22;--border:#2A2A30;--text:#e0e0e0;--text-muted:#888890;--accent:#F7931A;--accent-hover:#FFD700;--apps-color:#D97706;--books-color:#F7931A;--music-color:#F59E0B;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-heading:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}a{color:inherit;text-decoration:none}.skip-link{position:absolute;top:-100%}header{width:100%;padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:24px;background:rgba(20,20,22,.85);position:sticky;top:0;z-index:100}header .logo{font-family:var(--font-heading);font-size:1.1em;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}header nav a{font-size:.9em;color:var(--text-muted)}header nav a.active{color:var(--accent)}.vis-btn{margin-left:auto;background:linear-gradient(135deg,#6c3fc5,#4a90d9);color:#fff;font-family:var(--font-heading);font-size:.8em;font-weight:600;padding:7px 16px;border-radius:8px;white-space:nowrap}.fade-in{opacity:0}h1,h2,h3{font-family:var(--font-heading)}h1{font-size:2em;font-weight:700;color:#fff;margin-bottom:12px}h1 span{color:var(--accent)}footer{width:100%;padding:28px 32px 24px;border-top:1px solid var(--border);text-align:center}</style>
-<link rel="stylesheet" href="style.min.css?v=82">
+<link rel="stylesheet" href="style.min.css?v=84">
 <noscript><style>.fade-in{opacity:1!important;transform:none!important;transition:none!important}</style></noscript>
 <title>Blog | Personal Development Articles by Maurice Moret</title>
 </head>
@@ -54,6 +54,7 @@
     <button class="type-btn active" data-type="all">All</button>
     <button class="type-btn type-btn--book" data-type="books">Books</button>
     <button class="type-btn type-btn--game" data-type="games">Games</button>
+    <button class="type-btn type-btn--pack" data-type="icon-packs">Icon Packs</button>
   </div>
 
   <div class="blog-filters">
@@ -69,78 +70,77 @@
     <button class="filter-btn" data-filter="Strategy">Strategy</button>
     <button class="filter-btn" data-filter="Tips">Tips</button>
     <button class="filter-btn" data-filter="Genre">Genre</button>
-    <button class="filter-btn" data-filter="Story">Story</button>
   </div>
 
   <div class="article-grid">
     <!-- GAME-POSTS -->
-    <a href="blog/woolly-knitted-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/woolly-knitted-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Ten Yarns and a Felt Tile: How Woolly Got Its Stitches</h3>
       <p>The story behind Woolly, our knitted wool icon pack for Android: ten yarn colours, felt tiles with stitched borders and almost 3,000 icons.</p>
     </a>
-    <a href="blog/gilded-enamel-gold-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/gilded-enamel-gold-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Enamel, Gold Wire and Ten Gemstones: Inside the Gilded Icon Pack</h3>
       <p>How we made Gilded, an Android icon pack of glossy enamel set in raised gold wire, with ten gemstone colours and almost 3,000 icons.</p>
     </a>
-    <a href="blog/gummy-candy-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/gummy-candy-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Light Through Jelly: Making Gummy Icons Glow Like Candy</h3>
       <p>The thinking behind Gummy, an Android icon pack of see-through jelly candy icons in ten flavours, with almost 3,000 icons.</p>
     </a>
-    <a href="blog/balloon-foil-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/balloon-foil-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Crimped Seams and Rainbow Film: Drawing Foil Balloons for Your Phone</h3>
       <p>Why we made Balloon, an Android icon pack of puffy mirror foil balloon icons with ten foil shades and almost 3,000 icons.</p>
     </a>
-    <a href="blog/clay-plasticine-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/clay-plasticine-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Fingerprints on a Home Screen: The Thinking Behind Clay</h3>
       <p>The story of Clay, an Android icon pack in soft matte plasticine with finger dents, ten modelling colours and almost 3,000 icons.</p>
     </a>
-    <a href="blog/neon-glass-tube-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/neon-glass-tube-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>A Shop Sign at 2 a.m.: Building the Neon Icon Pack</h3>
       <p>How we built Neon, an Android icon pack of glowing glass tube icons on brick walls, with ten tube colours and almost 3,000 icons.</p>
     </a>
-    <a href="blog/stitched-leather-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/stitched-leather-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Saddle Stitches on Glass: Why Stitched Leather Icons Exist</h3>
       <p>The story of Stitched Leather, an Android icon pack of leather cut-outs sewn with thread, in ten hide colours with almost 3,000 icons.</p>
     </a>
-    <a href="blog/watercolour-washes-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/watercolour-washes-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Wet Edges on a Digital Page: Painting the Watercolour Washes Pack</h3>
       <p>How we made Watercolour Washes, an Android icon pack of painted icons on cold-press paper, in ten paints with almost 3,000 icons.</p>
     </a>
-    <a href="blog/frosted-crystal-glass-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/frosted-crystal-glass-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Light Behind Frosted Glass: How the Crystal Icons Glow</h3>
       <p>The story of Frosted Crystal, an Android icon pack of frosted glass crystal icons with ten glow colours and almost 3,000 icons.</p>
     </a>
-    <a href="blog/marquetry-wood-inlay-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/marquetry-wood-inlay-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Ten Timbers, One Lacquer: Inlaying Icons in Marquetry Wood</h3>
       <p>How we made Marquetry Wood, an Android icon pack of inlaid veneer icons in ten timbers with almost 3,000 icons.</p>
     </a>
-    <a href="blog/terrazzo-marble-chip-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/terrazzo-marble-chip-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Marble Chips and Brass Strips: A Terrazzo Floor for Your Apps</h3>
       <p>The story of Terrazzo, an Android icon pack of polished cement, marble chips and brass lines, with ten shades and almost 3,000 icons.</p>
     </a>
-    <a href="blog/chalk-on-slate-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/chalk-on-slate-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Smudges, Hatching and Dust: Teaching a Renderer to Draw in Chalk</h3>
       <p>How we made Chalk, an Android icon pack of chalk-on-slate drawings in ten board colours with almost 3,000 icons.</p>
     </a>
-    <a href="blog/papercut-shadowbox-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/papercut-shadowbox-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>Five Layers of Paper: Building Shadowbox Icons</h3>
       <p>The story of Papercut, an Android icon pack of layered craft paper shadowbox icons in ten paper schemes with almost 3,000 icons.</p>
     </a>
-    <a href="blog/ceramic-glazed-mosaic-icon-pack-story.html" class="article-card fade-in" data-type="games" data-game="icon-packs">
-      <span class="article-badge">Story</span><span class="article-type article-type--game">Game</span>
+    <a href="blog/ceramic-glazed-mosaic-icon-pack-story.html" class="article-card fade-in" data-type="icon-packs">
+      <span class="article-badge">Making of</span><span class="article-type article-type--pack">Icon Pack</span>
       <h3>A Wall Tiled Over Many Afternoons: The Ceramic Mosaic Pack</h3>
       <p>How we made Ceramic, an Android icon pack of glazed tile mosaic icons in ten glazes with almost 3,000 icons.</p>
     </a>
@@ -320,6 +320,6 @@
   <p>&copy; 2026 Mortek</p>
 </footer>
 
-<script src="site.min.js?v=2"></script>
+<script src="site.min.js?v=3"></script>
 </body>
 </html>

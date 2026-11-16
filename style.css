@@ -2127,3 +2127,6 @@ h1 span { color: var(--accent); }
 .teaser-row { margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .teaser-row .roblox-teaser { margin: 0; }
 @media (max-width: 640px) { .teaser-row { grid-template-columns: 1fr; } }
+
+.article-type--pack { color: #f7931a; border: 1px solid rgba(247, 147, 26, 0.35); background: rgba(247, 147, 26, 0.08); }
+.type-btn--pack.active { background: #f7931a; border-color: #f7931a; color: var(--bg); }

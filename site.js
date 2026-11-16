@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
       type = btn.dataset.type; apply();
     }));
-    const q = new URLSearchParams(location.search).get('type');
+    const q = new URLSearchParams(location.search).get('type') || location.hash.slice(1);
     const pre = q && document.querySelector('.type-btn[data-type="' + q + '"]');
     if (pre) pre.click();
   }
