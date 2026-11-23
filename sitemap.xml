@@ -79,7 +79,22 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/chrome-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/circuit-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/clay-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/critters-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
   </url>
@@ -95,6 +110,11 @@
   </url>
   <url>
     <loc>https://mortek.github.io/games.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/gems-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
   </url>
@@ -119,6 +139,16 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/japandi-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/kawaii-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/leather-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
@@ -140,6 +170,11 @@
   </url>
   <url>
     <loc>https://mortek.github.io/neon-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/origami-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
   </url>
@@ -174,6 +209,26 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/spellbook-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/stained-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/stickers-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/sushi-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/terrazzo-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
@@ -194,7 +249,17 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/voxel-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/watercolour-icon-pack.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/woodblock-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
   </url>
