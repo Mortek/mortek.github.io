@@ -7,7 +7,7 @@ from datetime import datetime
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 # Flip to True when Crystal Garden is live on Google Play (tools/crystal_garden_live.py does it).
-CG_LIVE = False
+CG_LIVE = True
 CG_PLAY = "https://play.google.com/store/apps/details?id=com.mortek.crystalgarden"
 GAMES = {
  "void-swarm": dict(name="Void Swarm: Idle Survivor", short="Void Swarm", url="https://play.google.com/store/apps/details?id=com.mortek.voidswarm", btn="Get it on Google Play", icon="apps/void swarm/app_icon.png", page="void-swarm.html", blurb="Pilot a lone drone against endless alien swarms. Upgrade your base while idle, with 20 weapons, 8 drones and 12 languages."),
