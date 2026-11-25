@@ -99,6 +99,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mortek.github.io/crystal-garden.html</loc>
+    <lastmod>2026-11-25</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mortek.github.io/frosted-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
@@ -706,6 +711,11 @@
   <url>
     <loc>https://mortek.github.io/blog/weapon-evolutions-guide.html</loc>
     <lastmod>2026-11-23</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://mortek.github.io/blog/what-is-crystal-garden-idle-merge.html</loc>
+    <lastmod>2026-11-25</lastmod>
     <priority>0.6</priority>
   </url>
   <url>

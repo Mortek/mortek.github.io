@@ -6,6 +6,9 @@ import json, glob, os, re, html
 from datetime import datetime
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
+# Flip to True when Crystal Garden is live on Google Play (tools/crystal_garden_live.py does it).
+CG_LIVE = False
+CG_PLAY = "https://play.google.com/store/apps/details?id=com.mortek.crystalgarden"
 GAMES = {
  "void-swarm": dict(name="Void Swarm: Idle Survivor", short="Void Swarm", url="https://play.google.com/store/apps/details?id=com.mortek.voidswarm", btn="Get it on Google Play", icon="apps/void swarm/app_icon.png", page="void-swarm.html", blurb="Pilot a lone drone against endless alien swarms. Upgrade your base while idle, with 20 weapons, 8 drones and 12 languages."),
  "crypto-mining-tycoon": dict(name="Crypto Mining: Idle Clicker", short="Crypto Mining", url="https://play.google.com/store/apps/details?id=com.mortek.cryptominingtycoon", btn="Get it on Google Play", icon="apps/crypto mining tycoon/app_icon.png", page="crypto-mining-tycoon.html", blurb="Tap to mine, buy upgrades, prestige for multipliers and build the ultimate crypto empire. An idle incremental game for Android."),
@@ -14,6 +17,7 @@ GAMES = {
  "shadowrealm": dict(name="Shadowrealm: Age of Darkness", short="Shadowrealm", url="https://www.playshadowrealm.com", btn="Play free at playshadowrealm.com", icon=None, page="shadowrealm.html", blurb="A dark fantasy RPG played entirely in your browser. Build your character, forge gear, battle rivals and conquer four cities."),
 }
 D = "https://mortek.github.io"
+GAMES["crystal-garden"] = dict(name="Crystal Garden: Idle Merge", short="Crystal Garden", url=CG_PLAY if CG_LIVE else D + "/crystal-garden.html", btn="Get it on Google Play" if CG_LIVE else "See the game page", icon="apps/crystal garden/app_icon.png", page="crystal-garden.html", blurb="Merge gems into crystals on 18 floating islands. A calm idle garden that pays offline." + ("" if CG_LIVE else " Coming soon to Google Play."))
 tpl = open("blog/whole.html", encoding="utf-8").read()
 head_tpl = tpl[:tpl.index('<script type="application/ld+json">')]
 footer = tpl[tpl.index("<footer>"):]
@@ -24,6 +28,7 @@ def banner_img(g, post):
 
 posts = []
 for jf in sorted(glob.glob("posts-src/*/*.json")):
+    if not os.path.exists(jf[:-5] + ".html"): continue  # icon-packs/posts.json belongs to build_icon_pack_posts.py
     p = json.load(open(jf, encoding="utf-8")); g = jf.split("/")[1]
     p["game"] = g; p["body"] = open(jf[:-5] + ".html", encoding="utf-8").read()
     posts.append(p)
