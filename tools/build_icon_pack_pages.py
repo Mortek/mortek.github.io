@@ -75,6 +75,11 @@ def build_images(pack, force):
                 im = Image.open(src).convert("RGB")
                 h = round(im.height * w / im.width)
                 im.resize((w, h), Image.LANCZOS).save(dst, "WEBP", quality=76, method=6)
+    feat = os.path.join(REPO, "out", "feature", pack, "en.png")  # current English feature graphic
+    if os.path.exists(feat):
+        dst = os.path.join(out, "banner.webp")
+        if stale(feat, dst, force):
+            Image.open(feat).convert("RGB").resize((1024, 500), Image.LANCZOS).save(dst, "WEBP", quality=80, method=6)
     wd = os.path.join(REPO, "out", "wallpapers", pack)
     os.makedirs(os.path.join(out, "wp"), exist_ok=True)
     for n in range(1, 13):
