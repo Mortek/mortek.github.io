@@ -5,7 +5,7 @@ Static personal site (GitHub Pages). Plain HTML/CSS/JS, no build step. Each `.ht
 ## Cache-busting on push (CSS/JS/HTML changes)
 
 Every push that touches CSS/JS/HTML must bump:
-- `sw.js` → `const CACHE = 'mortek-vN'` (currently v58)
+- `sw.js` → `const CACHE = 'mortek-vN'` (currently v156)
 - Any `?v=N` query strings on `<link>` / `<script>` tags
 - `music_visualizer.html` → `<h1>` version span (currently v3.7.19) when that file changes
 

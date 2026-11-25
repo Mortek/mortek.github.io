@@ -59,7 +59,7 @@ for p in posts:
     head = re.sub(r'(<meta (?:property="og:description"|name="twitter:description") content=")[^"]*"', lambda m: m.group(1) + esc(desc) + '"', head)
     head = head.replace("https://mortek.github.io/blog/whole.html", url).replace("https://mortek.github.io/og-books.png", og)
     head = head.replace('content="2026-04-09"', f'content="{p["date"]}"')
-    head = head.replace("style.min.css?v=72", "style.min.css?v=81")
+    head = head.replace("style.min.css?v=84", "style.min.css?v=84")
     ld = {"@context": "https://schema.org", "@type": "Article", "headline": title, "description": desc,
           "author": {"@type": "Person", "name": "Maurice Moret"},
           "publisher": {"@type": "Organization", "name": "Mortek", "logo": {"@type": "ImageObject", "url": f"{D}/icon-512.png"}},
