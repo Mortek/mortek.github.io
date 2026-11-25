@@ -16,11 +16,6 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://mortek.github.io/apps.html</loc>
-    <lastmod>2026-11-23</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://mortek.github.io/balloon-icon-pack.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
@@ -109,7 +104,7 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://mortek.github.io/games.html</loc>
+    <loc>https://mortek.github.io/games-and-apps.html</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.5</priority>
   </url>

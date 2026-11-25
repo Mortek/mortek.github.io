@@ -2,7 +2,7 @@ const CACHE = 'mortek-v155';
 const PRECACHE = [
   '/',
   '/index.html',
-  '/games.html',
+  '/games-and-apps.html',
   '/crypto-mining-tycoon.html',
   '/void-swarm.html',
   '/shadowrealm.html',
